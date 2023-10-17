@@ -1,0 +1,37 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "linux-base",
+			"hidden": true,
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/default",
+			"installDir": "${sourceDir}/out/install/default",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "linux-debug",
+			"displayName": "Linux x64 Debug",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/out/build/debug",
+			"installDir": "${sourceDir}/out/install/debug",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux x64 Release",
+			"inherits": "linux-base",
+			"binaryDir": "${sourceDir}/out/build/release",
+			"installDir": "${sourceDir}/out/install/release",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		}
+	]
+}
