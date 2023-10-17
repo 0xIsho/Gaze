@@ -1,5 +1,5 @@
 set(LIBS
-	# Client
+	Client
 	# Core
 	# Debug
 	Test
