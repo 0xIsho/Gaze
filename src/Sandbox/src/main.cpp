@@ -1,6 +1,20 @@
-#include <iostream>
+#include "Client/App.hpp"
 
-auto main() -> int
+class MyApp : public Gaze::Client::App
 {
-	std::cout << "Hello, World!\n";
+public:
+	MyApp(int argc, char** argv);
+
+private:
+};
+
+MyApp::MyApp(int argc, char** argv)
+	: App(argc, argv)
+{
+}
+
+auto main(int argc, char** argv) -> int
+{
+	auto app = MyApp(argc, argv);
+	return app.Run() == Gaze::Client::App::Status::Success ? 0 : 1;
 }

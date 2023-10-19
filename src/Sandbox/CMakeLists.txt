@@ -7,6 +7,11 @@ set(SOURCES
 add_executable(${TARGET} ${SOURCES})
 append_common_compiler_options(${TARGET})
 
+target_link_libraries(${TARGET}
+	PRIVATE
+		Gaze::Client
+)
+
 if (GAZE_BUILD_TESTS)
 	add_subdirectory("tests/")
 endif()
