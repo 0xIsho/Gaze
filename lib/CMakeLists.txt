@@ -1,7 +1,7 @@
 set(LIBS
 	Client
 	# Core
-	# Debug
+	Debug
 	Test
 )
 
