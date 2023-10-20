@@ -3,6 +3,7 @@ set(LIBS
 	# Core
 	Debug
 	Test
+	WM
 )
 
 foreach(LIB ${LIBS})
