@@ -35,8 +35,6 @@ namespace Gaze::Client {
 
 		const auto ret = OnShutdown();
 
-		m_IsRunning = false;
-
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running at this point.");
 		return ret;
 	}
