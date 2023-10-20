@@ -26,16 +26,16 @@ namespace Gaze::Client {
 		GAZE_ASSERT(m_IsRunning == true, "The application is not running upon reaching the main loop.");
 		while (m_IsRunning) {
 			OnUpdate();
-
-			static int shutdownCounter = 10; // Run # cycles then break out (we have no other way, for now).
-			if (--shutdownCounter <= 0) {
-				break;
-			}
 		}
 
 		const auto ret = OnShutdown();
 
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running at this point.");
 		return ret;
+	}
+
+	auto App::Quit() -> void
+	{
+		m_IsRunning = false;
 	}
 }

@@ -15,6 +15,7 @@ namespace Gaze::Client {
 		virtual ~App();
 
 		[[nodiscard]] auto Run() -> Status;
+		auto Quit() -> void;
 
 	private:
 		virtual auto OnInit() -> Status = 0;
