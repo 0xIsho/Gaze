@@ -23,6 +23,9 @@ MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win("Sandbox", 1024, 768)
 {
+	m_Win.OnClose([this] {
+		Quit();
+	});
 }
 
 auto MyApp::OnInit() -> Status
@@ -42,10 +45,6 @@ auto MyApp::OnUpdate() -> void
 {
 	Gaze::WM::PollEvents();
 	m_Win.Update();
-
-	if (m_Win.ShouldClose()) {
-		Quit();
-	}
 }
 
 auto MyApp::OnShutdown() -> Status

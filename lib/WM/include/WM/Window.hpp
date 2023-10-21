@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 #include <string_view>
 
 struct GLFWwindow;
@@ -8,6 +9,9 @@ struct GLFWwindow;
 namespace Gaze::WM {
 	class Window
 	{
+	public:
+		using CloseCallback = std::function<void()>;
+
 	public:
 		Window(std::string_view title, int width, int height);
 		Window(const Window&) = delete;
@@ -24,13 +28,14 @@ namespace Gaze::WM {
 
 		auto Update() -> void;
 
-		[[nodiscard]]
-		auto ShouldClose() -> bool;
+		auto OnClose(CloseCallback callback) -> void;
 
 	private:
 		GLFWwindow* m_Handle = nullptr;
 		std::string m_Title;
 		int m_Width = 0;
 		int m_Height = 0;
+
+		CloseCallback m_CbClose;
 	};
 }

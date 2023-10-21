@@ -54,6 +54,14 @@ namespace Gaze::WM {
 			if (m_Handle == nullptr) {
 				return false;
 			}
+			glfwSetWindowUserPointer(m_Handle, reinterpret_cast<void*>(this));
+			glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* win) {
+				const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(win));
+
+				if (self->m_CbClose) {
+					self->m_CbClose();
+				}
+			});
 		}
 
 		glfwShowWindow(m_Handle);
@@ -84,8 +92,8 @@ namespace Gaze::WM {
 		glfwSwapBuffers(m_Handle);
 	}
 
-	auto Window::ShouldClose() -> bool
+	auto Window::OnClose(CloseCallback callback) -> void
 	{
-		return glfwWindowShouldClose(m_Handle);
+		m_CbClose = std::move(callback);
 	}
 }
