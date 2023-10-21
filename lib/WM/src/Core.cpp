@@ -20,4 +20,9 @@ namespace Gaze::WM {
 	{
 		return g_IsInitialized;
 	}
+
+	auto PollEvents() -> void
+	{
+		glfwPollEvents();
+	}
 }

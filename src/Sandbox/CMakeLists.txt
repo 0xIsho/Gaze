@@ -10,6 +10,7 @@ append_common_compiler_options(${TARGET})
 target_link_libraries(${TARGET}
 	PRIVATE
 		Gaze::Client
+		Gaze::WM
 )
 
 if (GAZE_BUILD_TESTS)

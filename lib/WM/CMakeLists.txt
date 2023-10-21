@@ -4,10 +4,12 @@ find_package(glfw3 REQUIRED)
 
 set(HEADERS
 	"include/WM/Core.hpp"
+	"include/WM/Window.hpp"
 )
 
 set(SOURCES
 	"src/Core.cpp"
+	"src/Window.cpp"
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
