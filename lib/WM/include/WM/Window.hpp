@@ -10,7 +10,12 @@ namespace Gaze::WM {
 	{
 	public:
 		Window(std::string_view title, int width, int height);
+		Window(const Window&) = delete;
+		Window(Window&& other) noexcept;
 		~Window();
+
+		auto operator=(const Window&) -> Window& = delete;
+		auto operator=(Window&& other) noexcept -> Window&;
 
 		[[nodiscard]]
 		auto Show() -> bool;

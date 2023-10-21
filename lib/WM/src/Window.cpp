@@ -5,6 +5,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <utility>
+
 namespace Gaze::WM {
 	Window::Window(std::string_view title, int width, int height)
 		: m_Title(title.empty() ? "Gaze" : title)
@@ -22,6 +24,26 @@ namespace Gaze::WM {
 			glfwDestroyWindow(m_Handle);
 			m_Handle = nullptr;
 		}
+	}
+
+	Window::Window(Window&& other) noexcept
+		: m_Handle(std::exchange(other.m_Handle, nullptr))
+		, m_Title(std::exchange(other.m_Title, std::string()))
+		, m_Width(std::exchange(other.m_Width, 0))
+		, m_Height(std::exchange(other.m_Height, 0))
+	{
+	}
+
+	auto Window::operator=(Window&& other) noexcept -> Window&
+	{
+		if (this != &other) {
+			std::swap(m_Handle, other.m_Handle);
+			std::swap(m_Title, other.m_Title);
+			std::swap(m_Width, other.m_Width);
+			std::swap(m_Height, other.m_Height);
+		}
+
+		return *this;
 	}
 
 	auto Window::Show() -> bool
