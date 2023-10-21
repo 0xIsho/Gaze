@@ -12,13 +12,15 @@ namespace Gaze::WM {
 		Window(std::string_view title, int width, int height);
 		~Window();
 
-		[[nodiscard]] auto Show() -> bool;
+		[[nodiscard]]
+		auto Show() -> bool;
 		auto Hide() -> void;
 		auto Close() -> void;
 
 		auto Update() -> void;
 
-		[[nodiscard]] auto ShouldClose() -> bool;
+		[[nodiscard]]
+		auto ShouldClose() -> bool;
 
 	private:
 		GLFWwindow* m_Handle = nullptr;

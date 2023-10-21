@@ -14,7 +14,8 @@ namespace Gaze::Client {
 		App(int argc, char** argv);
 		virtual ~App();
 
-		[[nodiscard]] auto Run() -> Status;
+		[[nodiscard]]
+		auto Run() -> Status;
 		auto Quit() -> void;
 
 	private:
