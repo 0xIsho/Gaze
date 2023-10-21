@@ -15,11 +15,10 @@ namespace Gaze::Client {
 
 	auto App::Run() -> Status
 	{
-		if (const auto status = OnInit(); status != Status::Success) {
-			return status;
+		if (OnInit() == Status::Success) {
+			m_IsRunning = true;
 		}
 
-		m_IsRunning = true;
 		while (m_IsRunning) {
 			OnUpdate();
 		}
