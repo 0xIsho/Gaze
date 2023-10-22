@@ -1,6 +1,6 @@
 set(LIBS
 	Client
-	# Core
+	Core
 	Debug
 	Test
 	WM
