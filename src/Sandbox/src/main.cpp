@@ -3,8 +3,6 @@
 #include "WM/Core.hpp"
 #include "WM/Window.hpp"
 
-#include <iostream>
-
 class MyApp : public Gaze::Client::App
 {
 public:
