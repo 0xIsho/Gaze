@@ -2,6 +2,7 @@ set(TARGET Core)
 
 set(HEADERS
 	"include/Core/Platform.hpp"
+	"include/Core/Type.hpp"
 )
 
 set(SOURCES
