@@ -2,6 +2,7 @@ set(LIBS
 	Client
 	Core
 	Debug
+	Math
 	Test
 	WM
 )
