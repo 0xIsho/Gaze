@@ -2,12 +2,20 @@
 
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+
 namespace Gaze::WM {
 	static auto g_IsInitialized = false;
 
 	auto Init() -> bool
 	{
-		return g_IsInitialized = (glfwInit() == GLFW_TRUE);
+		g_IsInitialized = glfwInit() == GLFW_TRUE;
+
+		glfwSetErrorCallback([](int code, const char* description) {
+			std::cerr << "GLFW Error (" << code << "): " << description << '\n';
+		});
+
+		return g_IsInitialized;
 	}
 
 	auto Terminate() -> void
