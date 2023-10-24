@@ -2,6 +2,7 @@ set(LIBS
 	Client
 	Core
 	Debug
+	GFX
 	Math
 	Test
 	WM
