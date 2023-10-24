@@ -19,7 +19,7 @@ private:
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
-	, m_Win("Sandbox", 1024, 768)
+	, m_Win("Sandbox", 1280, 640)
 {
 	m_Win.OnClose([this] {
 		Quit();
