@@ -42,7 +42,7 @@ auto MyApp::OnInit() -> Status
 auto MyApp::OnUpdate() -> void
 {
 	Gaze::WM::PollEvents();
-	m_Win.Update();
+	m_Win.SwapBuffers();
 }
 
 auto MyApp::OnShutdown() -> Status

@@ -26,7 +26,7 @@ namespace Gaze::WM {
 		auto Hide() -> void;
 		auto Close() -> void;
 
-		auto Update() -> void;
+		auto SwapBuffers() -> void;
 
 		auto OnClose(CloseCallback callback) -> void;
 

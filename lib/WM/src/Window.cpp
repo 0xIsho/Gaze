@@ -87,7 +87,7 @@ namespace Gaze::WM {
 		}
 	}
 
-	auto Window::Update() -> void
+	auto Window::SwapBuffers() -> void
 	{
 		glfwSwapBuffers(m_Handle);
 	}
