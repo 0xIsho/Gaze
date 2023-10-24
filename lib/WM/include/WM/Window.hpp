@@ -30,6 +30,10 @@ namespace Gaze::WM {
 
 		auto OnClose(CloseCallback callback) -> void;
 
+		[[nodiscard]] auto Width() const -> int;
+		[[nodiscard]] auto Height() const -> int;
+		[[nodiscard]] auto Handle() const -> void*;
+
 	private:
 		GLFWwindow* m_Handle = nullptr;
 		std::string m_Title;
@@ -38,4 +42,19 @@ namespace Gaze::WM {
 
 		CloseCallback m_CbClose;
 	};
+
+	inline auto Window::Width() const -> int
+	{
+		return m_Width;
+	}
+
+	inline auto Window::Height() const -> int
+	{
+		return m_Height;
+	}
+
+	inline auto Window::Handle() const -> void*
+	{
+		return reinterpret_cast<void*>(m_Handle);
+	}
 }
