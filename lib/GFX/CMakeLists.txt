@@ -4,11 +4,24 @@ find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 set(HEADERS
+	"include/GFX/API.hpp"
+	"include/GFX/Renderer.hpp"
 
+	"include/GFX/Platform/Software/Renderer.hpp"
+
+	$<$<BOOL:UNIX>:
+		"include/GFX/Platform/Software/Linux/Renderer.hpp"
+		"include/GFX/Platform/Software/Linux/X11/Renderer.hpp"
+	>
 )
 
 set(SOURCES
-	"src/dummy.cpp"
+	"src/API.cpp"
+	"src/Renderer.cpp"
+
+	$<$<BOOL:UNIX>:
+		"src/Platform/Software/Linux/X11/Renderer.cpp"
+	>
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -21,6 +34,9 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
+	PUBLIC
+		Gaze::Core
+
 	PRIVATE
 		OpenGL::GL
 		glfw
