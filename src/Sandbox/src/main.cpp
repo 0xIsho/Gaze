@@ -1,7 +1,11 @@
 #include "Client/App.hpp"
 
+#include "Core/Type.hpp"
+
 #include "WM/Core.hpp"
 #include "WM/Window.hpp"
+
+#include "GFX/Renderer.hpp"
 
 class MyApp : public Gaze::Client::App
 {
@@ -15,12 +19,15 @@ private:
 
 private:
 	Gaze::WM::Window m_Win;
+	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win("Sandbox", 1280, 640)
 {
+	m_Rdr = Gaze::GFX::CreateRenderer();
+
 	m_Win.OnClose([this] {
 		Quit();
 	});
@@ -32,11 +39,16 @@ auto MyApp::OnInit() -> Status
 		return Status::Fail;
 	}
 
+	m_Rdr->SetClearColor(.8F, .8F, .8F, 1.0F);
+	m_Rdr->Clear();
+
 	return Status::Success;
 }
 
 auto MyApp::OnUpdate() -> void
 {
+	m_Rdr->Render();
+
 	Gaze::WM::PollEvents();
 	m_Win.SwapBuffers();
 }
