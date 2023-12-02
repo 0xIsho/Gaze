@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Type.hpp"
+
 namespace Gaze::Client {
 	class App
 	{
@@ -26,4 +28,13 @@ namespace Gaze::Client {
 	private:
 		bool m_IsRunning = false;
 	};
+
+	auto CreateApp(int argc, char** argv) -> Mem::Unique<App>;
 }
+
+#define GAZE_REGISTER_APP(TApp)                           \
+	auto Gaze::Client::CreateApp(int argc, char** argv)   \
+		-> ::Gaze::Mem::Unique<::Gaze::Client::App>       \
+	{                                                     \
+		return ::Gaze::Mem::MakeUnique<TApp>(argc, argv); \
+	}

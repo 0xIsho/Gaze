@@ -28,10 +28,6 @@ MyApp::MyApp(int argc, char** argv)
 
 auto MyApp::OnInit() -> Status
 {
-	if (!Gaze::WM::Init()) {
-		return Status::Fail;
-	}
-
 	if (!m_Win.Show()) {
 		return Status::Fail;
 	}
@@ -47,13 +43,7 @@ auto MyApp::OnUpdate() -> void
 
 auto MyApp::OnShutdown() -> Status
 {
-	Gaze::WM::Terminate();
-
 	return Status::Success;
 }
 
-auto main(int argc, char** argv) -> int
-{
-	auto app = MyApp(argc, argv);
-	return app.Run() == Gaze::Client::App::Status::Success ? 0 : 1;
-}
+GAZE_REGISTER_APP(MyApp);

@@ -18,8 +18,12 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
+	PUBLIC
+		Gaze::Core
+
 	PRIVATE
 		Gaze::Debug
+		Gaze::WM
 )
 
 if (GAZE_BUILD_TESTS)
