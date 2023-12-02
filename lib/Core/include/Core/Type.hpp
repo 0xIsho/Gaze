@@ -1,6 +1,7 @@
 #ifndef GAZE_CORE_TYPES_HPP
 #define GAZE_CORE_TYPES_HPP
 
+#include <memory>
 #include <cstdint>
 
 namespace Gaze {
@@ -18,6 +19,26 @@ namespace Gaze {
 	using F64 = double;
 
 	using Byte = U8;
+
+	namespace Mem {
+		template<typename T>
+		using Unique = std::unique_ptr<T>;
+
+		template<typename T>
+		using Shared = std::shared_ptr<T>;
+
+		template<typename T, typename... Args>
+		auto MakeUnique(Args&&... args)
+		{
+			return std::make_unique<T>(std::forward<Args>(args)...);
+		}
+
+		template<typename T, typename... Args>
+		auto MakeShared(Args&&... args)
+		{
+			return std::make_shared<T>(std::forward<T>(args)...);
+		}
+	}
 }
 
 #endif // GAZE_CORE_TYPES_HPP
