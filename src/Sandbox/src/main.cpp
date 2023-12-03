@@ -18,24 +18,24 @@ private:
 	auto OnShutdown() -> Status override;
 
 private:
-	Gaze::WM::Window m_Win;
+	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
-	, m_Win("Sandbox", 1280, 640)
+	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
 {
-	m_Rdr = Gaze::GFX::CreateRenderer();
+	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 
-	m_Win.OnClose([this] {
+	m_Win->OnClose([this] {
 		Quit();
 	});
 }
 
 auto MyApp::OnInit() -> Status
 {
-	if (!m_Win.Show()) {
+	if (!m_Win->Show()) {
 		return Status::Fail;
 	}
 
@@ -50,7 +50,7 @@ auto MyApp::OnUpdate() -> void
 	m_Rdr->Render();
 
 	Gaze::WM::PollEvents();
-	m_Win.SwapBuffers();
+	m_Win->SwapBuffers();
 }
 
 auto MyApp::OnShutdown() -> Status
