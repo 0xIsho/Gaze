@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core/Platform.hpp"
 
 #if defined(GAZE_PLATFORM_LINUX)
