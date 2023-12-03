@@ -36,7 +36,7 @@ namespace Gaze {
 		template<typename T, typename... Args>
 		auto MakeShared(Args&&... args)
 		{
-			return std::make_shared<T>(std::forward<T>(args)...);
+			return std::make_shared<T>(std::forward<Args>(args)...);
 		}
 	}
 }
