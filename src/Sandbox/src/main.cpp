@@ -37,8 +37,6 @@ auto MyApp::OnInit() -> Status
 {
 	m_Win->Show();
 
-	m_Rdr->SetClearColor(.8F, .8F, .8F, 1.0F);
-
 	return Status::Success;
 }
 
