@@ -3,6 +3,12 @@ set(TARGET GFX)
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
+if(UNIX)
+	find_package(X11 REQUIRED)
+else()
+	message(FATAL_ERROR "The renderer does not support the target platform: ${CMAKE_HOST_SYSTEM_NAME}")
+endif()
+
 set(HEADERS
 	"include/GFX/API.hpp"
 	"include/GFX/Renderer.hpp"
@@ -31,6 +37,11 @@ append_common_compiler_options(${TARGET})
 target_include_directories(${TARGET}
 	PUBLIC
 		"include/"
+
+	PRIVATE
+		$<$<BOOL:UNIX>:
+			${X11_INCLUDE_DIR}
+		>
 )
 
 target_link_libraries(${TARGET}
@@ -41,6 +52,10 @@ target_link_libraries(${TARGET}
 	PRIVATE
 		OpenGL::GL
 		glfw
+
+		$<$<BOOL:UNIX>:
+			${X11_LIBRARIES}
+		>
 )
 
 if (GAZE_BUILD_TESTS)

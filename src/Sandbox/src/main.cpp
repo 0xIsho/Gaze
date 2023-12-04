@@ -40,13 +40,13 @@ auto MyApp::OnInit() -> Status
 	}
 
 	m_Rdr->SetClearColor(.8F, .8F, .8F, 1.0F);
-	m_Rdr->Clear();
 
 	return Status::Success;
 }
 
 auto MyApp::OnUpdate() -> void
 {
+	m_Rdr->Clear();
 	m_Rdr->Render();
 
 	m_Win->SwapBuffers();
