@@ -35,9 +35,7 @@ MyApp::MyApp(int argc, char** argv)
 
 auto MyApp::OnInit() -> Status
 {
-	if (!m_Win->Show()) {
-		return Status::Fail;
-	}
+	m_Win->Show();
 
 	m_Rdr->SetClearColor(.8F, .8F, .8F, 1.0F);
 

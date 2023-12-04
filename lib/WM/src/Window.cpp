@@ -5,6 +5,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include <stdexcept>
 #include <utility>
 
 namespace Gaze::WM {
@@ -16,6 +17,21 @@ namespace Gaze::WM {
 		GAZE_ASSERT(!title.empty(), "Title was empty.");
 		GAZE_ASSERT(width > 0, "Window width must be positive.");
 		GAZE_ASSERT(height > 0, "Window height must be positive.");
+		GAZE_ASSERT(WM::IsInitialized(), "The Window Manager must be initialized before a window can be created.");
+
+		m_Handle = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
+		if (m_Handle == nullptr) {
+			throw std::runtime_error("Failed to create a window.");
+		}
+
+		glfwSetWindowUserPointer(m_Handle, reinterpret_cast<void*>(this));
+		glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* win) {
+			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(win));
+
+			if (self->m_CbClose) {
+				self->m_CbClose();
+			}
+		});
 	}
 
 	Window::~Window()
@@ -46,27 +62,9 @@ namespace Gaze::WM {
 		return *this;
 	}
 
-	auto Window::Show() -> bool
+	auto Window::Show() -> void
 	{
-		if (m_Handle == nullptr) {
-			GAZE_ASSERT(WM::IsInitialized(), "The Window Manager must be initialized before a window can be created.");
-			m_Handle = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
-			if (m_Handle == nullptr) {
-				return false;
-			}
-			glfwSetWindowUserPointer(m_Handle, reinterpret_cast<void*>(this));
-			glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* win) {
-				const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(win));
-
-				if (self->m_CbClose) {
-					self->m_CbClose();
-				}
-			});
-		}
-
 		glfwShowWindow(m_Handle);
-
-		return true;
 	}
 
 	auto Window::Hide() -> void

@@ -21,8 +21,7 @@ namespace Gaze::WM {
 		auto operator=(const Window&) -> Window& = delete;
 		auto operator=(Window&& other) noexcept -> Window&;
 
-		[[nodiscard]]
-		auto Show() -> bool;
+		auto Show() -> void;
 		auto Hide() -> void;
 		auto Close() -> void;
 
