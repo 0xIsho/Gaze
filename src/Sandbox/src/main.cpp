@@ -49,7 +49,6 @@ auto MyApp::OnUpdate() -> void
 {
 	m_Rdr->Render();
 
-	Gaze::WM::PollEvents();
 	m_Win->SwapBuffers();
 }
 

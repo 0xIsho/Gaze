@@ -23,6 +23,7 @@ namespace Gaze::Client {
 
 		while (m_IsRunning) {
 			OnUpdate();
+			Gaze::WM::PollEvents();
 		}
 
 		return OnShutdown();
