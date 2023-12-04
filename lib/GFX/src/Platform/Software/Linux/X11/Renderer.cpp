@@ -10,15 +10,60 @@
 #include <X11/Xutil.h>
 
 #include <limits>
+#include <utility>
 
 namespace Gaze::GFX::Platform::Software::Linux::X11 {
+	struct Color
+	{
+		Display* display;
+		XColor handle;
+
+		Color() = default;
+		Color(Display* dpy, F32 r, F32 g, F32 b)
+			: display(dpy)
+		{
+			// Xlib stores colors in the 0-UINT16_MAX range, so scale as necessary
+			handle.red = static_cast<U16>(r * std::numeric_limits<U16>::max() + .5F);
+			handle.green = static_cast<U16>(g * std::numeric_limits<U16>::max() + .5F);
+			handle.blue = static_cast<U16>(b * std::numeric_limits<U16>::max() + .5F);
+			handle.flags = DoRed | DoGreen | DoBlue;
+
+			XAllocColor(display, DefaultColormap(display, DefaultScreen(display)), &handle);
+		}
+
+		~Color()
+		{
+			if (display != nullptr) {
+				XFreeColors(display, DefaultColormap(display, DefaultScreen(display)), &handle.pixel, 1, 0);
+			}
+		}
+
+		Color(Color&& other)
+			: display(std::exchange(other.display, nullptr))
+			, handle(std::exchange(other.handle, XColor{}))
+		{
+		}
+
+		auto operator=(Color&& other)
+		{
+			if (this != &other) {
+				display = std::exchange(other.display, nullptr);
+				handle = std::exchange(other.handle, XColor{});
+			}
+		}
+
+		Color(const Color&) = delete;
+		auto operator=(const Color&) -> Color& = delete;
+	};
+
 	struct Renderer::Impl
 	{
 		Display* display;
 		XID xwindow;
 		GC gc;
 		Pixmap pixmap;
-		XColor clearcolor;
+		Color clearColor;
+		Color foregroundColor;
 	};
 
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
@@ -35,36 +80,28 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			static_cast<unsigned>(Window().Height()),
 			DefaultDepth(m_pImpl->display, DefaultScreen(m_pImpl->display))
 		);
+
+		m_pImpl->clearColor = Color(m_pImpl->display, 0.0F, 0.0F, 0.0F);
+		m_pImpl->foregroundColor = Color(m_pImpl->display, 1.0F, 1.0F, 1.0F);
 	}
 
 	Renderer::~Renderer()
 	{
 		XFreeGC(m_pImpl->display, m_pImpl->gc);
 		XFreePixmap(m_pImpl->display, m_pImpl->pixmap);
-		XFreeColors(
-			m_pImpl->display,
-			DefaultColormap(m_pImpl->display, DefaultScreen(m_pImpl->display)),
-			&m_pImpl->clearcolor.pixel,
-			1,
-			0
-		);
 		delete m_pImpl;
 	}
 
-	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void
+	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 /* a */) -> void
 	{
-		// Xlib stores colors in the 0-UINT16_MAX range, so scale as necessary
-		m_pImpl->clearcolor.red = static_cast<U16>(r * std::numeric_limits<U16>::max() + .5F);
-		m_pImpl->clearcolor.green = static_cast<U16>(g * std::numeric_limits<U16>::max() + .5F);
-		m_pImpl->clearcolor.blue = static_cast<U16>(b * std::numeric_limits<U16>::max() + .5F);
-		m_pImpl->clearcolor.flags = DoRed | DoGreen | DoBlue;
-
-		XAllocColor(m_pImpl->display, DefaultColormap(m_pImpl->display, DefaultScreen(m_pImpl->display)), &m_pImpl->clearcolor);
-		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->clearcolor.pixel);
+		// TODO: Skipping the Color allocation if the new is the same as the old one might be a good idea.
+		//   Not a big deal, though. As this function shouldn't be called that frequently anyway.
+		m_pImpl->clearColor = Color(m_pImpl->display, r, g, b);
 	}
 
 	auto Renderer::Clear() -> void
 	{
+		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->clearColor.handle.pixel);
 		XFillRectangle(
 			m_pImpl->display,
 			m_pImpl->pixmap,
@@ -74,6 +111,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			static_cast<unsigned int>(Window().Width()),
 			static_cast<unsigned int>(Window().Height())
 		);
+		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->foregroundColor.handle.pixel);
 	}
 
 	auto Renderer::Render() -> void
