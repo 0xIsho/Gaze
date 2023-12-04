@@ -48,8 +48,6 @@ auto MyApp::OnUpdate() -> void
 {
 	m_Rdr->Clear();
 	m_Rdr->Render();
-
-	m_Win->SwapBuffers();
 }
 
 auto MyApp::OnShutdown() -> Status

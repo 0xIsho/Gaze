@@ -87,11 +87,6 @@ namespace Gaze::WM {
 		}
 	}
 
-	auto Window::SwapBuffers() -> void
-	{
-		glfwSwapBuffers(m_Handle);
-	}
-
 	auto Window::OnClose(CloseCallback callback) -> void
 	{
 		m_CbClose = std::move(callback);
