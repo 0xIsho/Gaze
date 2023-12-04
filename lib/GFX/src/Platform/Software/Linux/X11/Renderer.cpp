@@ -140,4 +140,17 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			static_cast<int>(y * static_cast<F32>(Window().Height()))
 		);
 	}
+
+	auto Renderer::DrawLine(F32 x1, F32 y1, F32 x2, F32 y2) -> void
+	{
+		XDrawLine(
+			m_pImpl->display,
+			m_pImpl->pixmap,
+			m_pImpl->gc,
+			static_cast<int>(x1 * static_cast<F32>(Window().Width())),
+			static_cast<int>(y1 * static_cast<F32>(Window().Height())),
+			static_cast<int>(x2 * static_cast<F32>(Window().Width())),
+			static_cast<int>(y2 * static_cast<F32>(Window().Height()))
+		);
+	}
 }

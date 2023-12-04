@@ -21,6 +21,7 @@ namespace Gaze::GFX {
 		// Coordinates are in the range [0.0F-1.0F]!
 
 		virtual auto DrawPoint(F32 x, F32 y) -> void = 0;
+		virtual auto DrawLine(F32 x1, F32 y1, F32 x2, F32 y2) -> void = 0;
 		/**********************************************************/
 
 	protected:
