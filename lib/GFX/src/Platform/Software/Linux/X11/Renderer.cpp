@@ -71,8 +71,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->gc,
 			0,
 			0,
-			Window().Width(),
-			Window().Height()
+			static_cast<unsigned int>(Window().Width()),
+			static_cast<unsigned int>(Window().Height())
 		);
 	}
 
@@ -85,8 +85,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->gc,
 			0,
 			0,
-			Window().Width(),
-			Window().Height(),
+			static_cast<unsigned int>(Window().Width()),
+			static_cast<unsigned int>(Window().Height()),
 			0,
 			0
 		);
