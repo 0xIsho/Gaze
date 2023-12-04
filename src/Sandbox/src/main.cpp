@@ -45,6 +45,13 @@ auto MyApp::OnInit() -> Status
 auto MyApp::OnUpdate() -> void
 {
 	m_Rdr->Clear();
+
+	for (auto x = 0.0F; x < 1.0F; x += 0.01F) {
+		for (auto y = 0.0F; y < 1.0F; y += 0.01F) {
+			m_Rdr->DrawPoint(x, y);
+		}
+	}
+
 	m_Rdr->Render();
 }
 

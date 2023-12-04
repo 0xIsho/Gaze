@@ -17,6 +17,12 @@ namespace Gaze::GFX {
 		virtual auto Clear() -> void = 0;
 		virtual auto Render() -> void = 0;
 
+		/* ********** 2D Primitive Rendering Functions ********** */
+		// Coordinates are in the range [0.0F-1.0F]!
+
+		virtual auto DrawPoint(F32 x, F32 y) -> void = 0;
+		/**********************************************************/
+
 	protected:
 		[[nodiscard]]
 		auto Window() const -> const WM::Window& { return *m_Window.get(); }

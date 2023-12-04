@@ -129,4 +129,15 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			0
 		);
 	}
+
+	auto Renderer::DrawPoint(F32 x, F32 y) -> void
+	{
+		XDrawPoint(
+			m_pImpl->display,
+			m_pImpl->pixmap,
+			m_pImpl->gc,
+			static_cast<int>(x * static_cast<F32>(Window().Width())),
+			static_cast<int>(y * static_cast<F32>(Window().Height()))
+		);
+	}
 }

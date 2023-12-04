@@ -15,6 +15,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		auto Clear() -> void override;
 		auto Render() -> void override;
 
+		auto DrawPoint(F32 x, F32 y) -> void override;
+
 	private:
 		Impl* m_pImpl{ nullptr };
 	};
