@@ -11,6 +11,7 @@ namespace Gaze::WM {
 	{
 		g_IsInitialized = glfwInit() == GLFW_TRUE;
 
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // TODO: This should be ignored when using OpenGL
 		glfwSetErrorCallback([](int code, const char* description) {
 			std::cerr << "GLFW Error (" << code << "): " << description << '\n';
 		});
