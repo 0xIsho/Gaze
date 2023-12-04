@@ -4,6 +4,9 @@
 
 #include "WM/Core.hpp"
 
+#include <thread>
+#include <chrono>
+
 namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/)
 	{
@@ -24,6 +27,8 @@ namespace Gaze::Client {
 		while (m_IsRunning) {
 			OnUpdate();
 			Gaze::WM::PollEvents();
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(int((1 / 60.F) * 1000)));
 		}
 
 		return OnShutdown();
