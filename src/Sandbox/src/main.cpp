@@ -47,7 +47,7 @@ auto MyApp::OnUpdate() -> void
 	constexpr auto step = 0.05F;
 	for (auto x = 0.0F; x < 1.0F; x += step) {
 		for (auto y = 0.0F; y < 1.0F; y += step) {
-			m_Rdr->DrawTri(
+			m_Rdr->FillTri(
 				{{
 					{ x, y },
 					{ x, y + step/2 },
