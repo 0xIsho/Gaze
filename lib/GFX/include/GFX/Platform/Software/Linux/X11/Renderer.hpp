@@ -17,6 +17,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 
 		auto DrawPoint(Point2D p) -> void override;
 		auto DrawLine(Point2D start, Point2D end) -> void override;
+		auto DrawTri(const std::array<Point2D, 3>& ps) -> void override;
 
 	private:
 		Impl* m_pImpl{ nullptr };

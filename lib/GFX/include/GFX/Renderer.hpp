@@ -6,6 +6,8 @@
 
 #include "WM/Window.hpp"
 
+#include <array>
+
 namespace Gaze::GFX {
 	struct Point2D
 	{
@@ -28,6 +30,7 @@ namespace Gaze::GFX {
 
 		virtual auto DrawPoint(Point2D p) -> void = 0;
 		virtual auto DrawLine(Point2D start, Point2D end) -> void = 0;
+		virtual auto DrawTri(const std::array<Point2D, 3>& ps) -> void = 0;
 		/**********************************************************/
 
 	protected:

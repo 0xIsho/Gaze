@@ -153,4 +153,35 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			static_cast<int>(end.y * static_cast<F32>(Window().Height()))
 		);
 	}
+
+	auto Renderer::DrawTri(const std::array<Point2D, 3>& ps) -> void
+	{
+		XPoint points[] = {
+			{
+				static_cast<short>(ps[0].x * static_cast<F32>(Window().Width())),
+				static_cast<short>(ps[0].y * static_cast<F32>(Window().Height())),
+			},
+			{
+				static_cast<short>(ps[1].x * static_cast<F32>(Window().Width())),
+				static_cast<short>(ps[1].y * static_cast<F32>(Window().Height())),
+			},
+			{
+				static_cast<short>(ps[2].x * static_cast<F32>(Window().Width())),
+				static_cast<short>(ps[2].y * static_cast<F32>(Window().Height())),
+			},
+			{
+				static_cast<short>(ps[0].x * static_cast<F32>(Window().Width())),
+				static_cast<short>(ps[0].y * static_cast<F32>(Window().Height())),
+			},
+		};
+
+		XDrawLines(
+			m_pImpl->display,
+			m_pImpl->pixmap,
+			m_pImpl->gc,
+			points,
+			sizeof(points) / sizeof(*points),
+			CoordModeOrigin
+		);
+	}
 }
