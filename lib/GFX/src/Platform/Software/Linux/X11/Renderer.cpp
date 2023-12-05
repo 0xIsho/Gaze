@@ -108,8 +108,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->gc,
 			0,
 			0,
-			static_cast<unsigned int>(Window().Width()),
-			static_cast<unsigned int>(Window().Height())
+			unsigned(Window().Width()),
+			unsigned(Window().Height())
 		);
 		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->foregroundColor.handle.pixel);
 	}
@@ -123,8 +123,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->gc,
 			0,
 			0,
-			static_cast<unsigned int>(Window().Width()),
-			static_cast<unsigned int>(Window().Height()),
+			unsigned(Window().Width()),
+			unsigned(Window().Height()),
 			0,
 			0
 		);
@@ -136,8 +136,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			static_cast<int>(p.x * static_cast<F32>(Window().Width())),
-			static_cast<int>(p.y * static_cast<F32>(Window().Height()))
+			int(p.x * F32(Window().Width())),
+			int(p.y * F32(Window().Height()))
 		);
 	}
 
@@ -147,10 +147,10 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			static_cast<int>(start.x * static_cast<F32>(Window().Width())),
-			static_cast<int>(start.y * static_cast<F32>(Window().Height())),
-			static_cast<int>(end.x * static_cast<F32>(Window().Width())),
-			static_cast<int>(end.y * static_cast<F32>(Window().Height()))
+			int(start.x * F32(Window().Width())),
+			int(start.y * F32(Window().Height())),
+			int(end.x * F32(Window().Width())),
+			int(end.y * F32(Window().Height()))
 		);
 	}
 
@@ -158,20 +158,20 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 	{
 		XPoint points[] = {
 			{
-				static_cast<short>(ps[0].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[0].y * static_cast<F32>(Window().Height())),
+				short(ps[0].x * F32(Window().Width())),
+				short(ps[0].y * F32(Window().Height())),
 			},
 			{
-				static_cast<short>(ps[1].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[1].y * static_cast<F32>(Window().Height())),
+				short(ps[1].x * F32(Window().Width())),
+				short(ps[1].y * F32(Window().Height())),
 			},
 			{
-				static_cast<short>(ps[2].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[2].y * static_cast<F32>(Window().Height())),
+				short(ps[2].x * F32(Window().Width())),
+				short(ps[2].y * F32(Window().Height())),
 			},
 			{
-				static_cast<short>(ps[0].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[0].y * static_cast<F32>(Window().Height())),
+				short(ps[0].x * F32(Window().Width())),
+				short(ps[0].y * F32(Window().Height())),
 			},
 		};
 
@@ -189,20 +189,20 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 	{
 		XPoint points[] = {
 			{
-				static_cast<short>(ps[0].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[0].y * static_cast<F32>(Window().Height())),
+				short(ps[0].x * F32(Window().Width())),
+				short(ps[0].y * F32(Window().Height())),
 			},
 			{
-				static_cast<short>(ps[1].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[1].y * static_cast<F32>(Window().Height())),
+				short(ps[1].x * F32(Window().Width())),
+				short(ps[1].y * F32(Window().Height())),
 			},
 			{
-				static_cast<short>(ps[2].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[2].y * static_cast<F32>(Window().Height())),
+				short(ps[2].x * F32(Window().Width())),
+				short(ps[2].y * F32(Window().Height())),
 			},
 			{
-				static_cast<short>(ps[0].x * static_cast<F32>(Window().Width())),
-				static_cast<short>(ps[0].y * static_cast<F32>(Window().Height())),
+				short(ps[0].x * F32(Window().Width())),
+				short(ps[0].y * F32(Window().Height())),
 			},
 		};
 
