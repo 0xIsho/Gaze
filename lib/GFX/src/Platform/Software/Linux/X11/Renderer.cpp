@@ -136,8 +136,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			int(p.x * F32(Window().Width())),
-			int(p.y * F32(Window().Height()))
+			int(((p.x + 1) / 2) * F32(Window().Width())),
+			int(((1 - p.y) / 2) * F32(Window().Height()))
 		);
 	}
 
@@ -147,10 +147,10 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			int(start.x * F32(Window().Width())),
-			int(start.y * F32(Window().Height())),
-			int(end.x * F32(Window().Width())),
-			int(end.y * F32(Window().Height()))
+			int(((start.x + 1) / 2) * F32(Window().Width())),
+			int(((1 - start.y) / 2) * F32(Window().Height())),
+			int(((end.x + 1) / 2) * F32(Window().Width())),
+			int(((1 - end.y) / 2) * F32(Window().Height()))
 		);
 	}
 
@@ -158,20 +158,20 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 	{
 		XPoint points[] = {
 			{
-				short(ps[0].x * F32(Window().Width())),
-				short(ps[0].y * F32(Window().Height())),
+				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
 			},
 			{
-				short(ps[1].x * F32(Window().Width())),
-				short(ps[1].y * F32(Window().Height())),
+				short(((ps[1].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[1].y) / 2) * F32(Window().Height())),
 			},
 			{
-				short(ps[2].x * F32(Window().Width())),
-				short(ps[2].y * F32(Window().Height())),
+				short(((ps[2].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[2].y) / 2) * F32(Window().Height())),
 			},
 			{
-				short(ps[0].x * F32(Window().Width())),
-				short(ps[0].y * F32(Window().Height())),
+				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
 			},
 		};
 
@@ -189,20 +189,20 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 	{
 		XPoint points[] = {
 			{
-				short(ps[0].x * F32(Window().Width())),
-				short(ps[0].y * F32(Window().Height())),
+				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
 			},
 			{
-				short(ps[1].x * F32(Window().Width())),
-				short(ps[1].y * F32(Window().Height())),
+				short(((ps[1].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[1].y) / 2) * F32(Window().Height())),
 			},
 			{
-				short(ps[2].x * F32(Window().Width())),
-				short(ps[2].y * F32(Window().Height())),
+				short(((ps[2].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[2].y) / 2) * F32(Window().Height())),
 			},
 			{
-				short(ps[0].x * F32(Window().Width())),
-				short(ps[0].y * F32(Window().Height())),
+				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
+				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
 			},
 		};
 
