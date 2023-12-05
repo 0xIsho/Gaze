@@ -130,27 +130,27 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::DrawPoint(F32 x, F32 y) -> void
+	auto Renderer::DrawPoint(Point2D p) -> void
 	{
 		XDrawPoint(
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			static_cast<int>(x * static_cast<F32>(Window().Width())),
-			static_cast<int>(y * static_cast<F32>(Window().Height()))
+			static_cast<int>(p.x * static_cast<F32>(Window().Width())),
+			static_cast<int>(p.y * static_cast<F32>(Window().Height()))
 		);
 	}
 
-	auto Renderer::DrawLine(F32 x1, F32 y1, F32 x2, F32 y2) -> void
+	auto Renderer::DrawLine(Point2D start, Point2D end) -> void
 	{
 		XDrawLine(
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			static_cast<int>(x1 * static_cast<F32>(Window().Width())),
-			static_cast<int>(y1 * static_cast<F32>(Window().Height())),
-			static_cast<int>(x2 * static_cast<F32>(Window().Width())),
-			static_cast<int>(y2 * static_cast<F32>(Window().Height()))
+			static_cast<int>(start.x * static_cast<F32>(Window().Width())),
+			static_cast<int>(start.y * static_cast<F32>(Window().Height())),
+			static_cast<int>(end.x * static_cast<F32>(Window().Width())),
+			static_cast<int>(end.y * static_cast<F32>(Window().Height()))
 		);
 	}
 }
