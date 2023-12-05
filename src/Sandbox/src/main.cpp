@@ -44,18 +44,26 @@ auto MyApp::OnUpdate() -> void
 {
 	m_Rdr->Clear();
 
-	constexpr auto step = 0.05F;
-	for (auto x = 0.0F; x < 1.0F; x += step) {
-		for (auto y = 0.0F; y < 1.0F; y += step) {
-			m_Rdr->FillTri(
-				{{
-					{ x, y },
-					{ x, y + step/2 },
-					{ x + step/2, y}
-				}}
-			);
+	m_Rdr->DrawLine({ -1, 0 }, { 1, 0 });
+	m_Rdr->DrawLine({ 0, -1 }, { 0, 1 });
+
+	for (auto i = -1.0F; i <= 1.0F; i += 0.1F) {
+		m_Rdr->DrawLine({ -0.01F, i }, { 0.01F, i });
+		m_Rdr->DrawLine({ i, -0.01F }, { i, 0.01F });
+
+		for (auto j = -1.0F; j <= 1.0F; j += 0.1F) {
+			m_Rdr->DrawPoint({ i, j });
 		}
 	}
+
+	m_Rdr->DrawTri({{{ -.6F, .4F }, { -.4F, .4F }, { -.5F, .6F } }});
+	m_Rdr->FillTri({{{ -.6F, -.4F }, { -.5F, -.6F }, { -.4F, -.4F } }});
+
+	m_Rdr->DrawTri({{{ -.1F, .1F }, { -.1F, -.1F }, { .1F, -.1F }}});
+	m_Rdr->FillTri({{{ .1F, -.1F }, { .1F, .1F }, { -.1F, .1F }, }});
+
+	m_Rdr->DrawTri({{{ .6F, -.4F }, { .4F, -.4F }, { .5F, -.6F } }});
+	m_Rdr->FillTri({{{ .6F, .4F }, { .5F, .6F }, { .4F, .4F } }});
 
 	m_Rdr->Render();
 }
