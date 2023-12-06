@@ -78,7 +78,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->xwindow,
 			static_cast<unsigned>(Window().Width()),
 			static_cast<unsigned>(Window().Height()),
-			DefaultDepth(m_pImpl->display, DefaultScreen(m_pImpl->display))
+			unsigned(DefaultDepth(m_pImpl->display, DefaultScreen(m_pImpl->display)))
 		);
 
 		m_pImpl->clearColor = Color(m_pImpl->display, 0.0F, 0.0F, 0.0F);
@@ -152,10 +152,10 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			start.x,
-			start.y,
-			end.x,
-			end.y
+			int(start.x),
+			int(start.y),
+			int(end.x),
+			int(end.y)
 		);
 	}
 
