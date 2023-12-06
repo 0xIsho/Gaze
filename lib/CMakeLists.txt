@@ -3,7 +3,6 @@ set(LIBS
 	Core
 	Debug
 	GFX
-	Math
 	Test
 	WM
 )

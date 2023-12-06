@@ -130,49 +130,47 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::DrawPoint(Point2D p) -> void
+	auto Renderer::DrawPoint(Vec4 p) -> void
 	{
+		NDCtoScreen(p);
+
 		XDrawPoint(
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			int(((p.x + 1) / 2) * F32(Window().Width())),
-			int(((1 - p.y) / 2) * F32(Window().Height()))
+			int(p.x),
+			int(p.y)
 		);
 	}
 
-	auto Renderer::DrawLine(Point2D start, Point2D end) -> void
+	auto Renderer::DrawLine(Vec4 start, Vec4 end) -> void
 	{
+		NDCtoScreen(start);
+		NDCtoScreen(end);
+
 		XDrawLine(
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			int(((start.x + 1) / 2) * F32(Window().Width())),
-			int(((1 - start.y) / 2) * F32(Window().Height())),
-			int(((end.x + 1) / 2) * F32(Window().Width())),
-			int(((1 - end.y) / 2) * F32(Window().Height()))
+			start.x,
+			start.y,
+			end.x,
+			end.y
 		);
 	}
 
-	auto Renderer::DrawTri(const std::array<Point2D, 3>& ps) -> void
+	auto Renderer::DrawTri(const std::array<Vec4, 3>& ps) -> void
 	{
+		auto psTmp = ps;
+		NDCtoScreen(psTmp[0]);
+		NDCtoScreen(psTmp[1]);
+		NDCtoScreen(psTmp[2]);
+
 		XPoint points[] = {
-			{
-				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
-			},
-			{
-				short(((ps[1].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[1].y) / 2) * F32(Window().Height())),
-			},
-			{
-				short(((ps[2].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[2].y) / 2) * F32(Window().Height())),
-			},
-			{
-				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
-			},
+			{ short(psTmp[0].x), short(psTmp[0].y) },
+			{ short(psTmp[1].x), short(psTmp[1].y) },
+			{ short(psTmp[2].x), short(psTmp[2].y) },
+			{ short(psTmp[0].x), short(psTmp[0].y) },
 		};
 
 		XDrawLines(
@@ -185,25 +183,18 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::FillTri(const std::array<Point2D, 3>& ps) -> void
+	auto Renderer::FillTri(const std::array<Vec4, 3>& ps) -> void
 	{
+		auto psTmp = ps;
+		NDCtoScreen(psTmp[0]);
+		NDCtoScreen(psTmp[1]);
+		NDCtoScreen(psTmp[2]);
+
 		XPoint points[] = {
-			{
-				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
-			},
-			{
-				short(((ps[1].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[1].y) / 2) * F32(Window().Height())),
-			},
-			{
-				short(((ps[2].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[2].y) / 2) * F32(Window().Height())),
-			},
-			{
-				short(((ps[0].x + 1) / 2) * F32(Window().Width())),
-				short(((1 - ps[0].y) / 2) * F32(Window().Height())),
-			},
+			{ short(psTmp[0].x), short(psTmp[0].y) },
+			{ short(psTmp[1].x), short(psTmp[1].y) },
+			{ short(psTmp[2].x), short(psTmp[2].y) },
+			{ short(psTmp[0].x), short(psTmp[0].y) },
 		};
 
 		XFillPolygon(
@@ -215,5 +206,15 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			CoordModeOrigin,
 			Complex // TODO: Other options can improve performance but automatically choosing them is not practical
 		);
+	}
+
+	auto Renderer::NDCtoScreen(glm::vec4& vec) -> void
+	{
+		// TODO: Replace Window() with Viewport when support for that is added.
+		//   P.S. Don't forget to offset the coordinates by the viewport's (x,y)!
+
+		vec.x = (vec.x + 1) * (F32(Window().Width()) / 2);
+		vec.y = (1 - vec.y) * (F32(Window().Height()) / 2);
+		vec.z = (vec.z + 1) / 2;
 	}
 }

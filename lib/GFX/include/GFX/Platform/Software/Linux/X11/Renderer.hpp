@@ -15,10 +15,13 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		auto Clear() -> void override;
 		auto Render() -> void override;
 
-		auto DrawPoint(Point2D p) -> void override;
-		auto DrawLine(Point2D start, Point2D end) -> void override;
-		auto DrawTri(const std::array<Point2D, 3>& ps) -> void override;
-		auto FillTri(const std::array<Point2D, 3>& ps) -> void override;
+		auto DrawPoint(Vec4 p) -> void override;
+		auto DrawLine(Vec4 start, Vec4 end) -> void override;
+		auto DrawTri(const std::array<Vec4, 3>& ps) -> void override;
+		auto FillTri(const std::array<Vec4, 3>& ps) -> void override;
+
+	private:
+		auto NDCtoScreen(glm::vec4& vec) -> void;
 
 	private:
 		Impl* m_pImpl{ nullptr };

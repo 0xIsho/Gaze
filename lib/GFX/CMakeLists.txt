@@ -2,6 +2,7 @@ set(TARGET GFX)
 
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(glm REQUIRED)
 
 if(UNIX)
 	find_package(X11 REQUIRED)
@@ -37,6 +38,8 @@ append_common_compiler_options(${TARGET})
 target_include_directories(${TARGET}
 	PUBLIC
 		"include/"
+
+		${GLM_INCLUDE_DIRS}
 
 	PRIVATE
 		$<$<BOOL:UNIX>:

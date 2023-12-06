@@ -7,6 +7,8 @@
 
 #include "GFX/Renderer.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 class MyApp : public Gaze::Client::App
 {
 public:
@@ -44,26 +46,31 @@ auto MyApp::OnUpdate() -> void
 {
 	m_Rdr->Clear();
 
-	m_Rdr->DrawLine({ -1, 0 }, { 1, 0 });
-	m_Rdr->DrawLine({ 0, -1 }, { 0, 1 });
+	const auto model = glm::mat4(1.0F);
+	const auto view = glm::mat4(1.0F);
+	const auto projection = glm::ortho(-1.F, 1.F, -1.F, 1.F);
+	const auto mvp = projection * view * model;
 
-	for (auto i = -1.0F; i <= 1.0F; i += 0.1F) {
-		m_Rdr->DrawLine({ -0.01F, i }, { 0.01F, i });
-		m_Rdr->DrawLine({ i, -0.01F }, { i, 0.01F });
+	m_Rdr->DrawLine(glm::vec4{ -1, 0, 0, 1 } * mvp, glm::vec4{ 1, 0, 0, 1 } * mvp);
+	m_Rdr->DrawLine(glm::vec4{ 0, -1, 0, 1 } * mvp, glm::vec4{ 0, 1, 0, 1 } * mvp);
 
-		for (auto j = -1.0F; j <= 1.0F; j += 0.1F) {
-			m_Rdr->DrawPoint({ i, j });
+	for (auto i = -1.F; i <= 1.F; i += .1F) {
+		m_Rdr->DrawLine(glm::vec4{ i, -.0075F, 0, 1 } * mvp, glm::vec4{ i, .0075F, 0, 1 } * mvp);
+		m_Rdr->DrawLine(glm::vec4{ -.0075F, i, 0, 1 } * mvp, glm::vec4{ .0075F, i, 0, 1 } * mvp);
+
+		for (auto j = -1.F; j <= 1.F; j += .1F) {
+			m_Rdr->DrawPoint(glm::vec4{ i, j, 0.0F, 1.0F } * mvp);
 		}
 	}
 
-	m_Rdr->DrawTri({{{ -.6F, .4F }, { -.4F, .4F }, { -.5F, .6F } }});
-	m_Rdr->FillTri({{{ -.6F, -.4F }, { -.5F, -.6F }, { -.4F, -.4F } }});
+	m_Rdr->DrawTri({{ glm::vec4{ -.6F, .4F , 0, 1 } * mvp,glm::vec4 { -.5F, .6F, 0, 1 } * mvp, glm::vec4{ -.4F, .4F, 0, 1 } * mvp }});
+	m_Rdr->FillTri({{ glm::vec4{ -.6F, -.4F , 0, 1 } * mvp,glm::vec4 { -.5F, -.6F, 0, 1 } * mvp, glm::vec4{ -.4F, -.4F, 0, 1 } * mvp }});
 
-	m_Rdr->DrawTri({{{ -.1F, .1F }, { -.1F, -.1F }, { .1F, -.1F }}});
-	m_Rdr->FillTri({{{ .1F, -.1F }, { .1F, .1F }, { -.1F, .1F }, }});
+	m_Rdr->DrawTri({{ glm::vec4{ -.1F, .1F, 0, 1 } * mvp, glm::vec4{ -.1F, -.1F, 0, 1 } * mvp, glm::vec4{ .1F, -.1F, 0, 1 } * mvp }});
+	m_Rdr->FillTri({{ glm::vec4{ .1F, -.1F, 0, 1 } * mvp, glm::vec4{ .1F, .1F, 0, 1 } * mvp, glm::vec4{ -.1F, .1F, 0, 1 } * mvp }});
 
-	m_Rdr->DrawTri({{{ .6F, -.4F }, { .4F, -.4F }, { .5F, -.6F } }});
-	m_Rdr->FillTri({{{ .6F, .4F }, { .5F, .6F }, { .4F, .4F } }});
+	m_Rdr->DrawTri({{ glm::vec4{ .6F, -.4F, 0, 1 } * mvp, glm::vec4{ .4F, -.4F, 0, 1 } * mvp, glm::vec4{ .5F, -.6F, 0, 1 } * mvp }});
+	m_Rdr->FillTri({{ glm::vec4{ .6F, .4F, 0, 1 } * mvp, glm::vec4{ .5F, .6F, 0, 1 } * mvp, glm::vec4{ .4F, .4F, 0, 1 } * mvp }});
 
 	m_Rdr->Render();
 }
