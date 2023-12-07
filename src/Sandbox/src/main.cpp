@@ -11,6 +11,11 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <iostream>
+#include <iomanip>
+
+using namespace Gaze;
+
 class MyApp : public Gaze::Client::App
 {
 public:
@@ -18,7 +23,7 @@ public:
 
 private:
 	auto OnInit() -> Status override;
-	auto OnUpdate() -> void override;
+	auto OnUpdate(F64 deltaTime) -> void override;
 	auto OnShutdown() -> Status override;
 
 private:
@@ -49,7 +54,7 @@ auto MyApp::OnInit() -> Status
 	return Status::Success;
 }
 
-auto MyApp::OnUpdate() -> void
+auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
 	if (m_Input.IsKeyPressed(Gaze::Input::Key::kEscape)) {
 		Quit();
@@ -98,6 +103,11 @@ auto MyApp::OnUpdate() -> void
 	}
 
 	m_Rdr->Render();
+
+	std::cout
+		<< "Delta Time: "
+		<< std::fixed << std::setprecision(4) << deltaTime
+		<< " | FPS: " << I32(1 / deltaTime) << '\n';
 }
 
 auto MyApp::OnShutdown() -> Status

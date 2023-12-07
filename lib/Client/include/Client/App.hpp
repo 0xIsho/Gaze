@@ -22,7 +22,7 @@ namespace Gaze::Client {
 
 	private:
 		virtual auto OnInit() -> Status = 0;
-		virtual auto OnUpdate() -> void = 0;
+		virtual auto OnUpdate(F64 deltaTime) -> void = 0;
 		virtual auto OnShutdown() -> Status = 0;
 
 	private:

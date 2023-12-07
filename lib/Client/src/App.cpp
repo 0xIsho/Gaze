@@ -20,15 +20,31 @@ namespace Gaze::Client {
 
 	auto App::Run() -> Status
 	{
+		using namespace std::chrono;
+
 		if (OnInit() == Status::Success) {
 			m_IsRunning = true;
 		}
 
+		auto deltaTime = 1.0 / 30.0;
+		auto frameBegin = steady_clock::now();
+
 		while (m_IsRunning) {
-			OnUpdate();
+			OnUpdate(deltaTime);
 			Gaze::WM::PollEvents();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(int((1 / 60.F) * 1000)));
+
+			const auto frameEnd = steady_clock::now();
+			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
+
+			// Delta too large. Assume that a debugger took over and paused
+			// the engine's execution.
+			if (deltaTime > 5.0) {
+				deltaTime = 1.0F / 30.0F;
+			}
+
+			frameBegin = frameEnd;
 		}
 
 		return OnShutdown();

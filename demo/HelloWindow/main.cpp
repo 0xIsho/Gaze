@@ -2,6 +2,8 @@
 
 #include "WM/Window.hpp"
 
+using namespace Gaze;
+
 class MyApp : public Gaze::Client::App
 {
 public:
@@ -9,7 +11,7 @@ public:
 
 private:
 		auto OnInit() -> Status override;
-		auto OnUpdate() -> void override;
+		auto OnUpdate(F64 deltaTime) -> void override;
 		auto OnShutdown() -> Status override;
 
 private:
@@ -33,7 +35,7 @@ auto MyApp::OnInit() -> Status
 	return App::Status::Success;
 }
 
-auto MyApp::OnUpdate() -> void
+auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
 }
 
