@@ -24,11 +24,16 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 option(GAZE_BUILD_TESTS "Build the test suite?" ON)
+option(GAZE_BUILD_DEMOS "Build the demo apps?" ON)
 
 if (GAZE_BUILD_TESTS)
 	find_package(Catch2 REQUIRED)
 	include(Catch)
 	enable_testing()
+endif()
+
+if (GAZE_BUILD_DEMOS)
+	add_subdirectory("demo/")
 endif()
 
 add_subdirectory("lib/")
