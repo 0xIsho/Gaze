@@ -14,6 +14,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void override;
 		auto Clear() -> void override;
 		auto Render() -> void override;
+		auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void override;
 
 		auto DrawPoint(Vec4 p) -> void override;
 		auto DrawLine(Vec4 start, Vec4 end) -> void override;

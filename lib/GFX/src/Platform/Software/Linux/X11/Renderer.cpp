@@ -56,12 +56,21 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		auto operator=(const Color&) -> Color& = delete;
 	};
 
+	struct Viewport
+	{
+		I32 x;
+		I32 y;
+		I32 width;
+		I32 height;
+	};
+
 	struct Renderer::Impl
 	{
 		Display* display;
 		XID xwindow;
 		GC gc;
 		Pixmap pixmap;
+		Viewport viewport;
 		Color clearColor;
 		Color foregroundColor;
 	};
@@ -73,11 +82,12 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		m_pImpl->display = glfwGetX11Display();
 		m_pImpl->xwindow = glfwGetX11Window(static_cast<GLFWwindow*>(Window().Handle()));
 		m_pImpl->gc = XCreateGC(m_pImpl->display, m_pImpl->xwindow, 0, nullptr);
+		SetViewport(0, 0, Window().Width(), Window().Height());
 		m_pImpl->pixmap = XCreatePixmap(
 			m_pImpl->display,
 			m_pImpl->xwindow,
-			static_cast<unsigned>(Window().Width()),
-			static_cast<unsigned>(Window().Height()),
+			static_cast<unsigned>(m_pImpl->viewport.width),
+			static_cast<unsigned>(m_pImpl->viewport.height),
 			unsigned(DefaultDepth(m_pImpl->display, DefaultScreen(m_pImpl->display)))
 		);
 
@@ -101,21 +111,25 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 
 	auto Renderer::Clear() -> void
 	{
+		const auto& vp = m_pImpl->viewport;
 		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->clearColor.handle.pixel);
 		XFillRectangle(
 			m_pImpl->display,
 			m_pImpl->pixmap,
 			m_pImpl->gc,
-			0,
-			0,
-			unsigned(Window().Width()),
-			unsigned(Window().Height())
+			vp.x,
+			vp.y,
+			unsigned(vp.width),
+			unsigned(vp.height)
 		);
 		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->foregroundColor.handle.pixel);
 	}
 
 	auto Renderer::Render() -> void
 	{
+		const auto oldVp = m_pImpl->viewport;
+		SetViewport(0, 0, Window().Width(), Window().Height());
+
 		XCopyArea(
 			m_pImpl->display,
 			m_pImpl->pixmap,
@@ -128,6 +142,20 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			0,
 			0
 		);
+
+		SetViewport(oldVp.x, oldVp.y, oldVp.width, oldVp.height);
+	}
+
+	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) -> void
+	{
+		m_pImpl->viewport = { x, y, width, height };
+
+		auto rect = XRectangle{
+			short(x),
+			short(y),
+			static_cast<unsigned short>(width),
+			static_cast<unsigned short>(height) };
+		XSetClipRectangles(m_pImpl->display, m_pImpl->gc, 0, 0, &rect, 1, Unsorted);
 	}
 
 	auto Renderer::DrawPoint(Vec4 p) -> void
@@ -210,11 +238,10 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 
 	auto Renderer::NDCtoScreen(glm::vec4& vec) -> void
 	{
-		// TODO: Replace Window() with Viewport when support for that is added.
-		//   P.S. Don't forget to offset the coordinates by the viewport's (x,y)!
+		const auto& vp = m_pImpl->viewport;
 
-		vec.x = (vec.x + 1) * (F32(Window().Width()) / 2);
-		vec.y = (1 - vec.y) * (F32(Window().Height()) / 2);
+		vec.x = (vec.x + 1) * (F32(vp.width) / 2) + F32(vp.x);
+		vec.y = (1 - vec.y) * (F32(vp.height) / 2) + F32(vp.y);
 		vec.z = (vec.z + 1) / 2;
 	}
 }
