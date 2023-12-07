@@ -21,7 +21,7 @@ private:
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
-	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Hello Window", 800, 600))
+	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Hello Renderer", 800, 600))
 	, m_Rdr(Gaze::GFX::CreateRenderer(m_Win))
 {
 }

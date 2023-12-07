@@ -21,7 +21,7 @@ private:
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
-	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Hello Window", 800, 600))
+	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Hello Input", 800, 600))
 	, m_Input(m_Win)
 {
 }
