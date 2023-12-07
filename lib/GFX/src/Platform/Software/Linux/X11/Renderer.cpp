@@ -158,7 +158,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		XSetClipRectangles(m_pImpl->display, m_pImpl->gc, 0, 0, &rect, 1, Unsorted);
 	}
 
-	auto Renderer::DrawPoint(Vec4 p) -> void
+	auto Renderer::DrawPoint(Vec3 p) -> void
 	{
 		NDCtoScreen(p);
 
@@ -171,7 +171,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::DrawLine(Vec4 start, Vec4 end) -> void
+	auto Renderer::DrawLine(Vec3 start, Vec3 end) -> void
 	{
 		NDCtoScreen(start);
 		NDCtoScreen(end);
@@ -187,7 +187,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::DrawTri(const std::array<Vec4, 3>& ps) -> void
+	auto Renderer::DrawTri(const std::array<Vec3, 3>& ps) -> void
 	{
 		auto psTmp = ps;
 		NDCtoScreen(psTmp[0]);
@@ -211,7 +211,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::FillTri(const std::array<Vec4, 3>& ps) -> void
+	auto Renderer::FillTri(const std::array<Vec3, 3>& ps) -> void
 	{
 		auto psTmp = ps;
 		NDCtoScreen(psTmp[0]);
@@ -236,7 +236,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		);
 	}
 
-	auto Renderer::NDCtoScreen(glm::vec4& vec) -> void
+	auto Renderer::NDCtoScreen(glm::vec3& vec) -> void
 	{
 		const auto& vp = m_pImpl->viewport;
 

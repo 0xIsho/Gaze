@@ -6,12 +6,12 @@
 
 #include "WM/Window.hpp"
 
-#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
 
 #include <array>
 
 namespace Gaze::GFX {
-	using Vec4 = glm::vec4;
+	using Vec3 = glm::vec3;
 
 	class Renderer
 	{
@@ -27,10 +27,10 @@ namespace Gaze::GFX {
 		/* ********** 2D Primitive Rendering Functions ********** */
 		// Coordinates are NDC [-1.0F,1.0F]!
 
-		virtual auto DrawPoint(Vec4 p) -> void = 0;
-		virtual auto DrawLine(Vec4 start, Vec4 end) -> void = 0;
-		virtual auto DrawTri(const std::array<Vec4, 3>& ps) -> void = 0;
-		virtual auto FillTri(const std::array<Vec4, 3>& ps) -> void = 0;
+		virtual auto DrawPoint(Vec3 p) -> void = 0;
+		virtual auto DrawLine(Vec3 start, Vec3 end) -> void = 0;
+		virtual auto DrawTri(const std::array<Vec3, 3>& ps) -> void = 0;
+		virtual auto FillTri(const std::array<Vec3, 3>& ps) -> void = 0;
 		/**********************************************************/
 
 	protected:
