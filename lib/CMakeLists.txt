@@ -3,6 +3,7 @@ set(LIBS
 	Core
 	Debug
 	GFX
+	Input
 	Test
 	WM
 )

@@ -7,6 +7,8 @@
 
 #include "GFX/Renderer.hpp"
 
+#include "Input/Input.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 class MyApp : public Gaze::Client::App
@@ -22,11 +24,13 @@ private:
 private:
 	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
+	Gaze::Input::Handler m_Input;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
+	, m_Input(m_Win)
 {
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->SetClearColor(.7F, .7F, .7F, 1.F);
@@ -47,6 +51,10 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate() -> void
 {
+	if (m_Input.IsKeyPressed(Gaze::Input::Key::kEscape)) {
+		Quit();
+	}
+
 	auto render = [this] {
 		const auto model = glm::rotate(glm::mat4(1.F), glm::radians(30.F), { 0.F, 0.F, 1.F });
 		// const auto model = glm::mat4(1.0F);

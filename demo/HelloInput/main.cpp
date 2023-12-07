@@ -1,0 +1,51 @@
+#include "Client/App.hpp"
+
+#include "Core/Type.hpp"
+#include "WM/Window.hpp"
+#include "Input/Input.hpp"
+
+class MyApp : public Gaze::Client::App
+{
+public:
+	MyApp(int argc, char** argv);
+
+private:
+		auto OnInit() -> Status override;
+		auto OnUpdate() -> void override;
+		auto OnShutdown() -> Status override;
+
+private:
+	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
+	Gaze::Input::Handler m_Input;
+};
+
+MyApp::MyApp(int argc, char** argv)
+	: App(argc, argv)
+	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Hello Window", 800, 600))
+	, m_Input(m_Win)
+{
+}
+
+auto MyApp::OnInit() -> Status
+{
+	m_Win->OnClose([this] {
+		Quit();
+	});
+	m_Win->Show();
+
+	return App::Status::Success;
+}
+
+auto MyApp::OnUpdate() -> void
+{
+	if (m_Input.IsKeyPressed(Gaze::Input::Key::kEscape)) {
+		Quit();
+	}
+}
+
+auto MyApp::OnShutdown() -> Status
+{
+	return App::Status::Success;
+}
+
+GAZE_REGISTER_APP(MyApp);

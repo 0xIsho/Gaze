@@ -12,6 +12,7 @@ target_link_libraries(${TARGET}
 		Gaze::Client
 		Gaze::GFX
 		Gaze::WM
+		Gaze::Input
 )
 
 if (GAZE_BUILD_TESTS)

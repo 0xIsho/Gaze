@@ -1,4 +1,5 @@
 set(DEMOS
+	HelloInput
 	HelloRenderer
 	HelloWindow
 	HelloWorld
