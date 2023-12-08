@@ -1,6 +1,7 @@
 set(DEMOS
 	HelloInput
 	HelloRenderer
+	HelloViewport
 	HelloWindow
 	HelloWorld
 )
