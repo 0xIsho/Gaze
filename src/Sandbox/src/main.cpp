@@ -67,10 +67,12 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		const auto projection = glm::ortho(-1.F, 1.F, -1.F, 1.F);
 		const auto mvp = projection * view * model;
 
+		m_Rdr->SetColor(1.F, 1.F, 1.F, 1.F);
 		m_Rdr->DrawLine(glm::vec4{ -1, 0, 0, 1 } * mvp, glm::vec4{ 1, 0, 0, 1 } * mvp);
 		m_Rdr->DrawLine(glm::vec4{ 0, -1, 0, 1 } * mvp, glm::vec4{ 0, 1, 0, 1 } * mvp);
 
 		for (auto i = -1.F; i <= 1.F; i += .1F) {
+			m_Rdr->SetColor(.5F, .2F, 1.F, 1.F);
 			m_Rdr->DrawLine(glm::vec4{ i, -.0075F, 0, 1 } * mvp, glm::vec4{ i, .0075F, 0, 1 } * mvp);
 			m_Rdr->DrawLine(glm::vec4{ -.0075F, i, 0, 1 } * mvp, glm::vec4{ .0075F, i, 0, 1 } * mvp);
 
@@ -79,6 +81,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 			}
 		}
 
+		m_Rdr->SetColor(1.F, 1.F, 0.F, 1.F);
 		m_Rdr->DrawTri({{ glm::vec4{ -.6F, .4F , 0, 1 } * mvp,glm::vec4 { -.5F, .6F, 0, 1 } * mvp, glm::vec4{ -.4F, .4F, 0, 1 } * mvp }});
 		m_Rdr->FillTri({{ glm::vec4{ -.6F, -.4F , 0, 1 } * mvp,glm::vec4 { -.5F, -.6F, 0, 1 } * mvp, glm::vec4{ -.4F, -.4F, 0, 1 } * mvp }});
 

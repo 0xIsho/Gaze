@@ -102,6 +102,12 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		delete m_pImpl;
 	}
 
+	auto Renderer::SetColor(F32 r, F32 g, F32 b, F32 /*a*/) -> void
+	{
+		m_pImpl->foregroundColor = Color(m_pImpl->display, r, g, b);
+		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->foregroundColor.handle.pixel);
+	}
+
 	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 /* a */) -> void
 	{
 		// TODO: Skipping the Color allocation if the new is the same as the old one might be a good idea.

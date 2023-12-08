@@ -19,6 +19,7 @@ namespace Gaze::GFX {
 		Renderer(Mem::Shared<WM::Window> window);
 		virtual ~Renderer() = default;
 
+		virtual auto SetColor(F32 r, F32 g, F32 b, F32 a) -> void = 0;
 		virtual auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void = 0;
 		virtual auto Clear() -> void = 0;
 		virtual auto Render() -> void = 0;
