@@ -3,6 +3,7 @@
 #include "Core/Type.hpp"
 
 #include "GFX/API.hpp"
+#include "GFX/Mesh.hpp"
 
 #include "WM/Window.hpp"
 
@@ -16,6 +17,18 @@ namespace Gaze::GFX {
 	class Renderer
 	{
 	public:
+		enum class PrimitiveMode
+		{
+			Points,
+			Lines,
+			LineStrip,
+			LineLoop,
+			Triangles,
+			TriangleStrip,
+			TriangleFan
+		};
+
+	public:
 		Renderer(Mem::Shared<WM::Window> window);
 		virtual ~Renderer() = default;
 
@@ -24,6 +37,8 @@ namespace Gaze::GFX {
 		virtual auto Clear() -> void = 0;
 		virtual auto Render() -> void = 0;
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void = 0;
+
+		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void = 0;
 
 		/* ********** 2D Primitive Rendering Functions ********** */
 		// Coordinates are NDC [-1.0F,1.0F]!

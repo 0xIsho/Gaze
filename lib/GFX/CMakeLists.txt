@@ -12,6 +12,7 @@ endif()
 
 set(HEADERS
 	"include/GFX/API.hpp"
+	"include/GFX/Mesh.hpp"
 	"include/GFX/Renderer.hpp"
 
 	"include/GFX/Platform/Software/Renderer.hpp"
@@ -24,6 +25,7 @@ set(HEADERS
 
 set(SOURCES
 	"src/API.cpp"
+	"src/Mesh.cpp"
 	"src/Renderer.cpp"
 
 	$<$<BOOL:UNIX>:

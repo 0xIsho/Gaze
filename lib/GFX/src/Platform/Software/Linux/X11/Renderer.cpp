@@ -164,82 +164,139 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		XSetClipRectangles(m_pImpl->display, m_pImpl->gc, 0, 0, &rect, 1, Unsorted);
 	}
 
+	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
+	{
+		auto vertices = std::vector<XPoint>();
+		vertices.reserve(mesh.Vertices().size());
+
+		{
+			const auto& tmpVerts = mesh.Vertices();
+			for (const auto idx : mesh.Indices()) {
+				auto vert = tmpVerts[U64(idx)];
+				NDCtoScreen(vert);
+				auto p = XPoint{ short(vert.x), short(vert.y) };
+				vertices.push_back(p);
+			}
+		}
+
+		switch (mode) {
+		case PrimitiveMode::Points:
+			XDrawPoints(
+				m_pImpl->display,
+				m_pImpl->pixmap,
+				m_pImpl->gc,
+				vertices.data(),
+				int(vertices.size()),
+				CoordModeOrigin
+			);
+			break;
+		case PrimitiveMode::Lines:
+			XDrawSegments(
+				m_pImpl->display,
+				m_pImpl->pixmap, m_pImpl->gc,
+				reinterpret_cast<XSegment*>(vertices.data()),
+				int(vertices.size() / 2)
+			);
+			break;
+		case PrimitiveMode::LineLoop:
+			{
+				/**
+				 * A LineLoop is a LineStrip with the last point connected to the first one.
+				 *
+				 * Here we check if the first and last vertices refer to the same one and if not,
+				 * push "first" into the end of the vector to make ends meet.
+				 */
+				const auto first = vertices.front();
+				const auto last = vertices.back();
+				if ((first.x != last.x) || (first.y != last.y)) {
+					vertices.push_back(first);
+				}
+			}
+			[[fallthrough]];
+		case PrimitiveMode::LineStrip:
+			XDrawLines(
+				m_pImpl->display,
+				m_pImpl->pixmap,
+				m_pImpl->gc,
+				vertices.data(),
+				int(vertices.size()),
+				CoordModeOrigin
+			);
+			break;
+		case PrimitiveMode::Triangles:
+			// `leftovers` is either 1 or 2 extra vertices that wouldn't make a full triangle.
+			// e.g. 8 vertices will make 2 triangles with 2 vertices leftover; we skip those.
+			for (auto i = U64(0), leftovers = vertices.size() % 3; i < vertices.size() - leftovers; i += 3) {
+				XFillPolygon(
+					m_pImpl->display,
+					m_pImpl->pixmap,
+					m_pImpl->gc,
+					vertices.data() + i,
+					3,
+					Complex,
+					CoordModeOrigin
+				);
+			}
+			break;
+		case PrimitiveMode::TriangleStrip:
+			{
+				const auto& indices = mesh.Indices();
+				for (auto i = U64(2); i < indices.size(); i++) {
+					// Triangle strips are rendered in alternating winding order. That's what we're doing here.
+					auto idx1 = indices[i - (i % 2 ? 2 : 1)];
+					auto idx2 = indices[i - (i % 2 ? 1 : 2)];
+					auto idx3 = indices[i];
+
+					XPoint ps[] = { vertices[idx1], vertices[idx2], vertices[idx3] };
+
+					XFillPolygon(
+						m_pImpl->display,
+						m_pImpl->pixmap,
+						m_pImpl->gc,
+						ps,
+						3,
+						Complex,
+						CoordModeOrigin
+					);
+				}
+			}
+			break;
+		case PrimitiveMode::TriangleFan:
+			for (auto i = U64(2); i < vertices.size(); i++) {
+				XPoint ps[] = { vertices[0], vertices[i - 1], vertices[i] };
+
+				XFillPolygon(
+					m_pImpl->display,
+					m_pImpl->pixmap,
+					m_pImpl->gc,
+					ps,
+					3,
+					Complex,
+					CoordModeOrigin
+				);
+			}
+			break;
+		}
+	}
+
 	auto Renderer::DrawPoint(Vec3 p) -> void
 	{
-		NDCtoScreen(p);
-
-		XDrawPoint(
-			m_pImpl->display,
-			m_pImpl->pixmap,
-			m_pImpl->gc,
-			int(p.x),
-			int(p.y)
-		);
+		DrawMesh({ { std::move(p) }, { 0 } }, PrimitiveMode::Points);
 	}
 
 	auto Renderer::DrawLine(Vec3 start, Vec3 end) -> void
 	{
-		NDCtoScreen(start);
-		NDCtoScreen(end);
-
-		XDrawLine(
-			m_pImpl->display,
-			m_pImpl->pixmap,
-			m_pImpl->gc,
-			int(start.x),
-			int(start.y),
-			int(end.x),
-			int(end.y)
-		);
+		DrawMesh({ { std::move(start), std::move(end) }, { 0, 1 } }, PrimitiveMode::Lines);
 	}
 
 	auto Renderer::DrawTri(const std::array<Vec3, 3>& ps) -> void
 	{
-		auto psTmp = ps;
-		NDCtoScreen(psTmp[0]);
-		NDCtoScreen(psTmp[1]);
-		NDCtoScreen(psTmp[2]);
-
-		XPoint points[] = {
-			{ short(psTmp[0].x), short(psTmp[0].y) },
-			{ short(psTmp[1].x), short(psTmp[1].y) },
-			{ short(psTmp[2].x), short(psTmp[2].y) },
-			{ short(psTmp[0].x), short(psTmp[0].y) },
-		};
-
-		XDrawLines(
-			m_pImpl->display,
-			m_pImpl->pixmap,
-			m_pImpl->gc,
-			points,
-			sizeof(points) / sizeof(*points),
-			CoordModeOrigin
-		);
+		DrawMesh({ { ps[0], ps[1], ps[2] }, { 0, 1, 2 } }, PrimitiveMode::LineLoop);
 	}
 
 	auto Renderer::FillTri(const std::array<Vec3, 3>& ps) -> void
 	{
-		auto psTmp = ps;
-		NDCtoScreen(psTmp[0]);
-		NDCtoScreen(psTmp[1]);
-		NDCtoScreen(psTmp[2]);
-
-		XPoint points[] = {
-			{ short(psTmp[0].x), short(psTmp[0].y) },
-			{ short(psTmp[1].x), short(psTmp[1].y) },
-			{ short(psTmp[2].x), short(psTmp[2].y) },
-			{ short(psTmp[0].x), short(psTmp[0].y) },
-		};
-
-		XFillPolygon(
-			m_pImpl->display,
-			m_pImpl->pixmap,
-			m_pImpl->gc,
-			points,
-			sizeof(points) / sizeof(*points),
-			CoordModeOrigin,
-			Complex // TODO: Other options can improve performance but automatically choosing them is not practical
-		);
+		DrawMesh({ { ps[0], ps[1], ps[2] }, { 0, 1, 2 } }, PrimitiveMode::Triangles);
 	}
 
 	auto Renderer::NDCtoScreen(glm::vec3& vec) -> void
