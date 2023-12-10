@@ -4,7 +4,6 @@ set(LIBS
 	Debug
 	GFX
 	Input
-	Test
 	WM
 )
 

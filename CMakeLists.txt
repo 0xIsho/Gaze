@@ -30,6 +30,7 @@ if (GAZE_BUILD_TESTS)
 	find_package(Catch2 REQUIRED)
 	include(Catch)
 	enable_testing()
+	set(GAZE_CATCH2_TARGET Catch2::Catch2WithMain)
 endif()
 
 if (GAZE_BUILD_DEMOS)

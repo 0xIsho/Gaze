@@ -1,3 +1,3 @@
 add_executable(test_sandbox_dummy dummy.cpp)
-target_link_libraries(test_sandbox_dummy Gaze::Test)
+target_link_libraries(test_sandbox_dummy ${GAZE_CATCH2_TARGET})
 catch_discover_tests(test_sandbox_dummy)

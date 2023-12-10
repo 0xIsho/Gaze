@@ -6,7 +6,7 @@ This repository hosts the sources of the *Gaze Interactive Experiences Engine*.
 
 - A C++20-capable compiler (e.g. GCC/Clang/MSVC)
 - [CMake](https://cmake.org) (>=3.19)
-- [Catch2](https://github.com/catchorg/Catch2/tree/v2.x) (v2.x) *(Required only if testing is enabled)*
+- [Catch2](https://github.com/catchorg/Catch2) (v3) *(Required only if testing is enabled)*
 - [GLFW](https://glfw.org)
 - [GLM](https://github.com/g-truc/glm)
 
