@@ -5,6 +5,7 @@
 #include "WM/Core.hpp"
 #include "WM/Window.hpp"
 
+#include "GFX/Camera.hpp"
 #include "GFX/Renderer.hpp"
 
 #include "Input/Input.hpp"
@@ -30,6 +31,7 @@ private:
 	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
 	Gaze::Input::Handler m_Input;
+	Gaze::GFX::Camera m_Cam;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -59,8 +61,8 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	}
 
 	const auto model = glm::mat4(1.0F);
-	const auto view = glm::mat4(1.0F);
 	const auto projection = glm::ortho(-1.F, 1.F, -1.F, 1.F);
+	const auto view = m_Cam.ComputeViewMatrix();
 	const auto mvp = projection * view * model;
 
 	m_Rdr->SetColor(1.F, 1.F, 1.F, 1.F);

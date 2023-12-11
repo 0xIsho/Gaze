@@ -12,6 +12,7 @@ endif()
 
 set(HEADERS
 	"include/GFX/API.hpp"
+	"include/GFX/Camera.hpp"
 	"include/GFX/Mesh.hpp"
 	"include/GFX/Renderer.hpp"
 
@@ -25,6 +26,7 @@ set(HEADERS
 
 set(SOURCES
 	"src/API.cpp"
+	"src/Camera.cpp"
 	"src/Mesh.cpp"
 	"src/Renderer.cpp"
 
