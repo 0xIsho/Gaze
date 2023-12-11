@@ -11,12 +11,14 @@ namespace Gaze::WM {
 	{
 		g_IsInitialized = glfwInit() == GLFW_TRUE;
 
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // TODO: This should be ignored when using OpenGL
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO: Remove this once resizing logic is implemented.
+		if (g_IsInitialized) {
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // TODO: This should be ignored when using OpenGL
+			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO: Remove this once resizing logic is implemented.
 
-		glfwSetErrorCallback([](int code, const char* description) {
-			std::cerr << "GLFW Error (" << code << "): " << description << '\n';
-		});
+			glfwSetErrorCallback([](int code, const char* description) {
+				std::cerr << "GLFW Error (" << code << "): " << description << '\n';
+			});
+		}
 
 		return g_IsInitialized;
 	}
