@@ -11,7 +11,7 @@ namespace Gaze::GFX {
 		auto ComputeViewMatrix() const -> glm::mat4;
 
 	private:
-		glm::vec3 m_Position { .0F, 10.0F, .0F };
+		glm::vec3 m_Position { .0F, 0.0F, 1.0F };
 		glm::vec3 m_Front { .0F, .0F, -1.F };
 		glm::vec3 m_Up { .0F, 1.0F, .0F };
 	};
