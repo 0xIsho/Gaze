@@ -74,6 +74,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		Color clearColor;
 		Color foregroundColor;
 		glm::mat4 projectionMat;
+		Mem::Shared<Camera> camera;
 	};
 
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
@@ -170,6 +171,11 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		m_pImpl->projectionMat = std::move(projection);
 	}
 
+	auto Renderer::SetCamera(Mem::Shared<Camera> camera) -> void
+	{
+		m_pImpl->camera = std::move(camera);
+	}
+
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
 	{
 		auto vertices = std::vector<XPoint>();
@@ -179,7 +185,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			const auto& tmpVerts = mesh.Vertices();
 			for (const auto idx : mesh.Indices()) {
 				auto vert = tmpVerts[U64(idx)];
-				vert = m_pImpl->projectionMat * mesh.Transform() * glm::vec4(vert, 1.0F);
+				const auto viewMat = m_pImpl->camera ? m_pImpl->camera->ComputeViewMatrix() : glm::mat4(1.0F);
+				vert = m_pImpl->projectionMat * viewMat * mesh.Transform() * glm::vec4(vert, 1.0F);
 				NDCtoScreen(vert);
 				auto p = XPoint{ short(vert.x), short(vert.y) };
 				vertices.push_back(p);

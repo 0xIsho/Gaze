@@ -3,6 +3,7 @@
 #include "Core/Type.hpp"
 
 #include "GFX/API.hpp"
+#include "GFX/Camera.hpp"
 #include "GFX/Mesh.hpp"
 
 #include "WM/Window.hpp"
@@ -39,6 +40,7 @@ namespace Gaze::GFX {
 		virtual auto Render() -> void = 0;
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void = 0;
 		virtual auto SetProjection(glm::mat4 projection) -> void = 0;
+		virtual auto SetCamera(Mem::Shared<Camera> camera) -> void = 0;
 
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void = 0;
 

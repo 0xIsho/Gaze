@@ -17,6 +17,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		auto Render() -> void override;
 		auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void override;
 		auto SetProjection(glm::mat4 projection) -> void override;
+		auto SetCamera(Mem::Shared<Camera> camera) -> void override;
 
 		auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void override;
 

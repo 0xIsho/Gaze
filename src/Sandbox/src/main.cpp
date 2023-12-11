@@ -31,13 +31,14 @@ private:
 	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
 	Gaze::Input::Handler m_Input;
-	Gaze::GFX::Camera m_Cam;
+	Gaze::Mem::Shared<Gaze::GFX::Camera> m_Cam;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
 	, m_Input(m_Win)
+	, m_Cam(Mem::MakeShared<Gaze::GFX::Camera>())
 {
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->Clear();
@@ -52,6 +53,7 @@ auto MyApp::OnInit() -> Status
 	m_Win->Show();
 
 	m_Rdr->SetProjection(glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 10.F));
+	m_Rdr->SetCamera(m_Cam);
 
 	return Status::Success;
 }
