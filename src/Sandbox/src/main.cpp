@@ -56,6 +56,8 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
+	m_Rdr->Clear();
+
 	if (m_Input.IsKeyPressed(Gaze::Input::Key::kEscape)) {
 		Quit();
 	}
