@@ -62,10 +62,24 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		Quit();
 	}
 
-	const auto model = glm::mat4(1.0F);
-	const auto projection = glm::ortho(-1.F, 1.F, -1.F, 1.F);
+	auto mesh = Gaze::GFX::Mesh{
+		{
+			{  .25F, -.25F, .0F },
+			{  .25F,  .25F,  .0F },
+			{  .0F,   .5F,  .0F },
+			{ -.25F,  .25F,  .0F },
+			{ -.25F, -.25F, .0F },
+			{  .0F,  -.5F,  .0F },
+		},
+		{ 0, 1, 2, 3, 4, 5 }
+	};
+
+	mesh.Rotate(glm::radians(30.0F), { .0F, 1.F, 1.F });
+	mesh.Scale({ .5F, .5F, .5F });
+
+	const auto projection = glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 10.F);
 	const auto view = m_Cam.ComputeViewMatrix();
-	const auto mvp = projection * view * model;
+	const auto mvp = projection * view * mesh.Transform();
 
 	m_Rdr->SetColor(1.F, 1.F, 1.F, 1.F);
 	m_Rdr->DrawLine(glm::vec4{ -1, 0, 0, 1 } * mvp, glm::vec4{ 1, 0, 0, 1 } * mvp);
@@ -82,17 +96,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	}
 
 	m_Rdr->SetColor(1.F, .0F, .0F, 1.F);
-	m_Rdr->DrawMesh({
-		{
-			{  .25F, -.25F, .0F },
-			{  .25F,  .25F,  .0F },
-			{  .0F,   .5F,  .0F },
-			{ -.25F,  .25F,  .0F },
-			{ -.25F, -.25F, .0F },
-			{  .0F,  -.5F,  .0F },
-		},
-		{ 0, 1, 2, 3, 4, 5 }
-	}, Gaze::GFX::Renderer::PrimitiveMode::LineLoop);
+	m_Rdr->DrawMesh(mesh, Gaze::GFX::Renderer::PrimitiveMode::LineLoop);
 
 	m_Rdr->SetColor(1.F, 1.F, 0.F, 1.F);
 	m_Rdr->DrawTri({{ glm::vec4{ -.6F, .4F , 0, 1 } * mvp,glm::vec4 { -.5F, .6F, 0, 1 } * mvp, glm::vec4{ -.4F, .4F, 0, 1 } * mvp }});

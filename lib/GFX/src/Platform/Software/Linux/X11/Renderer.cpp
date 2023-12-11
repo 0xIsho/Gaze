@@ -173,6 +173,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			const auto& tmpVerts = mesh.Vertices();
 			for (const auto idx : mesh.Indices()) {
 				auto vert = tmpVerts[U64(idx)];
+				vert = glm::vec4(vert, 1.0F) * mesh.Transform();
 				NDCtoScreen(vert);
 				auto p = XPoint{ short(vert.x), short(vert.y) };
 				vertices.push_back(p);
