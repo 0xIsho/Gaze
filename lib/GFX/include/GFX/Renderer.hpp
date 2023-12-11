@@ -8,6 +8,7 @@
 #include "WM/Window.hpp"
 
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 #include <array>
 
@@ -37,6 +38,7 @@ namespace Gaze::GFX {
 		virtual auto Clear() -> void = 0;
 		virtual auto Render() -> void = 0;
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void = 0;
+		virtual auto SetProjection(glm::mat4 projection) -> void = 0;
 
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void = 0;
 

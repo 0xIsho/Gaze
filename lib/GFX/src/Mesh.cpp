@@ -20,7 +20,7 @@ namespace Gaze::GFX {
 
 	auto Mesh::Rotate(F32 radians, const glm::vec3& axis) -> void
 	{
-		m_Transform *= glm::mat4_cast(glm::angleAxis(-radians, axis));
+		m_Transform *= glm::mat4_cast(glm::angleAxis(radians, axis));
 	}
 
 	auto Mesh::Scale(const glm::vec3& scale) -> void

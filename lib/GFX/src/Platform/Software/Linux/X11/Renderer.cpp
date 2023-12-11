@@ -73,6 +73,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		Viewport viewport;
 		Color clearColor;
 		Color foregroundColor;
+		glm::mat4 projectionMat;
 	};
 
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
@@ -164,6 +165,11 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		XSetClipRectangles(m_pImpl->display, m_pImpl->gc, 0, 0, &rect, 1, Unsorted);
 	}
 
+	auto Renderer::SetProjection(glm::mat4 projection) -> void
+	{
+		m_pImpl->projectionMat = std::move(projection);
+	}
+
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
 	{
 		auto vertices = std::vector<XPoint>();
@@ -173,7 +179,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			const auto& tmpVerts = mesh.Vertices();
 			for (const auto idx : mesh.Indices()) {
 				auto vert = tmpVerts[U64(idx)];
-				vert = glm::vec4(vert, 1.0F) * mesh.Transform();
+				vert = m_pImpl->projectionMat * mesh.Transform() * glm::vec4(vert, 1.0F);
 				NDCtoScreen(vert);
 				auto p = XPoint{ short(vert.x), short(vert.y) };
 				vertices.push_back(p);
