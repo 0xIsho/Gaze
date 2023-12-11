@@ -33,8 +33,6 @@ namespace Gaze::Client {
 			OnUpdate(deltaTime);
 			Gaze::WM::PollEvents();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(int((1 / 60.F) * 1000)));
-
 			const auto frameEnd = steady_clock::now();
 			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
 
