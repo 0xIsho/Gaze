@@ -190,11 +190,11 @@ auto MyApp::HandleCollision() -> void
 	m_P2Pos.y = std::clamp(m_P2Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
 
 	if (
-		const auto left = m_BallPos.y <= kWallThickness,
-		right = m_BallPos.y + kBallSize >= kWinHeight - kWallThickness;
-		left || right
+		const auto top = m_BallPos.y <= kWallThickness,
+		bottom = m_BallPos.y + kBallSize >= kWinHeight - kWallThickness;
+		top || bottom
 	) {
-		if (left) {
+		if (top) {
 			m_BallPos.y = kWallThickness + 1;
 		} else {
 			m_BallPos.y = kWinHeight - kBallSize - kWallThickness - 1;
