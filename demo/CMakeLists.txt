@@ -1,4 +1,5 @@
 set(DEMOS
+	Games
 	HelloInput
 	HelloRenderer
 	HelloViewport
