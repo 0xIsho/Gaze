@@ -54,7 +54,7 @@ private:
 	GFX::Mesh m_PaddleMesh;
 	GFX::Mesh m_BallMesh;
 	GFX::Mesh m_ScoreMarkerMesh;
-	const GFX::Mesh m_WallsMesh;
+	GFX::Mesh m_WallMesh;
 	const GFX::Mesh m_MidlineMesh;
 
 	static constexpr auto kWinWidth = 800;
@@ -87,16 +87,12 @@ MyApp::MyApp(int argc, char** argv)
 			{ .0F, .0F, .0F },
 			{ .0F, 10.F, .0F }
 		}, { 0, 1 })
-	, m_WallsMesh({
+	, m_WallMesh({
 			{ .0F      , .0F           , .0F },
 			{ .0F      , kWallThickness, .0F },
 			{ kWinWidth, .0F           , .0F },
 			{ kWinWidth, kWallThickness, .0F },
-			{ .0F      , kWinHeight - kWallThickness, .0F },
-			{ .0F      , kWinHeight                 , .0F },
-			{ kWinWidth, kWinHeight - kWallThickness, .0F },
-			{ kWinWidth, kWinHeight                 , .0F },
-		}, { 0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7 })
+		}, { 0, 1, 2, 2, 1, 3 })
 	, m_MidlineMesh({
 			{ kWinWidth / 2, kWallThickness             , .0F },
 			{ kWinWidth / 2, kWinHeight - kWallThickness, .0F }
@@ -153,7 +149,11 @@ auto MyApp::OnShutdown() -> Status
 
 auto MyApp::RenderPlayground() -> void
 {
-	m_Rdr->DrawMesh(m_WallsMesh, GFX::Renderer::PrimitiveMode::Triangles);
+	m_WallMesh.SetPosition({ .0F, .0F, .0F });
+	m_Rdr->DrawMesh(m_WallMesh, GFX::Renderer::PrimitiveMode::Triangles);
+	m_WallMesh.SetPosition({ .0F, kWinHeight - kWallThickness, .0F });
+	m_Rdr->DrawMesh(m_WallMesh, GFX::Renderer::PrimitiveMode::Triangles);
+
 	m_Rdr->DrawMesh(m_MidlineMesh, GFX::Renderer::PrimitiveMode::Lines);
 }
 
