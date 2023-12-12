@@ -7,6 +7,9 @@
 #include "GFX/Mesh.hpp"
 #include "GFX/Renderer.hpp"
 
+#include "Input/Input.hpp"
+#include "Input/KeyCode.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace Gaze;
@@ -23,10 +26,12 @@ private:
 
 	auto RenderPlayground() -> void;
 	auto RenderPlayers() -> void;
+	auto HandleInput(F64 deltaTime) -> void;
 
 private:
 	Mem::Shared<WM::Window> m_Win;
 	Mem::Unique<GFX::Renderer> m_Rdr;
+	Input::Handler m_Input;
 
 	glm::vec3 m_P1Pos;
 	glm::vec3 m_P2Pos;
@@ -36,12 +41,14 @@ private:
 	static constexpr auto kWallThickness = 30.F;
 	static constexpr auto kPaddleWidth = 10.F;
 	static constexpr auto kPaddleHeight = 50.F;
+	static constexpr auto kPaddleSpeed = 200.0F;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
+	, m_Input(m_Win)
 	, m_P1Pos({ kWallThickness, kWinHeight / 2 - kPaddleHeight / 2, .0F })
 	, m_P2Pos({ kWinWidth - kWallThickness - kPaddleWidth, kWinHeight / 2 - kPaddleHeight / 2, .0F })
 {
@@ -65,6 +72,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 
 	RenderPlayground();
 	RenderPlayers();
+	HandleInput(deltaTime);
 
 	m_Rdr->Render();
 }
@@ -121,6 +129,25 @@ auto MyApp::RenderPlayers() -> void
 
 	paddle.SetPosition(m_P2Pos);
 	m_Rdr->DrawMesh(paddle, GFX::Renderer::PrimitiveMode::Triangles);
+}
+
+auto MyApp::HandleInput(F64 deltaTime) -> void
+{
+	if (m_Input.IsKeyPressed(Input::Key::kW)) {
+		m_P1Pos.y -= kPaddleSpeed * F32(deltaTime);
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kS)) {
+		m_P1Pos.y += kPaddleSpeed * F32(deltaTime);
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kUp)) {
+		m_P2Pos.y -= kPaddleSpeed * F32(deltaTime);
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kDown)) {
+		m_P2Pos.y += kPaddleSpeed * F32(deltaTime);
+	}
+
+	m_P1Pos.y = std::clamp(m_P1Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
+	m_P2Pos.y = std::clamp(m_P2Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
 }
 
 GAZE_REGISTER_APP(MyApp);
