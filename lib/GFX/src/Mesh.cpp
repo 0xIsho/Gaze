@@ -13,6 +13,11 @@ namespace Gaze::GFX {
 	{
 	}
 
+	auto Mesh::SetPosition(const glm::vec3& position) -> void
+	{
+		m_Transform[3] = glm::vec4(position, 1.0F);
+	}
+
 	auto Mesh::Translate(const glm::vec3& translation) -> void
 	{
 		m_Transform = glm::translate(m_Transform, translation);
