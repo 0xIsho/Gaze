@@ -12,6 +12,10 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <ctime>
+#include <random>
+#include <cstdlib>
+
 using namespace Gaze;
 
 class MyApp : public Client::App
@@ -35,7 +39,9 @@ private:
 
 	glm::vec3 m_P1Pos;
 	glm::vec3 m_P2Pos;
+
 	glm::vec3 m_BallPos;
+	glm::vec2 m_BallDir;
 
 	static constexpr auto kWinWidth = 800;
 	static constexpr auto kWinHeight = 400;
@@ -44,6 +50,7 @@ private:
 	static constexpr auto kPaddleHeight = 50.F;
 	static constexpr auto kPaddleSpeed = 200.0F;
 	static constexpr auto kBallSize = 10.F;
+	static constexpr auto kBallSpeed = 400.F;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -54,7 +61,11 @@ MyApp::MyApp(int argc, char** argv)
 	, m_P1Pos({ kWallThickness, kWinHeight / 2 - kPaddleHeight / 2, .0F })
 	, m_P2Pos({ kWinWidth - kWallThickness - kPaddleWidth, kWinHeight / 2 - kPaddleHeight / 2, .0F })
 	, m_BallPos({ kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2, .0F })
+	, m_BallDir({ .0F, .0F })
 {
+	srand(time(nullptr));
+	m_BallDir = { rand() - RAND_MAX / 2, rand() - RAND_MAX / 2 };
+	m_BallDir = glm::normalize(m_BallDir);
 }
 
 auto MyApp::OnInit() -> Status
@@ -76,6 +87,8 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	RenderPlayground();
 	RenderPlayers();
 	HandleInput(deltaTime);
+	m_BallPos.x += m_BallDir.x * kBallSpeed * F32(deltaTime);
+	m_BallPos.y += m_BallDir.y * kBallSpeed * F32(deltaTime);
 
 	m_Rdr->Render();
 }
