@@ -66,7 +66,7 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_Input(m_Win)
 {
-	srand(time(nullptr));
+	srand(U32(time(nullptr)));
 	Reset();
 }
 
@@ -82,7 +82,7 @@ auto MyApp::OnInit() -> Status
 	return Status::Success;
 }
 
-auto MyApp::OnUpdate(F64 deltaTime) -> void
+auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 {
 	if (m_Input.IsKeyPressed(Input::Key::kEnter) || m_Input.IsKeyPressed(Input::Key::kSpace)) {
 		m_GameStarted = true;
