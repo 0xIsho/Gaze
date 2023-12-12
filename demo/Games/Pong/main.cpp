@@ -31,6 +31,7 @@ private:
 	auto RenderPlayground() -> void;
 	auto RenderPlayers() -> void;
 	auto HandleInput(F64 deltaTime) -> void;
+	auto HandleCollision() -> void;
 
 private:
 	Mem::Shared<WM::Window> m_Win;
@@ -87,6 +88,8 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	RenderPlayground();
 	RenderPlayers();
 	HandleInput(deltaTime);
+	HandleCollision();
+
 	m_BallPos.x += m_BallDir.x * kBallSpeed * F32(deltaTime);
 	m_BallPos.y += m_BallDir.y * kBallSpeed * F32(deltaTime);
 
@@ -174,9 +177,29 @@ auto MyApp::HandleInput(F64 deltaTime) -> void
 	if (m_Input.IsKeyPressed(Input::Key::kDown)) {
 		m_P2Pos.y += kPaddleSpeed * F32(deltaTime);
 	}
+}
 
+auto MyApp::HandleCollision() -> void
+{
 	m_P1Pos.y = std::clamp(m_P1Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
 	m_P2Pos.y = std::clamp(m_P2Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
+
+	if (
+		const auto left = m_BallPos.y <= kWallThickness,
+		right = m_BallPos.y + kBallSize >= kWinHeight - kWallThickness;
+		left || right
+	) {
+		if (left) {
+			m_BallPos.y = kWallThickness + 1;
+		} else {
+			m_BallPos.y = kWinHeight - kBallSize - kWallThickness - 1;
+		}
+
+		m_BallDir.y *= -1;
+	}
+	if (m_BallPos.x <= kWallThickness || m_BallPos.x >= kWinWidth - kWallThickness) {
+		m_BallDir.x *= -1;
+	}
 }
 
 GAZE_REGISTER_APP(MyApp);
