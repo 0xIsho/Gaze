@@ -95,6 +95,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 
 		m_pImpl->clearColor = Color(m_pImpl->display, 0.0F, 0.0F, 0.0F);
 		m_pImpl->foregroundColor = Color(m_pImpl->display, 1.0F, 1.0F, 1.0F);
+		m_pImpl->projectionMat = glm::mat4(1.0F);
 	}
 
 	Renderer::~Renderer()
