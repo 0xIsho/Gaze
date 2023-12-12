@@ -21,6 +21,8 @@ namespace Gaze::GFX {
 		[[nodiscard]]
 		auto Transform() const -> const glm::mat4&;
 
+		auto SetPosition(const glm::vec3& position) -> void;
+
 		auto Translate(const glm::vec3& translation) -> void;
 		auto Rotate(F32 radians, const glm::vec3& axis) -> void;
 		auto Scale(const glm::vec3& scale) -> void;
