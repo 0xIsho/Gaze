@@ -48,8 +48,7 @@ private:
 	static constexpr auto kWinWidth = 800;
 	static constexpr auto kWinHeight = 400;
 	static constexpr auto kWallThickness = 30.F;
-	static constexpr auto kPaddleWidth = 10.F;
-	static constexpr auto kPaddleHeight = 50.F;
+	static constexpr auto kPaddleSize = glm::vec2(10.F, 50.F);
 	static constexpr auto kPaddleSpeed = 200.0F;
 	static constexpr auto kBallSize = 10.F;
 	static constexpr auto kBallSpeed = 400.F;
@@ -60,8 +59,8 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_Input(m_Win)
-	, m_P1Pos({ kWallThickness, kWinHeight / 2 - kPaddleHeight / 2, .0F })
-	, m_P2Pos({ kWinWidth - kWallThickness - kPaddleWidth, kWinHeight / 2 - kPaddleHeight / 2, .0F })
+	, m_P1Pos({ kWallThickness, kWinHeight / 2 - kPaddleSize.y / 2, .0F })
+	, m_P2Pos({ kWinWidth - kWallThickness - kPaddleSize.x, kWinHeight / 2 - kPaddleSize.y / 2, .0F })
 	, m_BallPos({ kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2, .0F })
 	, m_BallDir({ .0F, .0F })
 {
@@ -140,9 +139,9 @@ auto MyApp::RenderPlayers() -> void
 {
 	auto paddle = GFX::Mesh({
 		{ .0F               , .0F          , .0F },
-		{ .0F               , kPaddleHeight, .0F },
-		{ kPaddleWidth      , .0F          , .0F },
-		{ kPaddleWidth      , kPaddleHeight, .0F }
+		{ .0F               , kPaddleSize.y, .0F },
+		{ kPaddleSize.x      , .0F          , .0F },
+		{ kPaddleSize.x      , kPaddleSize.y, .0F }
 	},
 	{
 		0, 1, 2, 2, 1, 3
@@ -186,8 +185,8 @@ auto MyApp::HandleInput(F64 deltaTime) -> void
 
 auto MyApp::HandleCollision() -> void
 {
-	m_P1Pos.y = std::clamp(m_P1Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
-	m_P2Pos.y = std::clamp(m_P2Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleHeight);
+	m_P1Pos.y = std::clamp(m_P1Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleSize.y);
+	m_P2Pos.y = std::clamp(m_P2Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleSize.y);
 
 	if (
 		const auto top = m_BallPos.y <= kWallThickness,
@@ -202,8 +201,27 @@ auto MyApp::HandleCollision() -> void
 
 		m_BallDir.y *= -1;
 	}
-	if (m_BallPos.x <= kWallThickness || m_BallPos.x >= kWinWidth - kWallThickness) {
+	if (
+		const auto left = m_BallPos.x <= 0,
+		right = m_BallPos.x + kBallSize >= kWinWidth;
+		left || right
+	) {
+		if (left) {
+			m_BallPos.x = 1;
+		} else {
+			m_BallPos.x = kWinWidth - kBallSize - 1;
+		}
+
 		m_BallDir.x *= -1;
+	}
+
+	if (m_BallPos.x + kBallSize >= m_P1Pos.x && m_BallPos.x <= m_P1Pos.x + kPaddleSize.x &&
+		m_BallPos.y + kBallSize >= m_P1Pos.y && m_BallPos.y <= m_P1Pos.y + kPaddleSize.y) {
+		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P1Pos + glm::vec3{ kPaddleSize * .5F, .0F }));
+	}
+	if (m_BallPos.x + kBallSize >= m_P2Pos.x && m_BallPos.x <= m_P2Pos.x + kPaddleSize.x &&
+		m_BallPos.y + kBallSize >= m_P2Pos.y && m_BallPos.y <= m_P2Pos.y + kPaddleSize.y) {
+		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P2Pos + glm::vec3{ kPaddleSize * .5F, .0F }));
 	}
 }
 
