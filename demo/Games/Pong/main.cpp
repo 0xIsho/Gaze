@@ -31,6 +31,7 @@ private:
 
 	auto RenderPlayground() -> void;
 	auto RenderPlayers() -> void;
+	auto RenderScoreboard() -> void;
 	auto HandleInput(F64 deltaTime) -> void;
 	auto HandleCollision() -> void;
 	auto Reset() -> void;
@@ -41,7 +42,9 @@ private:
 	Input::Handler m_Input;
 
 	glm::vec3 m_P1Pos;
+	I32 m_P1Score{};
 	glm::vec3 m_P2Pos;
+	I32 m_P2Score{};
 
 	glm::vec3 m_BallPos;
 	glm::vec2 m_BallDir;
@@ -89,6 +92,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 
 	RenderPlayground();
 	RenderPlayers();
+	RenderScoreboard();
 
 	m_Rdr->Render();
 }
@@ -173,6 +177,39 @@ auto MyApp::RenderPlayers() -> void
 	m_Rdr->DrawMesh(ball, GFX::Renderer::PrimitiveMode::Triangles);
 }
 
+auto MyApp::RenderScoreboard() -> void
+{
+	auto p1ScoreboardPos = glm::vec3{
+		kWinWidth / 4 - (m_P1Score + 10),
+		kWallThickness + 10,
+		.0F
+	};
+	auto p2ScoreboardPos = glm::vec3{
+		kWinWidth - kWinWidth / 4 - (m_P2Score + 10),
+		kWallThickness + 10,
+		.0F
+	};
+
+	auto line = GFX::Mesh({
+		{ .0F, .0F, .0F },
+		{ .0F, 10.F, .0F }
+	},
+	{
+		0, 1
+	});
+
+	for (auto i = I32(0); i < m_P1Score; i++) {
+		line.SetPosition(p1ScoreboardPos);
+		m_Rdr->DrawMesh(line, GFX::Renderer::PrimitiveMode::Lines);
+		p1ScoreboardPos.x += 5;
+	}
+	for (auto i = I32(0); i < m_P2Score; i++) {
+		line.SetPosition(p2ScoreboardPos);
+		m_Rdr->DrawMesh(line, GFX::Renderer::PrimitiveMode::Lines);
+		p2ScoreboardPos.x += 5;
+	}
+}
+
 auto MyApp::HandleInput(F64 deltaTime) -> void
 {
 	if (m_Input.IsKeyPressed(Input::Key::kW)) {
@@ -213,9 +250,9 @@ auto MyApp::HandleCollision() -> void
 		left || right
 	) {
 		if (left) {
-			// P2 scored
+			m_P2Score++;
 		} else {
-			// P1 scored
+			m_P1Score++;
 		}
 
 		Reset();
