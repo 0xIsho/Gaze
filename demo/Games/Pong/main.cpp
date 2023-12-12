@@ -33,6 +33,7 @@ private:
 	auto RenderPlayers() -> void;
 	auto HandleInput(F64 deltaTime) -> void;
 	auto HandleCollision() -> void;
+	auto Reset() -> void;
 
 private:
 	Mem::Shared<WM::Window> m_Win;
@@ -44,6 +45,8 @@ private:
 
 	glm::vec3 m_BallPos;
 	glm::vec2 m_BallDir;
+
+	bool m_GameStarted{ false };
 
 	static constexpr auto kWinWidth = 800;
 	static constexpr auto kWinHeight = 400;
@@ -59,14 +62,9 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_Input(m_Win)
-	, m_P1Pos({ kWallThickness, kWinHeight / 2 - kPaddleSize.y / 2, .0F })
-	, m_P2Pos({ kWinWidth - kWallThickness - kPaddleSize.x, kWinHeight / 2 - kPaddleSize.y / 2, .0F })
-	, m_BallPos({ kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2, .0F })
-	, m_BallDir({ .0F, .0F })
 {
 	srand(time(nullptr));
-	m_BallDir = { rand() - RAND_MAX / 2, rand() - RAND_MAX / 2 };
-	m_BallDir = glm::normalize(m_BallDir);
+	Reset();
 }
 
 auto MyApp::OnInit() -> Status
@@ -83,6 +81,10 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
+	if (m_Input.IsKeyPressed(Input::Key::kEnter) || m_Input.IsKeyPressed(Input::Key::kSpace)) {
+		m_GameStarted = true;
+	}
+
 	m_Rdr->Clear();
 
 	RenderPlayground();
@@ -93,6 +95,10 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 
 auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
 {
+	if (!m_GameStarted) {
+		return;
+	}
+
 	m_BallPos.x += m_BallDir.x * kBallSpeed * F32(deltaTime);
 	m_BallPos.y += m_BallDir.y * kBallSpeed * F32(deltaTime);
 
@@ -207,12 +213,13 @@ auto MyApp::HandleCollision() -> void
 		left || right
 	) {
 		if (left) {
-			m_BallPos.x = 1;
+			// P2 scored
 		} else {
-			m_BallPos.x = kWinWidth - kBallSize - 1;
+			// P1 scored
 		}
 
-		m_BallDir.x *= -1;
+		Reset();
+		return;
 	}
 
 	if (m_BallPos.x + kBallSize >= m_P1Pos.x && m_BallPos.x <= m_P1Pos.x + kPaddleSize.x &&
@@ -223,6 +230,18 @@ auto MyApp::HandleCollision() -> void
 		m_BallPos.y + kBallSize >= m_P2Pos.y && m_BallPos.y <= m_P2Pos.y + kPaddleSize.y) {
 		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P2Pos + glm::vec3{ kPaddleSize * .5F, .0F }));
 	}
+}
+
+auto MyApp::Reset() -> void
+{
+	m_P1Pos = { kWallThickness, kWinHeight / 2 - kPaddleSize.y / 2, .0F };
+	m_P2Pos = { kWinWidth - kWallThickness - kPaddleSize.x, kWinHeight / 2 - kPaddleSize.y / 2, .0F };
+	m_BallPos = { kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2, .0F };
+
+	m_BallDir = { rand() - RAND_MAX / 2, rand() - RAND_MAX / 2 };
+	m_BallDir = glm::normalize(m_BallDir);
+
+	m_GameStarted = false;
 }
 
 GAZE_REGISTER_APP(MyApp);
