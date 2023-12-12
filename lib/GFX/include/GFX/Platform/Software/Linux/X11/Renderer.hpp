@@ -27,6 +27,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		auto FillTri(const std::array<Vec3, 3>& ps) -> void override;
 
 	private:
+		auto ApplyProjection(glm::vec3& vec, const Mesh& mesh) -> void;
 		auto NDCtoScreen(glm::vec3& vec) -> void;
 
 	private:
