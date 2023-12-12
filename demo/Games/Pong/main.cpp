@@ -35,6 +35,7 @@ private:
 
 	glm::vec3 m_P1Pos;
 	glm::vec3 m_P2Pos;
+	glm::vec3 m_BallPos;
 
 	static constexpr auto kWinWidth = 800;
 	static constexpr auto kWinHeight = 400;
@@ -42,6 +43,7 @@ private:
 	static constexpr auto kPaddleWidth = 10.F;
 	static constexpr auto kPaddleHeight = 50.F;
 	static constexpr auto kPaddleSpeed = 200.0F;
+	static constexpr auto kBallSize = 10.F;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -51,6 +53,7 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Input(m_Win)
 	, m_P1Pos({ kWallThickness, kWinHeight / 2 - kPaddleHeight / 2, .0F })
 	, m_P2Pos({ kWinWidth - kWallThickness - kPaddleWidth, kWinHeight / 2 - kPaddleHeight / 2, .0F })
+	, m_BallPos({ kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2, .0F })
 {
 }
 
@@ -124,11 +127,24 @@ auto MyApp::RenderPlayers() -> void
 		0, 1, 2, 2, 1, 3
 	});
 
+	auto ball = GFX::Mesh({
+		{ .0F      , .0F      , .0F },
+		{ .0F      , kBallSize, .0F },
+		{ kBallSize, .0F      , .0F },
+		{ kBallSize, kBallSize, .0F }
+	},
+	{
+		0, 1, 2, 2, 1, 3
+	});
+
 	paddle.SetPosition(m_P1Pos);
 	m_Rdr->DrawMesh(paddle, GFX::Renderer::PrimitiveMode::Triangles);
 
 	paddle.SetPosition(m_P2Pos);
 	m_Rdr->DrawMesh(paddle, GFX::Renderer::PrimitiveMode::Triangles);
+
+	ball.SetPosition(m_BallPos);
+	m_Rdr->DrawMesh(ball, GFX::Renderer::PrimitiveMode::Triangles);
 }
 
 auto MyApp::HandleInput(F64 deltaTime) -> void
