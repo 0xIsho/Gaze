@@ -26,6 +26,7 @@ public:
 private:
 	auto OnInit() -> Status;
 	auto OnUpdate(F64 deltaTime) -> void;
+	auto OnFixedUpdate(F64 deltaTime) -> void;
 	auto OnShutdown() -> Status;
 
 	auto RenderPlayground() -> void;
@@ -87,13 +88,17 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 
 	RenderPlayground();
 	RenderPlayers();
-	HandleInput(deltaTime);
-	HandleCollision();
 
+	m_Rdr->Render();
+}
+
+auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
+{
 	m_BallPos.x += m_BallDir.x * kBallSpeed * F32(deltaTime);
 	m_BallPos.y += m_BallDir.y * kBallSpeed * F32(deltaTime);
 
-	m_Rdr->Render();
+	HandleInput(deltaTime);
+	HandleCollision();
 }
 
 auto MyApp::OnShutdown() -> Status

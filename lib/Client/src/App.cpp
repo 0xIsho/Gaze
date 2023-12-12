@@ -29,9 +29,17 @@ namespace Gaze::Client {
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
 
+		constexpr auto fixedTimeStep = 1 / 60.0;
+		auto accumulatedTimestep = 0.0;
+
 		while (m_IsRunning) {
 			OnUpdate(deltaTime);
 			Gaze::WM::PollEvents();
+
+			while (accumulatedTimestep >= fixedTimeStep) {
+				OnFixedUpdate(fixedTimeStep);
+				accumulatedTimestep -= fixedTimeStep;
+			}
 
 			const auto frameEnd = steady_clock::now();
 			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
@@ -47,6 +55,7 @@ namespace Gaze::Client {
 				deltaTime = 1.0F / 30.0F;
 			}
 
+			accumulatedTimestep += deltaTime;
 			frameBegin = frameEnd;
 		}
 
