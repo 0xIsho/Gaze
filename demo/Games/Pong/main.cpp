@@ -51,6 +51,12 @@ private:
 
 	bool m_GameStarted{ false };
 
+	GFX::Mesh m_PaddleMesh;
+	GFX::Mesh m_BallMesh;
+	GFX::Mesh m_ScoreMarkerMesh;
+	const GFX::Mesh m_WallsMesh;
+	const GFX::Mesh m_MidlineMesh;
+
 	static constexpr auto kWinWidth = 800;
 	static constexpr auto kWinHeight = 400;
 	static constexpr auto kWallThickness = 30.F;
@@ -65,6 +71,36 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_Input(m_Win)
+	, m_PaddleMesh({
+			{ .0F               , .0F          , .0F },
+			{ .0F               , kPaddleSize.y, .0F },
+			{ kPaddleSize.x      , .0F          , .0F },
+			{ kPaddleSize.x      , kPaddleSize.y, .0F }
+		}, { 0, 1, 2, 2, 1, 3 })
+	, m_BallMesh({
+			{ .0F      , .0F      , .0F },
+			{ .0F      , kBallSize, .0F },
+			{ kBallSize, .0F      , .0F },
+			{ kBallSize, kBallSize, .0F }
+		}, { 0, 1, 2, 2, 1, 3 })
+	, m_ScoreMarkerMesh({
+			{ .0F, .0F, .0F },
+			{ .0F, 10.F, .0F }
+		}, { 0, 1 })
+	, m_WallsMesh({
+			{ .0F      , .0F           , .0F },
+			{ .0F      , kWallThickness, .0F },
+			{ kWinWidth, .0F           , .0F },
+			{ kWinWidth, kWallThickness, .0F },
+			{ .0F      , kWinHeight - kWallThickness, .0F },
+			{ .0F      , kWinHeight                 , .0F },
+			{ kWinWidth, kWinHeight - kWallThickness, .0F },
+			{ kWinWidth, kWinHeight                 , .0F },
+		}, { 0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7 })
+	, m_MidlineMesh({
+			{ kWinWidth / 2, kWallThickness             , .0F },
+			{ kWinWidth / 2, kWinHeight - kWallThickness, .0F }
+		}, { 0, 1 })
 {
 	srand(U32(time(nullptr)));
 	Reset();
@@ -117,64 +153,20 @@ auto MyApp::OnShutdown() -> Status
 
 auto MyApp::RenderPlayground() -> void
 {
-	const auto walls = GFX::Mesh({
-		{ .0F      , .0F           , .0F },
-		{ .0F      , kWallThickness, .0F },
-		{ kWinWidth, .0F           , .0F },
-		{ kWinWidth, kWallThickness, .0F },
-
-		{ .0F      , kWinHeight - kWallThickness, .0F },
-		{ .0F      , kWinHeight                 , .0F },
-		{ kWinWidth, kWinHeight - kWallThickness, .0F },
-		{ kWinWidth, kWinHeight                 , .0F },
-	},
-	{
-		0, 1, 2, 2, 1, 3,
-		4, 5, 6, 6, 5, 7,
-	});
-
-	const auto midLine = GFX::Mesh({
-		{ kWinWidth / 2, kWallThickness             , .0F },
-		{ kWinWidth / 2, kWinHeight - kWallThickness, .0F }
-	},
-	{
-		0, 1
-	});
-
-	m_Rdr->DrawMesh(walls, GFX::Renderer::PrimitiveMode::Triangles);
-	m_Rdr->DrawMesh(midLine, GFX::Renderer::PrimitiveMode::Lines);
+	m_Rdr->DrawMesh(m_WallsMesh, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->DrawMesh(m_MidlineMesh, GFX::Renderer::PrimitiveMode::Lines);
 }
 
 auto MyApp::RenderPlayers() -> void
 {
-	auto paddle = GFX::Mesh({
-		{ .0F               , .0F          , .0F },
-		{ .0F               , kPaddleSize.y, .0F },
-		{ kPaddleSize.x      , .0F          , .0F },
-		{ kPaddleSize.x      , kPaddleSize.y, .0F }
-	},
-	{
-		0, 1, 2, 2, 1, 3
-	});
+	m_PaddleMesh.SetPosition(m_P1Pos);
+	m_Rdr->DrawMesh(m_PaddleMesh, GFX::Renderer::PrimitiveMode::Triangles);
 
-	auto ball = GFX::Mesh({
-		{ .0F      , .0F      , .0F },
-		{ .0F      , kBallSize, .0F },
-		{ kBallSize, .0F      , .0F },
-		{ kBallSize, kBallSize, .0F }
-	},
-	{
-		0, 1, 2, 2, 1, 3
-	});
+	m_PaddleMesh.SetPosition(m_P2Pos);
+	m_Rdr->DrawMesh(m_PaddleMesh, GFX::Renderer::PrimitiveMode::Triangles);
 
-	paddle.SetPosition(m_P1Pos);
-	m_Rdr->DrawMesh(paddle, GFX::Renderer::PrimitiveMode::Triangles);
-
-	paddle.SetPosition(m_P2Pos);
-	m_Rdr->DrawMesh(paddle, GFX::Renderer::PrimitiveMode::Triangles);
-
-	ball.SetPosition(m_BallPos);
-	m_Rdr->DrawMesh(ball, GFX::Renderer::PrimitiveMode::Triangles);
+	m_BallMesh.SetPosition(m_BallPos);
+	m_Rdr->DrawMesh(m_BallMesh, GFX::Renderer::PrimitiveMode::Triangles);
 }
 
 auto MyApp::RenderScoreboard() -> void
@@ -190,22 +182,14 @@ auto MyApp::RenderScoreboard() -> void
 		.0F
 	};
 
-	auto line = GFX::Mesh({
-		{ .0F, .0F, .0F },
-		{ .0F, 10.F, .0F }
-	},
-	{
-		0, 1
-	});
-
-	for (auto i = I32(0); i < m_P1Score; i++) {
-		line.SetPosition(p1ScoreboardPos);
-		m_Rdr->DrawMesh(line, GFX::Renderer::PrimitiveMode::Lines);
+	for (auto i = 0; i < m_P1Score; i++) {
+		m_ScoreMarkerMesh.SetPosition(p1ScoreboardPos);
+		m_Rdr->DrawMesh(m_ScoreMarkerMesh, GFX::Renderer::PrimitiveMode::Lines);
 		p1ScoreboardPos.x += 5;
 	}
-	for (auto i = I32(0); i < m_P2Score; i++) {
-		line.SetPosition(p2ScoreboardPos);
-		m_Rdr->DrawMesh(line, GFX::Renderer::PrimitiveMode::Lines);
+	for (auto i = 0; i < m_P2Score; i++) {
+		m_ScoreMarkerMesh.SetPosition(p2ScoreboardPos);
+		m_Rdr->DrawMesh(m_ScoreMarkerMesh, GFX::Renderer::PrimitiveMode::Lines);
 		p2ScoreboardPos.x += 5;
 	}
 }
