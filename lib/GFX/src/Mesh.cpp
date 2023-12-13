@@ -30,6 +30,8 @@ namespace Gaze::GFX {
 
 	auto Mesh::Scale(const glm::vec3& scale) -> void
 	{
-		m_Transform = glm::scale(m_Transform, scale);
+		m_Transform[0][0] = scale[0];
+		m_Transform[1][1] = scale[1];
+		m_Transform[2][2] = scale[2];
 	}
 }
