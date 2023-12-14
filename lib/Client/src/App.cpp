@@ -4,17 +4,35 @@
 
 #include "WM/Core.hpp"
 
+#include "Net/Core.hpp"
+
 #include <thread>
 #include <chrono>
+#include <stdexcept>
 
 namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/) noexcept
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
+
+		if (!Gaze::WM::Init()) {
+			throw std::runtime_error("Failed to initialize the window manager.");
+		}
+
+		if (!Gaze::Net::Init()) {
+			throw std::runtime_error("Failed to initialize the Network sub-system.");
+		}
 	}
 
 	App::~App()
 	{
+		if (Net::IsInitialized()) {
+			Net::Terminate();
+		}
+		if (Gaze::WM::IsInitialized()) {
+			Gaze::WM::Terminate();
+		}
+
 		m_IsRunning = false;
 	}
 
@@ -67,11 +85,6 @@ namespace Gaze::Client {
 
 auto main(int argc, char** argv) -> int
 {
-	auto ret = 1;
-	if (Gaze::WM::Init()) {
-		auto app = Gaze::Client::CreateApp(argc, argv);
-		ret = app->Run() == Gaze::Client::App::Status::Success ? 0 : 1;
-	}
-	Gaze::WM::Terminate();
-	return ret;
+	auto app = Gaze::Client::CreateApp(argc, argv);
+	return app->Run() == Gaze::Client::App::Status::Success ? 0 : 1;
 }
