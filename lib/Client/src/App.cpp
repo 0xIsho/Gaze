@@ -10,6 +10,9 @@
 #include <chrono>
 #include <stdexcept>
 
+#include "Net/Packet.hpp"
+#include <cstring>
+
 namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/) noexcept
 	{
@@ -86,6 +89,10 @@ namespace Gaze::Client {
 		constexpr auto fixedTimeStep = 1 / 60.0;
 		auto accumulatedTimestep = 0.0;
 
+		char msg[] = "Hello, World!";
+		auto packet = Net::Packet(reinterpret_cast<const void*>(msg), strlen(msg) + 1);
+		m_Client.Send(packet);
+
 		while (m_IsRunning) {
 			OnUpdate(deltaTime);
 			Gaze::WM::PollEvents();
@@ -128,9 +135,13 @@ namespace Gaze::Client {
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
 
+		char msg[] = "Hello, World!";
+		auto packet = Net::Packet(reinterpret_cast<const void*>(msg), strlen(msg) + 1);
+
 		while (m_IsRunning) {
 			m_Server.Update();
 			OnUpdate(deltaTime);
+			m_Server.Broadcast(packet);
 
 			const auto frameEnd = steady_clock::now();
 			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;

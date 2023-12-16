@@ -2,6 +2,8 @@
 
 #include "Core/Type.hpp"
 
+#include "Net/Packet.hpp"
+
 namespace Gaze::Net {
 	class Server
 	{
@@ -12,6 +14,8 @@ namespace Gaze::Net {
 		~Server();
 
 		auto Update() -> void;
+
+		auto Broadcast(Packet packet, U8 channel = 0) -> void;
 
 	private:
 		Impl* m_pImpl;

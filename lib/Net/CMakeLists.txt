@@ -6,12 +6,14 @@ pkg_check_modules(ENet REQUIRED libenet)
 set(HEADERS
 	"include/Net/Client.hpp"
 	"include/Net/Core.hpp"
+	"include/Net/Packet.hpp"
 	"include/Net/Server.hpp"
 )
 
 set(SOURCES
 	"src/Client.cpp"
 	"src/Core.cpp"
+	"src/Packet.cpp"
 	"src/Server.cpp"
 )
 

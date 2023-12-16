@@ -2,6 +2,8 @@
 
 #include "Core/Type.hpp"
 
+#include "Net/Packet.hpp"
+
 #include <string_view>
 
 namespace Gaze::Net {
@@ -18,6 +20,8 @@ namespace Gaze::Net {
 		auto Disconnect() -> void;
 
 		auto Update() -> void;
+
+		auto Send(Packet packet, U8 channel = 0) -> void;
 
 	private:
 		Impl* m_pImpl;

@@ -96,9 +96,16 @@ namespace Gaze::Net {
 				event.peer->data = nullptr;
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
+				printf("Packet of size %lu recieved: %s\n", event.packet->dataLength, event.packet->data);
 				enet_packet_destroy(event.packet);
 				break;
 			}
 		}
+	}
+
+	auto Client::Send(Packet packet, U8 channel /*= 0*/) -> void
+	{
+		enet_peer_send(&(m_pImpl->host->peers[0]), channel, static_cast<ENetPacket*>(packet.Handle()));
+		packet.HasOwnership(false);
 	}
 }
