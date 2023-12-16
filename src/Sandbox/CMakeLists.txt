@@ -1,18 +1,21 @@
-set(TARGET Sandbox)
+set(CLIENT_TARGET SandboxClient)
+set(SERVER_TARGET SandboxServer)
 
-set(SOURCES
-	"src/main.cpp"
-)
-
-add_executable(${TARGET} ${SOURCES})
-append_common_compiler_options(${TARGET})
-
-target_link_libraries(${TARGET}
+add_executable(${CLIENT_TARGET} "src/Client.cpp")
+append_common_compiler_options(${CLIENT_TARGET})
+target_link_libraries(${CLIENT_TARGET}
 	PRIVATE
 		Gaze::Client
+		Gaze::Input
 		Gaze::GFX
 		Gaze::WM
-		Gaze::Input
+)
+
+add_executable(${SERVER_TARGET} "src/Server.cpp")
+append_common_compiler_options(${SERVER_TARGET})
+target_link_libraries(${SERVER_TARGET}
+	PRIVATE
+		Gaze::Client
 )
 
 if (GAZE_BUILD_TESTS)

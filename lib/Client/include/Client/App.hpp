@@ -16,17 +16,41 @@ namespace Gaze::Client {
 		App(int argc, char** argv) noexcept;
 		virtual ~App();
 
-		[[nodiscard]] auto Run()  noexcept -> Status;
-		              auto Quit() noexcept -> void;
+		[[nodiscard]] auto Start()           noexcept -> Status;
+		[[nodiscard]] auto IsRunning() const noexcept -> bool;
+		              auto Quit()            noexcept -> void;
 
-	private:
-		virtual auto OnInit() -> Status = 0;
-		virtual auto OnUpdate(F64 deltaTime) -> void = 0;
-		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
-		virtual auto OnShutdown() -> Status = 0;
+	protected:
+		[[nodiscard]] virtual auto Run()                   -> Status = 0;
+		[[nodiscard]] virtual auto OnInit()                -> Status = 0;
+		              virtual auto OnUpdate(F64 deltaTime) -> void = 0;
+		[[nodiscard]] virtual auto OnShutdown()            -> Status = 0;
 
-	private:
+	protected:
 		bool m_IsRunning = false;
+	};
+
+	class ClientApp : public App
+	{
+	public:
+		ClientApp(int argc, char** argv);
+		virtual ~ClientApp();
+
+	protected:
+		[[nodiscard]] auto Run() -> Status override;
+
+	private:
+		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
+	};
+
+	class ServerApp : public App
+	{
+	public:
+		ServerApp(int argc, char** argv);
+		virtual ~ServerApp();
+
+	protected:
+		[[nodiscard]] auto Run() -> Status override;
 	};
 
 	auto CreateApp(int argc, char** argv) -> Mem::Unique<App>;

@@ -15,10 +15,6 @@ namespace Gaze::Client {
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
 
-		if (!Gaze::WM::Init()) {
-			throw std::runtime_error("Failed to initialize the window manager.");
-		}
-
 		if (!Gaze::Net::Init()) {
 			throw std::runtime_error("Failed to initialize the Network sub-system.");
 		}
@@ -29,20 +25,54 @@ namespace Gaze::Client {
 		if (Net::IsInitialized()) {
 			Net::Terminate();
 		}
-		if (Gaze::WM::IsInitialized()) {
-			Gaze::WM::Terminate();
-		}
 
 		m_IsRunning = false;
 	}
 
-	auto App::Run() noexcept -> Status
+	auto App::Start() noexcept -> Status
 	try {
-		using namespace std::chrono;
+		if (m_IsRunning) {
+			return Status::Success;
+		}
 
 		if (OnInit() == Status::Success) {
 			m_IsRunning = true;
+		} else {
+			return Status::Fail;
 		}
+
+		if (const auto ret = Run(); ret != Status::Success) {
+			return ret;
+		}
+
+		return OnShutdown();
+	} catch (...) {
+		return Status::Fail;
+	}
+
+	auto App::Quit() noexcept -> void
+	{
+		m_IsRunning = false;
+	}
+
+	ClientApp::ClientApp(int argc, char** argv)
+		: App(argc, argv)
+	{
+		if (!Gaze::WM::Init()) {
+			throw std::runtime_error("Failed to initialize the window manager.");
+		}
+	}
+
+	ClientApp::~ClientApp()
+	{
+		if (Gaze::WM::IsInitialized()) {
+			Gaze::WM::Terminate();
+		}
+	}
+
+	auto ClientApp::Run() -> Status
+	{
+		using namespace std::chrono;
 
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
@@ -72,19 +102,39 @@ namespace Gaze::Client {
 			frameBegin = frameEnd;
 		}
 
-		return OnShutdown();
-	} catch (...) {
-		return Status::Fail;
+		return Status::Success;
 	}
 
-	auto App::Quit() noexcept -> void
+	ServerApp::ServerApp(int argc, char** argv)
+		: App(argc, argv)
 	{
-		m_IsRunning = false;
+	}
+
+	ServerApp::~ServerApp()
+	{
+	}
+
+	auto ServerApp::Run() -> Status
+	{
+		using namespace std::chrono;
+
+		auto deltaTime = 1.0 / 30.0;
+		auto frameBegin = steady_clock::now();
+
+		while (m_IsRunning) {
+			OnUpdate(deltaTime);
+
+			const auto frameEnd = steady_clock::now();
+			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
+			frameBegin = frameEnd;
+		}
+
+		return Status::Success;
 	}
 }
 
 auto main(int argc, char** argv) -> int
 {
 	auto app = Gaze::Client::CreateApp(argc, argv);
-	return app->Run() == Gaze::Client::App::Status::Success ? 0 : 1;
+	return app->Start() == Gaze::Client::App::Status::Success ? 0 : 1;
 }

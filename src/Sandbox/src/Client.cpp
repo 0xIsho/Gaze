@@ -19,12 +19,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <iostream>
-#include <iomanip>
-
 using namespace Gaze;
 
-class MyApp : public Gaze::Client::App
+class MyApp : public Client::ClientApp
 {
 public:
 	MyApp(int argc, char** argv);
@@ -47,7 +44,7 @@ private:
 };
 
 MyApp::MyApp(int argc, char** argv)
-	: App(argc, argv)
+	: ClientApp(argc, argv)
 	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
 	, m_Cam(Mem::MakeShared<Gaze::GFX::Camera>())
 {

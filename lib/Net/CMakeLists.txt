@@ -5,10 +5,12 @@ pkg_check_modules(ENet REQUIRED libenet)
 
 set(HEADERS
 	"include/Net/Core.hpp"
+	"include/Net/Server.hpp"
 )
 
 set(SOURCES
 	"src/Core.cpp"
+	"src/Server.cpp"
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -24,7 +26,8 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
-	PRIVATE
+	PUBLIC
+		Gaze::Core
 		Gaze::Debug
 
 		${ENet_LIBRARIES}

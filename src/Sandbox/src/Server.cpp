@@ -1,43 +1,36 @@
 #include "Client/App.hpp"
 
-#include <cstdio>
-
 using namespace Gaze;
 
-class MyApp : public Client::ClientApp
+class MyApp : public Client::ServerApp
 {
 public:
 	MyApp(int argc, char** argv);
 
 private:
-	auto OnInit() -> Status override;
-	auto OnUpdate(F64 deltaTime) -> void override;
-	auto OnShutdown() -> Status override;
+	auto OnInit() -> Status;
+	auto OnUpdate(F64 deltaTime) -> void;
+	auto OnShutdown() -> Status;
 };
 
 MyApp::MyApp(int argc, char** argv)
-	: ClientApp(argc, argv)
+	: ServerApp(argc, argv)
 {
+
 }
 
 auto MyApp::OnInit() -> Status
 {
-	puts("Hello, world!");
-
 	return Status::Success;
 }
 
 auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
-	puts("Updating...");
 
-	Quit();
 }
 
 auto MyApp::OnShutdown() -> Status
 {
-	puts("Goodbye, world!");
-
 	return Status::Success;
 }
 
