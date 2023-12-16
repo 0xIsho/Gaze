@@ -32,8 +32,25 @@ namespace Gaze::Net {
 	auto Server::Update() -> void
 	{
 		auto event = ENetEvent();
-		while (enet_host_service(m_pImpl->host, &event, 1000) > 0) {
-			// TODO
+		while (enet_host_service(m_pImpl->host, &event, 0) > 0) {
+			switch (event.type) {
+			case ENET_EVENT_TYPE_CONNECT:
+				printf("New peer connection from %x:%u.\n",
+					event.peer->address.host,
+					event.peer->address.port
+					);
+				break;
+			case ENET_EVENT_TYPE_DISCONNECT:
+				printf("Peer %x:%u disconnected.\n",
+					event.peer->address.host,
+					event.peer->address.port
+					);
+				event.peer->data = nullptr;
+				break;
+			case ENET_EVENT_TYPE_RECEIVE:
+				enet_packet_destroy(event.packet);
+				break;
+			}
 		}
 	}
 }
