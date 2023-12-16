@@ -65,6 +65,8 @@ namespace Gaze::Client {
 
 	ClientApp::~ClientApp()
 	{
+		m_Client.Disconnect();
+
 		if (Gaze::WM::IsInitialized()) {
 			Gaze::WM::Terminate();
 		}
@@ -73,6 +75,10 @@ namespace Gaze::Client {
 	auto ClientApp::Run() -> Status
 	{
 		using namespace std::chrono;
+
+		if (!m_Client.Connect("127.0.0.1", 54321)) {
+			return Status::Fail;
+		}
 
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
@@ -83,6 +89,7 @@ namespace Gaze::Client {
 		while (m_IsRunning) {
 			OnUpdate(deltaTime);
 			Gaze::WM::PollEvents();
+			m_Client.Update();
 
 			while (accumulatedTimestep >= fixedTimeStep) {
 				OnFixedUpdate(fixedTimeStep);
@@ -122,6 +129,7 @@ namespace Gaze::Client {
 		auto frameBegin = steady_clock::now();
 
 		while (m_IsRunning) {
+			m_Server.Update();
 			OnUpdate(deltaTime);
 
 			const auto frameEnd = steady_clock::now();

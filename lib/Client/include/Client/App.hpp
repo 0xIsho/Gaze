@@ -2,6 +2,9 @@
 
 #include "Core/Type.hpp"
 
+#include "Net/Server.hpp"
+#include "Net/Client.hpp"
+
 namespace Gaze::Client {
 	class App
 	{
@@ -41,6 +44,9 @@ namespace Gaze::Client {
 
 	private:
 		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
+
+	private:
+		Net::Client m_Client;
 	};
 
 	class ServerApp : public App
@@ -51,6 +57,9 @@ namespace Gaze::Client {
 
 	protected:
 		[[nodiscard]] auto Run() -> Status override;
+
+	private:
+		Net::Server m_Server;
 	};
 
 	auto CreateApp(int argc, char** argv) -> Mem::Unique<App>;
