@@ -8,6 +8,7 @@ set(HEADERS
 	"include/Net/Core.hpp"
 	"include/Net/Packet.hpp"
 	"include/Net/Server.hpp"
+	"include/Net/Type.hpp"
 )
 
 set(SOURCES

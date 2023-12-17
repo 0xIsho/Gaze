@@ -82,6 +82,11 @@ namespace Gaze::Net {
 		return reinterpret_cast<void*>(m_pImpl->packet);
 	}
 
+	auto Packet::Data() const -> void*
+	{
+		return reinterpret_cast<void*>(m_pImpl->packet->data);
+	}
+
 	auto Packet::HasOwnership(bool val) -> void
 	{
 		m_pImpl->hasOwnership = val;

@@ -18,6 +18,8 @@ namespace Gaze::Net {
 
 		[[nodiscard]]
 		auto Handle() const -> void*;
+		[[nodiscard]]
+		auto Data() const -> void*;
 
 		auto HasOwnership(bool val) -> void;
 

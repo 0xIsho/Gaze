@@ -92,6 +92,9 @@ namespace Gaze::Client {
 		char msg[] = "Hello, World!";
 		auto packet = Net::Packet(reinterpret_cast<const void*>(msg), strlen(msg) + 1);
 		m_Client.Send(packet);
+		m_Client.OnPacketReceived([](auto senderID, auto packet) {
+			printf("Packet received from %u: %s\n", senderID, static_cast<const char*>(packet.Data()));
+		});
 
 		while (m_IsRunning) {
 			OnUpdate(deltaTime);
@@ -137,11 +140,15 @@ namespace Gaze::Client {
 
 		char msg[] = "Hello, World!";
 		auto packet = Net::Packet(reinterpret_cast<const void*>(msg), strlen(msg) + 1);
+		m_Server.OnPacketReceived([this](auto senderID, auto packet) {
+			printf("Packet received from %u: %s\n", senderID, static_cast<const char*>(packet.Data()));
+			puts("Echoing back.");
+			m_Server.Send(senderID, std::move(packet));
+		});
 
 		while (m_IsRunning) {
 			m_Server.Update();
 			OnUpdate(deltaTime);
-			m_Server.Broadcast(packet);
 
 			const auto frameEnd = steady_clock::now();
 			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
