@@ -29,11 +29,8 @@ namespace Gaze::Net {
 				enet_packet_destroy(m_pImpl->packet);
 			}
 
-			m_pImpl->packet = enet_packet_create(
-				other.m_pImpl->packet->data,
-				other.m_pImpl->packet->dataLength,
-				ENET_PACKET_FLAG_NO_ALLOCATE
-			);
+			m_pImpl->packet = other.m_pImpl->packet;
+			other.m_pImpl->hasOwnership = false;
 		}
 
 		GAZE_ASSERT(m_pImpl->packet, "Failed to create a packet");
@@ -64,12 +61,11 @@ namespace Gaze::Net {
 				enet_packet_destroy(m_pImpl->packet);
 			}
 
-			m_pImpl->packet = enet_packet_create(
-				other.m_pImpl->packet->data,
-				other.m_pImpl->packet->dataLength,
-				ENET_PACKET_FLAG_NO_ALLOCATE
-			);
+			m_pImpl->packet = other.m_pImpl->packet;
+			other.m_pImpl->hasOwnership = false;
 		}
+
+		return *this;
 	}
 
 	auto Packet::operator=(Packet&& other) noexcept -> Packet&
