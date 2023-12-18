@@ -4,8 +4,6 @@
 
 #include <enet/enet.h>
 
-#include <cstdio>
-
 namespace Gaze::Net {
 	struct Client::Impl
 	{

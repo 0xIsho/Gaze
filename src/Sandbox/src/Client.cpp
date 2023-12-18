@@ -31,6 +31,7 @@ private:
 	auto OnUpdate(F64 deltaTime) -> void override;
 	auto OnFixedUpdate(F64 deltaTime) -> void override;
 	auto OnShutdown() -> Status override;
+	auto OnPacketReceived(U32 sender, Net::Packet packet) -> void override;
 
 private:
 	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
@@ -267,6 +268,11 @@ auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
 auto MyApp::OnShutdown() -> Status
 {
 	return Status::Success;
+}
+
+auto MyApp::OnPacketReceived(U32 sender, Net::Packet packet) -> void
+{
+	printf("Packet received from %u: %s\n", sender, static_cast<const char*>(packet.Data()));
 }
 
 GAZE_REGISTER_APP(MyApp);

@@ -4,6 +4,7 @@
 
 #include "Net/Server.hpp"
 #include "Net/Client.hpp"
+#include "Net/Packet.hpp"
 
 namespace Gaze::Client {
 	class App
@@ -28,6 +29,7 @@ namespace Gaze::Client {
 		[[nodiscard]] virtual auto OnInit()                -> Status = 0;
 		              virtual auto OnUpdate(F64 deltaTime) -> void = 0;
 		[[nodiscard]] virtual auto OnShutdown()            -> Status = 0;
+		virtual auto OnPacketReceived(U32 /*sender*/, Net::Packet /*packet*/) -> void { };
 
 	protected:
 		bool m_IsRunning = false;
@@ -41,6 +43,8 @@ namespace Gaze::Client {
 
 	protected:
 		[[nodiscard]] auto Run() -> Status override;
+
+		auto Send(Net::Packet packet, U8 channel = 0) -> void;
 
 	private:
 		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
@@ -57,6 +61,8 @@ namespace Gaze::Client {
 
 	protected:
 		[[nodiscard]] auto Run() -> Status override;
+
+		auto Send(U32 peerID, Net::Packet packet, U8 channel = 0) -> void;
 
 	private:
 		Net::Server m_Server;

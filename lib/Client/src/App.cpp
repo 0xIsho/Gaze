@@ -64,6 +64,9 @@ namespace Gaze::Client {
 		if (!Gaze::WM::Init()) {
 			throw std::runtime_error("Failed to initialize the window manager.");
 		}
+
+		// Ignore errors. Connection will be retried in Run() if unsuccessful
+		(void)m_Client.Connect("127.0.0.1", 54321);
 	}
 
 	ClientApp::~ClientApp()
@@ -79,21 +82,14 @@ namespace Gaze::Client {
 	{
 		using namespace std::chrono;
 
-		if (!m_Client.Connect("127.0.0.1", 54321)) {
-			return Status::Fail;
-		}
-
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
 
 		constexpr auto fixedTimeStep = 1 / 60.0;
 		auto accumulatedTimestep = 0.0;
 
-		char msg[] = "Hello, World!";
-		auto packet = Net::Packet(reinterpret_cast<const void*>(msg), strlen(msg) + 1);
-		m_Client.Send(packet);
-		m_Client.OnPacketReceived([](auto senderID, auto packet) {
-			printf("Packet received from %u: %s\n", senderID, static_cast<const char*>(packet.Data()));
+		m_Client.OnPacketReceived([this](auto senderID, auto packet) {
+			OnPacketReceived(senderID, std::move(packet));
 		});
 
 		while (m_IsRunning) {
@@ -122,6 +118,11 @@ namespace Gaze::Client {
 		return Status::Success;
 	}
 
+	auto ClientApp::Send(Net::Packet packet, U8 channel /*= 0*/) -> void
+	{
+		m_Client.Send(std::move(packet), channel);
+	}
+
 	ServerApp::ServerApp(int argc, char** argv)
 		: App(argc, argv)
 	{
@@ -138,12 +139,8 @@ namespace Gaze::Client {
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
 
-		char msg[] = "Hello, World!";
-		auto packet = Net::Packet(reinterpret_cast<const void*>(msg), strlen(msg) + 1);
 		m_Server.OnPacketReceived([this](auto senderID, auto packet) {
-			printf("Packet received from %u: %s\n", senderID, static_cast<const char*>(packet.Data()));
-			puts("Echoing back.");
-			m_Server.Send(senderID, std::move(packet));
+			OnPacketReceived(senderID, std::move(packet));
 		});
 
 		while (m_IsRunning) {
@@ -156,6 +153,11 @@ namespace Gaze::Client {
 		}
 
 		return Status::Success;
+	}
+
+	auto ServerApp::Send(U32 peerID, Net::Packet packet, U8 channel /*= 0*/) -> void
+	{
+		m_Server.Send(peerID, std::move(packet), channel);
 	}
 }
 
