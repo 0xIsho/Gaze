@@ -17,7 +17,7 @@ namespace Gaze::Client {
 		};
 
 	public:
-		App(int argc, char** argv) noexcept;
+		App(int argc, char** argv);
 		virtual ~App();
 
 		[[nodiscard]] auto Start()           noexcept -> Status;

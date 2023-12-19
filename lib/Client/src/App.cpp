@@ -14,7 +14,7 @@
 #include <cstring>
 
 namespace Gaze::Client {
-	App::App(int /*argc*/, char** /*argv*/) noexcept
+	App::App(int /*argc*/, char** /*argv*/)
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
 
