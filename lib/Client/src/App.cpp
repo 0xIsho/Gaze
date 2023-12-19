@@ -139,6 +139,9 @@ namespace Gaze::Client {
 		m_Server.OnPacketReceived([this](auto senderID, auto packet) {
 			OnPacketReceived(senderID, std::move(packet));
 		});
+		m_Server.OnClientConnected([this](auto clientID) {
+			OnClientConnected(clientID);
+		});
 
 		auto deltaTime = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();

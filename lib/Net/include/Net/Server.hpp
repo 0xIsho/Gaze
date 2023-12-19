@@ -11,6 +11,9 @@ namespace Gaze::Net {
 		struct Impl;
 
 	public:
+		using ClientConnectedCallback = std::function<void(U32)>;
+
+	public:
 		Server(U32 host = 0, U16 port = 54321);
 		~Server();
 
@@ -20,7 +23,7 @@ namespace Gaze::Net {
 		auto Send(U32 peerID, Packet packet, U8 channel = 0) -> bool;
 
 		auto OnPacketReceived(PacketReceivedCallback callback) -> void;
-
+		auto OnClientConnected(ClientConnectedCallback callback) -> void;
 	private:
 		Impl* m_pImpl;
 	};
