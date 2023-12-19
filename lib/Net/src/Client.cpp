@@ -79,8 +79,9 @@ namespace Gaze::Net {
 
 	auto Client::Update() -> void
 	{
+		enet_host_service(m_pImpl->host, nullptr, 0);
 		auto event = ENetEvent();
-		while (enet_host_service(m_pImpl->host, &event, 0) > 0) {
+		while (enet_host_check_events(m_pImpl->host, &event) > 0) {
 			switch (event.type) {
 			case ENET_EVENT_TYPE_CONNECT:
 				printf("New peer connection from %x:%u.\n",
