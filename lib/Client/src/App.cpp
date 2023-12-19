@@ -159,6 +159,11 @@ namespace Gaze::Client {
 	{
 		return m_Server.Send(peerID, std::move(packet), channel);
 	}
+
+	auto ServerApp::Broadcast(Net::Packet packet, U8 channel /*= 0*/) -> void
+	{
+		m_Server.Broadcast(std::move(packet), channel);
+	}
 }
 
 auto main(int argc, char** argv) -> int

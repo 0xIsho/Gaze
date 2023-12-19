@@ -63,6 +63,7 @@ namespace Gaze::Client {
 		[[nodiscard]] auto Run() -> Status override;
 
 		auto Send(U32 peerID, Net::Packet packet, U8 channel = 0) -> bool;
+		auto Broadcast(Net::Packet packet, U8 channel = 0) -> void;
 
 	private:
 		Net::Server m_Server;
