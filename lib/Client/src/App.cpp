@@ -136,19 +136,29 @@ namespace Gaze::Client {
 	{
 		using namespace std::chrono;
 
-		auto deltaTime = 1.0 / 30.0;
-		auto frameBegin = steady_clock::now();
-
 		m_Server.OnPacketReceived([this](auto senderID, auto packet) {
 			OnPacketReceived(senderID, std::move(packet));
 		});
+
+		auto deltaTime = 1.0 / 30.0;
+		auto frameBegin = steady_clock::now();
+
+		constexpr auto fixedTimeStep = 1 / 60.0;
+		auto accumulatedTimestep = 0.0;
 
 		while (m_IsRunning) {
 			m_Server.Update();
 			OnUpdate(deltaTime);
 
+			while (accumulatedTimestep >= fixedTimeStep) {
+				OnFixedUpdate(fixedTimeStep);
+				accumulatedTimestep -= fixedTimeStep;
+			}
+
 			const auto frameEnd = steady_clock::now();
 			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
+
+			accumulatedTimestep += deltaTime;
 			frameBegin = frameEnd;
 		}
 

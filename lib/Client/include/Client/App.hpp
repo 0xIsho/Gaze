@@ -29,6 +29,7 @@ namespace Gaze::Client {
 		[[nodiscard]] virtual auto OnInit()                -> Status = 0;
 		              virtual auto OnUpdate(F64 deltaTime) -> void = 0;
 		[[nodiscard]] virtual auto OnShutdown()            -> Status = 0;
+		              virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
 		virtual auto OnPacketReceived(U32 /*sender*/, Net::Packet /*packet*/) -> void { };
 
 	protected:
@@ -45,9 +46,6 @@ namespace Gaze::Client {
 		[[nodiscard]] auto Run() -> Status override;
 
 		auto Send(Net::Packet packet, U8 channel = 0) -> bool;
-
-	private:
-		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
 
 	private:
 		Net::Client m_Client;
