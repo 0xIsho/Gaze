@@ -52,11 +52,6 @@ namespace Gaze::Net {
 			case ENET_EVENT_TYPE_RECEIVE:
 				GAZE_ASSERT(m_pImpl->cbPacketReceived, "NULL callback");
 
-				// Let ENet know that we're managing the buffer; Not entirely sure
-				// if this is supported (this type of use is not documented...) or
-				// a hack..FWIW, it makes sure that ENet doesn't free() our buffer
-				event.packet->flags |= ENET_PACKET_FLAG_NO_ALLOCATE;
-
 				m_pImpl->cbPacketReceived(
 					event.peer->incomingPeerID,
 					Packet(event.packet->data, event.packet->dataLength)
@@ -70,12 +65,14 @@ namespace Gaze::Net {
 	auto Server::Broadcast(Packet packet, U8 channel /*= 0*/) -> void
 	{
 		enet_host_broadcast(m_pImpl->host, channel, static_cast<ENetPacket*>(packet.Handle()));
-		packet.HasOwnership(false);
 	}
 
-	auto Server::Send(U32 peerID, Packet packet, U8 channel /*= 0*/) -> void
+	auto Server::Send(U32 peerID, Packet packet, U8 channel /*= 0*/) -> bool
 	{
-		enet_peer_send(&(m_pImpl->host->peers[peerID]), channel, static_cast<ENetPacket*>(packet.Handle()));
+		return enet_peer_send(
+			&(m_pImpl->host->peers[peerID]),
+			channel, static_cast<ENetPacket*>(packet.Handle())
+		) == 0;
 	}
 
 	auto Server::OnPacketReceived(PacketReceivedCallback callback) -> void

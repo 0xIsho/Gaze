@@ -22,7 +22,7 @@ namespace Gaze::Net {
 
 		auto Update() -> void;
 
-		auto Send(Packet packet, U8 channel = 0) -> void;
+		auto Send(Packet packet, U8 channel = 0) -> bool;
 
 		auto OnPacketReceived(PacketReceivedCallback callback) -> void;
 

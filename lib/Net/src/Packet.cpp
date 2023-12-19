@@ -10,27 +10,26 @@ namespace Gaze::Net {
 	struct Packet::Impl
 	{
 		ENetPacket* packet = nullptr;
-		bool hasOwnership = true;
 	};
 
 	Packet::Packet(const void* data, U64 size)
 		: m_pImpl(new Impl())
 	{
-		m_pImpl->packet = enet_packet_create(data, size, ENET_PACKET_FLAG_NO_ALLOCATE);
-
+		m_pImpl->packet = enet_packet_create(data, size, 0);
 		GAZE_ASSERT(m_pImpl->packet, "Failed to create a packet");
+		m_pImpl->packet->referenceCount++;
 	}
 
 	Packet::Packet(const Packet& other)
 		: m_pImpl(new Impl())
 	{
 		if (this != &other) {
-			if (m_pImpl->packet && m_pImpl->hasOwnership) {
+			if (m_pImpl->packet && --m_pImpl->packet->referenceCount == 0) {
 				enet_packet_destroy(m_pImpl->packet);
 			}
 
 			m_pImpl->packet = other.m_pImpl->packet;
-			other.m_pImpl->hasOwnership = false;
+			m_pImpl->packet->referenceCount++;
 		}
 
 		GAZE_ASSERT(m_pImpl->packet, "Failed to create a packet");
@@ -46,7 +45,7 @@ namespace Gaze::Net {
 	Packet::~Packet()
 	{
 		if (m_pImpl) {
-			if (m_pImpl->hasOwnership) {
+			if (m_pImpl->packet && --m_pImpl->packet->referenceCount == 0) {
 				enet_packet_destroy(m_pImpl->packet);
 			}
 
@@ -57,12 +56,12 @@ namespace Gaze::Net {
 	auto Packet::operator=(const Packet& other) -> Packet&
 	{
 		if (this != &other) {
-			if (m_pImpl->packet && m_pImpl->hasOwnership) {
+			if (--m_pImpl->packet->referenceCount == 0) {
 				enet_packet_destroy(m_pImpl->packet);
 			}
 
 			m_pImpl->packet = other.m_pImpl->packet;
-			other.m_pImpl->hasOwnership = false;
+			m_pImpl->packet->referenceCount++;
 		}
 
 		return *this;
@@ -85,10 +84,5 @@ namespace Gaze::Net {
 	auto Packet::Data() const -> void*
 	{
 		return reinterpret_cast<void*>(m_pImpl->packet->data);
-	}
-
-	auto Packet::HasOwnership(bool val) -> void
-	{
-		m_pImpl->hasOwnership = val;
 	}
 }

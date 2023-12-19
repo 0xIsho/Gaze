@@ -44,7 +44,7 @@ namespace Gaze::Client {
 	protected:
 		[[nodiscard]] auto Run() -> Status override;
 
-		auto Send(Net::Packet packet, U8 channel = 0) -> void;
+		auto Send(Net::Packet packet, U8 channel = 0) -> bool;
 
 	private:
 		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
@@ -62,7 +62,7 @@ namespace Gaze::Client {
 	protected:
 		[[nodiscard]] auto Run() -> Status override;
 
-		auto Send(U32 peerID, Net::Packet packet, U8 channel = 0) -> void;
+		auto Send(U32 peerID, Net::Packet packet, U8 channel = 0) -> bool;
 
 	private:
 		Net::Server m_Server;

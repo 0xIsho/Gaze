@@ -21,8 +21,6 @@ namespace Gaze::Net {
 		[[nodiscard]]
 		auto Data() const -> void*;
 
-		auto HasOwnership(bool val) -> void;
-
 	private:
 		Impl* m_pImpl;
 	};

@@ -17,7 +17,7 @@ namespace Gaze::Net {
 		auto Update() -> void;
 
 		auto Broadcast(Packet packet, U8 channel = 0) -> void;
-		auto Send(U32 peerID, Packet packet, U8 channel = 0) -> void;
+		auto Send(U32 peerID, Packet packet, U8 channel = 0) -> bool;
 
 		auto OnPacketReceived(PacketReceivedCallback callback) -> void;
 

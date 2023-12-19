@@ -118,9 +118,9 @@ namespace Gaze::Client {
 		return Status::Success;
 	}
 
-	auto ClientApp::Send(Net::Packet packet, U8 channel /*= 0*/) -> void
+	auto ClientApp::Send(Net::Packet packet, U8 channel /*= 0*/) -> bool
 	{
-		m_Client.Send(std::move(packet), channel);
+		return m_Client.Send(std::move(packet), channel);
 	}
 
 	ServerApp::ServerApp(int argc, char** argv)
@@ -155,9 +155,9 @@ namespace Gaze::Client {
 		return Status::Success;
 	}
 
-	auto ServerApp::Send(U32 peerID, Net::Packet packet, U8 channel /*= 0*/) -> void
+	auto ServerApp::Send(U32 peerID, Net::Packet packet, U8 channel /*= 0*/) -> bool
 	{
-		m_Server.Send(peerID, std::move(packet), channel);
+		return m_Server.Send(peerID, std::move(packet), channel);
 	}
 }
 
