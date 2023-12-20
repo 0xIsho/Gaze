@@ -78,9 +78,6 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		{ 0, 1, 2, 3, 4, 5 }
 	};
 
-	mesh.Rotate(glm::radians(30.0F), { .0F, 1.F, 1.F });
-	mesh.Scale({ .5F, .5F, .5F });
-
 	m_Rdr->SetColor(1.F, 1.F, 1.F, 1.F);
 	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
 	m_Rdr->DrawLine({ 0, -1, 0 }, { 0, 1, 0 });
