@@ -60,6 +60,26 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
+	constexpr auto cameraSpeed = 0.5F; // adjust accordingly
+	if (m_Input.IsKeyPressed(Input::Key::kW)) {
+		m_Cam->Move(cameraSpeed * F32(deltaTime) * m_Cam->Front());
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kS)) {
+		m_Cam->Move(cameraSpeed * F32(deltaTime) * -m_Cam->Front());
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kE)) {
+		m_Cam->Move(cameraSpeed * F32(deltaTime) * m_Cam->Up());
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kQ)) {
+		m_Cam->Move(cameraSpeed * F32(deltaTime) * -m_Cam->Up());
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kA)) {
+		m_Cam->Move(cameraSpeed * F32(deltaTime) * -glm::normalize(glm::cross(m_Cam->Front(), m_Cam->Up())));
+	}
+	if (m_Input.IsKeyPressed(Input::Key::kD)) {
+		m_Cam->Move(cameraSpeed * F32(deltaTime) * glm::normalize(glm::cross(m_Cam->Front(), m_Cam->Up())));
+	}
+
 	m_Rdr->Clear();
 
 	if (m_Input.IsKeyPressed(Gaze::Input::Key::kEscape)) {

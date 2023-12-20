@@ -7,4 +7,9 @@ namespace Gaze::GFX {
 	{
 		return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
+
+	auto Camera::Move(glm::vec3 dir) -> void
+	{
+		m_Position += dir;
+	}
 }
