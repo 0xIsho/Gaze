@@ -53,6 +53,7 @@ target_include_directories(${TARGET}
 
 target_link_libraries(${TARGET}
 	PUBLIC
+		Gaze::Debug
 		Gaze::Core
 		Gaze::WM
 

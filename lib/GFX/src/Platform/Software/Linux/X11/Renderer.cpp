@@ -1,5 +1,7 @@
 #include "GFX/Platform/Software/Linux/X11/Renderer.hpp"
 
+#include "Debug/Assert.hpp"
+
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
@@ -96,6 +98,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		m_pImpl->clearColor = Color(m_pImpl->display, 0.0F, 0.0F, 0.0F);
 		m_pImpl->foregroundColor = Color(m_pImpl->display, 1.0F, 1.0F, 1.0F);
 		m_pImpl->projectionMat = glm::mat4(1.0F);
+		m_pImpl->camera = Mem::MakeShared<Camera>();
 	}
 
 	Renderer::~Renderer()
@@ -174,6 +177,8 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 
 	auto Renderer::SetCamera(Mem::Shared<Camera> camera) -> void
 	{
+		GAZE_ASSERT(camera != nullptr, "Camera was NULL");
+
 		m_pImpl->camera = std::move(camera);
 	}
 
