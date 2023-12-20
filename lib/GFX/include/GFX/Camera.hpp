@@ -3,6 +3,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include <utility>
+
 namespace Gaze::GFX {
 	class Camera
 	{
@@ -14,8 +16,10 @@ namespace Gaze::GFX {
 
 		[[nodiscard]]
 		auto Position() const -> const glm::vec3& { return m_Position; }
+		auto SetPosition(glm::vec3 vec) -> void { m_Position = std::move(vec); }
 		[[nodiscard]]
 		auto Front() const -> const glm::vec3& { return m_Front; }
+		auto SetFront(glm::vec3 vec) -> void { m_Front = std::move(vec); }
 		[[nodiscard]]
 		auto Up() const -> const glm::vec3& { return m_Up; }
 

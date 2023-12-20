@@ -32,6 +32,13 @@ namespace Gaze::WM {
 				self->m_CbClose();
 			}
 		});
+		glfwSetCursorPosCallback(m_Handle, [](auto* window, auto x, auto y) {
+			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			if (self->m_CbMouseMove) {
+				self->m_CbMouseMove(x, y);
+			}
+		});
 	}
 
 	Window::~Window()
@@ -88,5 +95,10 @@ namespace Gaze::WM {
 	auto Window::OnClose(CloseCallback callback) -> void
 	{
 		m_CbClose = std::move(callback);
+	}
+
+	auto Window::OnMouseMove(MouseMoveCallback callback) -> void
+	{
+		m_CbMouseMove = std::move(callback);
 	}
 }

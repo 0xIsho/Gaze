@@ -11,6 +11,7 @@ namespace Gaze::WM {
 	{
 	public:
 		using CloseCallback = std::function<void()>;
+		using MouseMoveCallback = std::function<void(double, double)>;
 
 	public:
 		Window(std::string_view title, int width, int height);
@@ -26,6 +27,7 @@ namespace Gaze::WM {
 		auto Close() -> void;
 
 		auto OnClose(CloseCallback callback) -> void;
+		auto OnMouseMove(MouseMoveCallback callback) -> void;
 
 		[[nodiscard]] auto Width() const -> int;
 		[[nodiscard]] auto Height() const -> int;
@@ -38,6 +40,7 @@ namespace Gaze::WM {
 		int m_Height = 0;
 
 		CloseCallback m_CbClose;
+		MouseMoveCallback m_CbMouseMove;
 	};
 
 	inline auto Window::Width() const -> int

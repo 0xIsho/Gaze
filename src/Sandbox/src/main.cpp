@@ -32,6 +32,9 @@ private:
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
 	Gaze::Input::Handler m_Input;
 	Gaze::Mem::Shared<Gaze::GFX::Camera> m_Cam;
+
+	double m_Yaw{};
+	double m_Pitch{};
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -40,11 +43,42 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Input(m_Win)
 	, m_Cam(Mem::MakeShared<Gaze::GFX::Camera>())
 {
+	m_Cam->SetPosition({ 1.F, 1.F, 1.F });
+	m_Cam->SetFront({ -1.F, -1.F, -1.F });
+
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->Clear();
 
 	m_Win->OnClose([this] {
 		Quit();
+	});
+
+	m_Win->OnMouseMove([this] (auto x, auto y) {
+		static auto lastX = 1280.0 / 2;
+		static auto lastY = 640.0 / 2;
+		constexpr auto sensitivity = .5;
+
+		const auto deltaX = (x - lastX) * sensitivity;
+		const auto deltaY = (lastY - y) * sensitivity;
+
+		m_Yaw += deltaX;
+		m_Pitch += deltaY;
+
+		if (m_Pitch > 89) {
+			m_Pitch = 89;
+		}
+		if (m_Pitch < -89) {
+			m_Pitch = -89;
+		}
+
+		glm::vec3 direction;
+		direction.x = F32(cos(glm::radians(m_Yaw))) * F32(cos(glm::radians(m_Pitch)));
+		direction.y = F32(sin(glm::radians(m_Pitch)));
+		direction.z = F32(sin(glm::radians(m_Yaw))) * F32(cos(glm::radians(m_Pitch)));
+		m_Cam->SetFront(glm::normalize(direction));
+
+		lastX = x;
+		lastY = y;
 	});
 }
 
