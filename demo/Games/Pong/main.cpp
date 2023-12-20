@@ -245,11 +245,11 @@ auto MyApp::HandleCollision() -> void
 
 	if (m_BallPos.x + kBallSize >= m_P1Pos.x && m_BallPos.x <= m_P1Pos.x + kPaddleSize.x &&
 		m_BallPos.y + kBallSize >= m_P1Pos.y && m_BallPos.y <= m_P1Pos.y + kPaddleSize.y) {
-		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P1Pos + glm::vec3{ kPaddleSize * .5F, .0F }));
+		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P1Pos + glm::vec3{ kPaddleSize.x / 2 - 10, kPaddleSize.y / 2, .0F }));
 	}
 	if (m_BallPos.x + kBallSize >= m_P2Pos.x && m_BallPos.x <= m_P2Pos.x + kPaddleSize.x &&
 		m_BallPos.y + kBallSize >= m_P2Pos.y && m_BallPos.y <= m_P2Pos.y + kPaddleSize.y) {
-		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P2Pos + glm::vec3{ kPaddleSize * .5F, .0F }));
+		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P2Pos + glm::vec3{ kPaddleSize.x / 2 + 10, kPaddleSize.y / 2, .0F }));
 	}
 }
 
