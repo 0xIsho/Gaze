@@ -1,5 +1,6 @@
 #include "GFX/Platform/Software/Linux/X11/Renderer.hpp"
 
+#include "Core/Type.hpp"
 #include "Debug/Assert.hpp"
 
 #define GLFW_EXPOSE_NATIVE_X11
@@ -182,20 +183,39 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		m_pImpl->camera = std::move(camera);
 	}
 
+	static auto ApplyProjection(
+		const Mesh& mesh,
+		const Camera& camera,
+		const Viewport& viewport,
+		const glm::mat4 projectionMat
+	) -> std::vector<XPoint>
+	{
+		const auto viewMat = camera.ComputeViewMatrix();
+		auto ret = std::vector<XPoint>();
+		ret.reserve(mesh.Vertices().size());
+
+		const auto mvp = projectionMat * viewMat * mesh.Transform();
+		const auto halfVpWidth = F32(viewport.width) / 2;
+		const auto halfVpHeight = F32(viewport.height) / 2;
+		const auto& vertices = mesh.Vertices();
+
+		for (auto idx : mesh.Indices()) {
+			GAZE_ASSERT(idx >= 0, "Negative index");
+			GAZE_ASSERT(U64(idx) < mesh.Vertices().size(), "Index out of range");
+
+			auto vert = vertices[U64(idx)];
+			vert = mvp * glm::vec4(vert, 1.0F);
+			vert.x = (vert.x + 1) * halfVpWidth + F32(viewport.x);
+			vert.y = (1 - vert.y) * halfVpHeight + F32(viewport.y);
+			ret.emplace_back(XPoint{ I16(vert.x), I16(vert.y) });
+		}
+
+		return ret;
+	}
+
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
 	{
-		auto vertices = std::vector<XPoint>();
-		vertices.reserve(mesh.Vertices().size());
-
-		{
-			const auto& tmpVerts = mesh.Vertices();
-			for (const auto idx : mesh.Indices()) {
-				auto vert = tmpVerts[U64(idx)];
-				ApplyProjection(vert, mesh);
-				auto p = XPoint{ short(vert.x), short(vert.y) };
-				vertices.push_back(p);
-			}
-		}
+		auto vertices = ApplyProjection(mesh, *m_pImpl->camera, m_pImpl->viewport, m_pImpl->projectionMat);
 
 		switch (mode) {
 		case PrimitiveMode::Points:
@@ -315,15 +335,5 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 	auto Renderer::FillTri(const std::array<Vec3, 3>& ps) -> void
 	{
 		DrawMesh({ { ps[0], ps[1], ps[2] }, { 0, 1, 2 } }, PrimitiveMode::Triangles);
-	}
-
-	auto Renderer::ApplyProjection(glm::vec3& vec, const Mesh& mesh) -> void
-	{
-		const auto viewMat = m_pImpl->camera ? m_pImpl->camera->ComputeViewMatrix() : glm::mat4(1.0F);
-		const auto& vp = m_pImpl->viewport;
-
-		vec = m_pImpl->projectionMat * viewMat * mesh.Transform() * glm::vec4(vec, 1.0F);
-		vec.x = (vec.x + 1) * F32(vp.width / 2) + F32(vp.x);
-		vec.y = (1 - vec.y) * F32(vp.height / 2) + F32(vp.y);
 	}
 }
