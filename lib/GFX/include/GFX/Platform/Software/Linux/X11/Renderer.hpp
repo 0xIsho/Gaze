@@ -28,7 +28,6 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 
 	private:
 		auto ApplyProjection(glm::vec3& vec, const Mesh& mesh) -> void;
-		auto NDCtoScreen(glm::vec3& vec) -> void;
 
 	private:
 		Impl* m_pImpl{ nullptr };

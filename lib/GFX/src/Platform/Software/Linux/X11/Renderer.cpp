@@ -187,7 +187,6 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			for (const auto idx : mesh.Indices()) {
 				auto vert = tmpVerts[U64(idx)];
 				ApplyProjection(vert, mesh);
-				NDCtoScreen(vert);
 				auto p = XPoint{ short(vert.x), short(vert.y) };
 				vertices.push_back(p);
 			}
@@ -316,15 +315,10 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 	auto Renderer::ApplyProjection(glm::vec3& vec, const Mesh& mesh) -> void
 	{
 		const auto viewMat = m_pImpl->camera ? m_pImpl->camera->ComputeViewMatrix() : glm::mat4(1.0F);
-		vec = m_pImpl->projectionMat * viewMat * mesh.Transform() * glm::vec4(vec, 1.0F);
-	}
-
-	auto Renderer::NDCtoScreen(glm::vec3& vec) -> void
-	{
 		const auto& vp = m_pImpl->viewport;
 
-		vec.x = (vec.x + 1) * (F32(vp.width) / 2) + F32(vp.x);
-		vec.y = (1 - vec.y) * (F32(vp.height) / 2) + F32(vp.y);
-		vec.z = (vec.z + 1) / 2;
+		vec = m_pImpl->projectionMat * viewMat * mesh.Transform() * glm::vec4(vec, 1.0F);
+		vec.x = (vec.x + 1) * F32(vp.width / 2) + F32(vp.x);
+		vec.y = (1 - vec.y) * F32(vp.height / 2) + F32(vp.y);
 	}
 }
