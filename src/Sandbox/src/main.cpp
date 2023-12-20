@@ -52,8 +52,9 @@ auto MyApp::OnInit() -> Status
 {
 	m_Win->Show();
 
-	m_Rdr->SetProjection(glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 10.F));
+	m_Rdr->SetProjection(glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 100.F));
 	m_Rdr->SetCamera(m_Cam);
+	m_Rdr->SetClearColor(.1F, .1F, .1F, 1.F);
 
 	return Status::Success;
 }
@@ -98,39 +99,20 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		{ 0, 1, 2, 3, 4, 5 }
 	};
 
-	m_Rdr->SetColor(1.F, 1.F, 1.F, 1.F);
-	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
-	m_Rdr->DrawLine({ 0, -1, 0 }, { 0, 1, 0 });
-
-	for (auto i = -1.F; i <= 1.F; i += .1F) {
-		m_Rdr->SetColor(.5F, .2F, 1.F, 1.F);
-		m_Rdr->DrawLine({ i, -.0075F, 0 }, { i, .0075F, 0 });
-		m_Rdr->DrawLine({ -.0075F, i, 0 }, { .0075F, i, 0 });
-
-		for (auto j = -1.F; j <= 1.F; j += .1F) {
-			m_Rdr->DrawPoint({ i, j, 0.0F });
-		}
+	m_Rdr->SetColor(.6F, .6F, .6F, 1.F);
+	for (auto i = -.9F; i <= 1.F; i += .1F) {
+		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
+		m_Rdr->DrawLine({ -1.F, .0F, i }, { 1.F, .0F, i });
 	}
 
-	m_Rdr->SetColor(1.F, .0F, .0F, 1.F);
-	m_Rdr->DrawMesh(mesh, Gaze::GFX::Renderer::PrimitiveMode::LineLoop);
-
-	m_Rdr->SetColor(1.F, 1.F, 0.F, 1.F);
-	m_Rdr->DrawTri({{ { -.6F,  .4F, 0 }, { -.5F,  .6F, 0 }, { -.4F,  .4F, 0 } }});
-	m_Rdr->FillTri({{ { -.6F, -.4F, 0 }, { -.5F, -.6F, 0 }, { -.4F, -.4F, 0 } }});
-
-	m_Rdr->DrawTri({{ { -.1F,  .1F, 0 }, { -.1F, -.1F, 0 }, {  .1F, -.1F, 0 } }});
-	m_Rdr->FillTri({{ {  .1F, -.1F, 0 }, {  .1F,  .1F, 0 }, { -.1F,  .1F, 0 } }});
-
-	m_Rdr->DrawTri({{ {  .6F, -.4F, 0 }, {  .4F, -.4F, 0 }, {  .5F, -.6F, 0 } }});
-	m_Rdr->FillTri({{ {  .6F,  .4F, 0 }, {  .5F,  .6F, 0 }, {  .4F,  .4F, 0 } }});
+	m_Rdr->SetColor(1.F, 0.F, 0.F, 1.F);
+	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
+	m_Rdr->SetColor(0.F, 1.F, 0.F, 1.F);
+	m_Rdr->DrawLine({ 0, -1, 0 }, { 0, 1, 0 });
+	m_Rdr->SetColor(0.F, 0.F, 1.F, 1.F);
+	m_Rdr->DrawLine({ 0, 0, -1 }, { 0, 0, 1 });
 
 	m_Rdr->Render();
-
-	std::cout
-		<< "Delta Time: "
-		<< std::fixed << std::setprecision(4) << deltaTime
-		<< " | FPS: " << I32(1 / deltaTime) << '\n';
 }
 
 auto MyApp::OnShutdown() -> Status
