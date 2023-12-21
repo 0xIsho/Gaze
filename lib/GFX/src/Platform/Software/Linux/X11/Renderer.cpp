@@ -195,6 +195,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		ret.reserve(mesh.Vertices().size());
 
 		const auto mv = viewMat * mesh.Transform();
+		const auto mvp = projectionMat * mv;
 		const auto halfVpWidth = F32(viewport.width) / 2;
 		const auto halfVpHeight = F32(viewport.height) / 2;
 		const auto& vertices = mesh.Vertices();
@@ -204,11 +205,14 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 			GAZE_ASSERT(U64(idx) < mesh.Vertices().size(), "Index out of range");
 
 			auto vert = glm::vec4(vertices[U64(idx)], 1.0F);
-			vert = mv * vert;
-			vert.x /= -vert.z;
-			vert.y /= -vert.z;
-			// TODO: Clipping
-			vert = projectionMat * vert;
+			vert = mvp * vert;
+
+			// TODO clipping.
+
+			vert.x /= vert.w;
+			vert.y /= vert.w;
+			vert.z /= vert.w;
+
 			vert.x = (vert.x + 1) * halfVpWidth + F32(viewport.x);
 			vert.y = (1 - vert.y) * halfVpHeight + F32(viewport.y);
 			ret.emplace_back(XPoint{ I16(vert.x), I16(vert.y) });
