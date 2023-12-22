@@ -49,7 +49,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) -> void
 	{
-
+		glViewport(x, y, width, height);
 	}
 
 	auto Renderer::SetProjection(glm::mat4 projection) -> void
