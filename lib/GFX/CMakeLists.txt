@@ -6,12 +6,6 @@ find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glm REQUIRED)
 
-if(UNIX)
-	find_package(X11 REQUIRED)
-else()
-	message(FATAL_ERROR "The renderer does not support the target platform: ${CMAKE_HOST_SYSTEM_NAME}")
-endif()
-
 set(HEADERS
 	"include/GFX/API.hpp"
 	"include/GFX/Camera.hpp"
@@ -19,12 +13,6 @@ set(HEADERS
 	"include/GFX/Renderer.hpp"
 
 	"include/GFX/Platform/OpenGL/Renderer.hpp"
-	"include/GFX/Platform/Software/Renderer.hpp"
-
-	$<$<BOOL:UNIX>:
-		"include/GFX/Platform/Software/Linux/Renderer.hpp"
-		"include/GFX/Platform/Software/Linux/X11/Renderer.hpp"
-	>
 )
 
 set(SOURCES
@@ -34,10 +22,6 @@ set(SOURCES
 	"src/Renderer.cpp"
 
 	"src/Platform/OpenGL/Renderer.cpp"
-
-	$<$<BOOL:UNIX>:
-		"src/Platform/Software/Linux/X11/Renderer.cpp"
-	>
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -49,11 +33,6 @@ target_include_directories(${TARGET}
 		"include/"
 
 		${GLM_INCLUDE_DIRS}
-
-	PRIVATE
-		$<$<BOOL:UNIX>:
-			${X11_INCLUDE_DIR}
-		>
 )
 
 target_link_libraries(${TARGET}
@@ -66,10 +45,6 @@ target_link_libraries(${TARGET}
 		OpenGL::GL
 		Gaze::GLAD
 		glfw
-
-		$<$<BOOL:UNIX>:
-			${X11_LIBRARIES}
-		>
 )
 
 if (GAZE_BUILD_TESTS)

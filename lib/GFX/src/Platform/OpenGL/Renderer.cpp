@@ -20,11 +20,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 	}
 
-	auto Renderer::SetColor(F32 r, F32 g, F32 b, F32 a) -> void
-	{
-
-	}
-
 	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void
 	{
 		glClearColor(r, g, b, a);

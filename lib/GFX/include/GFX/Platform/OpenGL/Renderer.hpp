@@ -9,7 +9,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		Renderer(Mem::Shared<WM::Window> window);
 		virtual ~Renderer() = default;
 
-		auto SetColor(F32 r, F32 g, F32 b, F32 a) -> void override;
 		auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void override;
 		auto Clear(Buffer buffer = kColorBuffer) -> void override;
 		auto Render() -> void override;

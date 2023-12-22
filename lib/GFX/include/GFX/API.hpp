@@ -2,7 +2,6 @@
 
 namespace Gaze::GFX {
 	enum class API {
-		kSoftware,
 		kOpenGL
 	};
 

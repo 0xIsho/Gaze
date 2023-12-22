@@ -133,17 +133,13 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		{ 0, 1, 2, 3, 4, 5 }
 	};
 
-	m_Rdr->SetColor(.6F, .6F, .6F, 1.F);
 	for (auto i = -.9F; i <= 1.F; i += .1F) {
 		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
 		m_Rdr->DrawLine({ -1.F, .0F, i }, { 1.F, .0F, i });
 	}
 
-	m_Rdr->SetColor(1.F, 0.F, 0.F, 1.F);
 	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
-	m_Rdr->SetColor(0.F, 1.F, 0.F, 1.F);
 	m_Rdr->DrawLine({ 0, -1, 0 }, { 0, 1, 0 });
-	m_Rdr->SetColor(0.F, 0.F, 1.F, 1.F);
 	m_Rdr->DrawLine({ 0, 0, -1 }, { 0, 0, 1 });
 
 	m_Rdr->Render();

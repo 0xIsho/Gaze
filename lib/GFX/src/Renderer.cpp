@@ -4,7 +4,6 @@
 #include "Core/Platform.hpp"
 
 #include "GFX/API.hpp"
-#include "GFX/Platform/Software/Renderer.hpp"
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
 namespace Gaze::GFX {
@@ -16,7 +15,6 @@ namespace Gaze::GFX {
 	auto CreateRenderer(Mem::Shared<WM::Window> window) -> Mem::Unique<Renderer>
 	{
 		switch (GetAPI()) {
-		case API::kSoftware: return Mem::MakeUnique<Platform::Software::Renderer>(std::move(window));
 		case API::kOpenGL: return Mem::MakeUnique<Platform::OpenGL::Renderer>(std::move(window));
 		}
 
