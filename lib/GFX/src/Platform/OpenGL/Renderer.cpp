@@ -1,6 +1,7 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
 #include "glad/gl.h"
+#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
 namespace Gaze::GFX::Platform::OpenGL {
@@ -26,17 +27,29 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void
 	{
-
+		glClearColor(r, g, b, a);
 	}
 
 	auto Renderer::Clear(Buffer buffer /*= kColorBuffer*/) -> void
 	{
+		auto bufferBits = 0U;
 
+		if (buffer & Buffer::kColorBuffer) {
+			bufferBits |= GL_COLOR_BUFFER_BIT;
+		}
+		if (buffer & Buffer::kDepthBuffer) {
+			bufferBits |= GL_DEPTH_BUFFER_BIT;
+		}
+		if (buffer & Buffer::kStencilBuffer) {
+			bufferBits |= GL_STENCIL_BUFFER_BIT;
+		}
+
+		glClear(bufferBits);
 	}
 
 	auto Renderer::Render() -> void
 	{
-
+		glfwSwapBuffers(static_cast<GLFWwindow*>(Window().Handle()));
 	}
 
 	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) -> void
