@@ -122,7 +122,7 @@ namespace Gaze::GFX::Platform::Software::Linux::X11 {
 		m_pImpl->clearColor = Color(m_pImpl->display, r, g, b);
 	}
 
-	auto Renderer::Clear() -> void
+	auto Renderer::Clear(Buffer /*buffer*/ /*= kColorBuffer*/) -> void
 	{
 		const auto& vp = m_pImpl->viewport;
 		XSetForeground(m_pImpl->display, m_pImpl->gc, m_pImpl->clearColor.handle.pixel);

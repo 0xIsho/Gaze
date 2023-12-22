@@ -29,7 +29,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	}
 
-	auto Renderer::Clear() -> void
+	auto Renderer::Clear(Buffer buffer /*= kColorBuffer*/) -> void
 	{
 
 	}
