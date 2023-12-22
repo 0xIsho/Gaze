@@ -11,7 +11,6 @@ namespace Gaze::WM {
 	{
 		s_IsInitialized = glfwInit() == GLFW_TRUE;
 
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // TODO: This should be ignored when using OpenGL
 		if (s_IsInitialized) {
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO: Remove this once resizing logic is implemented.
 

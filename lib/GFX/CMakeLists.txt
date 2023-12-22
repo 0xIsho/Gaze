@@ -1,5 +1,7 @@
 set(TARGET GFX)
 
+add_subdirectory("vendor/")
+
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glm REQUIRED)
@@ -16,6 +18,7 @@ set(HEADERS
 	"include/GFX/Mesh.hpp"
 	"include/GFX/Renderer.hpp"
 
+	"include/GFX/Platform/OpenGL/Renderer.hpp"
 	"include/GFX/Platform/Software/Renderer.hpp"
 
 	$<$<BOOL:UNIX>:
@@ -29,6 +32,8 @@ set(SOURCES
 	"src/Camera.cpp"
 	"src/Mesh.cpp"
 	"src/Renderer.cpp"
+
+	"src/Platform/OpenGL/Renderer.cpp"
 
 	$<$<BOOL:UNIX>:
 		"src/Platform/Software/Linux/X11/Renderer.cpp"
@@ -59,6 +64,7 @@ target_link_libraries(${TARGET}
 
 	PRIVATE
 		OpenGL::GL
+		Gaze::GLAD
 		glfw
 
 		$<$<BOOL:UNIX>:
