@@ -5,6 +5,66 @@
 #include <GLFW/glfw3.h>
 
 namespace Gaze::GFX::Platform::OpenGL {
+	static auto EnableDebugOutput()
+	{
+		int flags;
+		glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		if ((flags & GL_CONTEXT_FLAG_DEBUG_BIT) == 0) { // Not a debug context
+			return;
+		}
+
+		// clang-format off
+		static const auto sources = std::unordered_map<GLenum, const char*> {
+			{ GL_DEBUG_SOURCE_API               , "API"                 },
+			{ GL_DEBUG_SOURCE_WINDOW_SYSTEM     , "Application"         },
+			{ GL_DEBUG_SOURCE_SHADER_COMPILER   , "Shader Compiler"     },
+			{ GL_DEBUG_SOURCE_THIRD_PARTY       , "Third Party"         },
+			{ GL_DEBUG_SOURCE_APPLICATION       , "Application"         },
+			{ GL_DEBUG_SOURCE_OTHER             , "Other"               },
+		};
+		static const auto types = std::unordered_map<GLenum, const char*> {
+			{ GL_DEBUG_TYPE_ERROR               , "Error"               },
+			{ GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR , "Deprecated Behavior" },
+			{ GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR  , "Undefined Behavior"  },
+			{ GL_DEBUG_TYPE_PORTABILITY         , "Portability"         },
+			{ GL_DEBUG_TYPE_PERFORMANCE         , "Performance"         },
+			{ GL_DEBUG_TYPE_MARKER              , "Marker"              },
+			{ GL_DEBUG_TYPE_PUSH_GROUP          , "Push Group"          },
+			{ GL_DEBUG_TYPE_POP_GROUP           , "Pop Group"           },
+			{ GL_DEBUG_TYPE_OTHER               , "Other"               },
+		};
+		static const auto severities = std::unordered_map<GLenum, const char*> {
+			{ GL_DEBUG_SEVERITY_HIGH            , "High"                },
+			{ GL_DEBUG_SEVERITY_MEDIUM          , "Medium"              },
+			{ GL_DEBUG_SEVERITY_LOW             , "Low"                 },
+			{ GL_DEBUG_SEVERITY_NOTIFICATION    , "Notification"        },
+		};
+		// clang-format on
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+
+		glDebugMessageCallback(
+			[](
+				GLenum source,
+				GLenum type,
+				GLuint /* id */,
+				GLenum severity,
+				GLsizei /* length */,
+				const GLchar* message,
+				const void* /* userParam */
+			) {
+				fprintf(stderr,
+					"OpenGL Message {\n  Source: %s\n  Type: %s\n  Severity: %s\n  Message: %s\n}\n",
+					sources.at(source),
+					types.at(type),
+					severities.at(severity),
+					message);
+			},
+			nullptr
+		);
+	}
+
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
 		: GFX::Renderer(std::move(window))
 	{
@@ -14,6 +74,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 
 		gladLoadGL(static_cast<GLADloadfunc>(glfwGetProcAddress));
+
+#ifndef NDEBUG
+		EnableDebugOutput();
+#endif
+		glEnable(GL_PROGRAM_POINT_SIZE);
 
 		if (!currentContextExists) {
 			glfwMakeContextCurrent(nullptr);
