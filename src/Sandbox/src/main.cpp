@@ -89,6 +89,7 @@ auto MyApp::OnInit() -> Status
 	m_Rdr->SetProjection(glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 100.F));
 	m_Rdr->SetCamera(m_Cam);
 	m_Rdr->SetClearColor(.1F, .1F, .1F, 1.F);
+	m_Rdr->MakeContextCurrent();
 
 	return Status::Success;
 }
@@ -130,8 +131,15 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 			{ -.25F, -.25F, .0F },
 			{  .0F,  -.5F,  .0F },
 		},
-		{ 0, 1, 2, 3, 4, 5 }
+		{
+			0, 1, 3,
+			1, 2, 3,
+			3, 4, 0,
+			4, 5, 0,
+		}
 	};
+
+	m_Rdr->DrawMesh(mesh, GFX::Renderer::PrimitiveMode::Triangles);
 
 	for (auto i = -.9F; i <= 1.F; i += .1F) {
 		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });

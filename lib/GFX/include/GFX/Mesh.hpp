@@ -12,12 +12,12 @@ namespace Gaze::GFX {
 	class Mesh
 	{
 	public:
-		Mesh(std::initializer_list<glm::vec3> vertices, std::initializer_list<I64> indices);
+		Mesh(std::initializer_list<glm::vec3> vertices, std::initializer_list<U32> indices);
 
 		[[nodiscard]]
 		auto Vertices() const -> const std::vector<glm::vec3>&;
 		[[nodiscard]]
-		auto Indices() const -> const std::vector<I64>&;
+		auto Indices() const -> const std::vector<U32>&;
 		[[nodiscard]]
 		auto Transform() const -> const glm::mat4&;
 
@@ -29,7 +29,7 @@ namespace Gaze::GFX {
 
 	private:
 		std::vector<glm::vec3> m_Vertices;
-		std::vector<I64> m_Indices;
+		std::vector<U32> m_Indices;
 		glm::mat4 m_Transform;
 	};
 
@@ -38,7 +38,7 @@ namespace Gaze::GFX {
 		return m_Vertices;
 	}
 
-	inline auto Mesh::Indices() const -> const std::vector<I64>&
+	inline auto Mesh::Indices() const -> const std::vector<U32>&
 	{
 		return m_Indices;
 	}

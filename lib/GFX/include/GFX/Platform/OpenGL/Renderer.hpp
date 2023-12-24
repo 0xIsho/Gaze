@@ -5,6 +5,8 @@
 namespace Gaze::GFX::Platform::OpenGL {
 	class Renderer : public GFX::Renderer
 	{
+		using GLID = U32;
+
 	public:
 		Renderer(Mem::Shared<WM::Window> window);
 		virtual ~Renderer() = default;
@@ -12,6 +14,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void override;
 		auto Clear(Buffer buffer = kColorBuffer) -> void override;
 		auto Render() -> void override;
+		auto MakeContextCurrent() -> void override;
 		auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void override;
 		auto SetProjection(glm::mat4 projection) -> void override;
 		auto SetCamera(Mem::Shared<Camera> camera) -> void override;
