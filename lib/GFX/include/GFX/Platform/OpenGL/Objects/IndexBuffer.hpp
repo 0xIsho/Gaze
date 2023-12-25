@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GFX/Platform/OpenGL/Objects/Object.hpp"
+#include "Object.hpp"
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
 	class IndexBuffer : public Object<IndexBuffer>
