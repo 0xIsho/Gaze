@@ -1,7 +1,7 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
 #include "glad/gl.h"
-#include <GL/gl.h>
+
 #include <GLFW/glfw3.h>
 
 namespace Gaze::GFX::Platform::OpenGL {
