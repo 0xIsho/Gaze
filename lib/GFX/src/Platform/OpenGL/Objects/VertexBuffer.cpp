@@ -8,11 +8,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 	{
 	}
 
-	VertexBuffer::VertexBuffer(
-		const void* data,
-		I64 size,
-		BufferUsage usage /*= BufferUsage::StaticDraw*/
-	)
+	VertexBuffer::VertexBuffer(const void* data, I64 size, BufferUsage usage /*= BufferUsage::StaticDraw*/)
 		: VertexBuffer()
 	{
 		Bind();
