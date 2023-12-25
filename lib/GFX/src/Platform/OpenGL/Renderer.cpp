@@ -1,11 +1,14 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
 #include "GFX/Platform/OpenGL/Objects/IndexBuffer.hpp"
+#include "GFX/Platform/OpenGL/Objects/Shader.hpp"
 #include "GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
 
 #include "glad/gl.h"
 
 #include <GLFW/glfw3.h>
+
+#include <cstdio>
 
 namespace Gaze::GFX::Platform::OpenGL {
 	static auto EnableDebugOutput()
@@ -176,20 +179,26 @@ namespace Gaze::GFX::Platform::OpenGL {
 			}
 		)";
 
-		auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexSource, nullptr);
-		glCompileShader(vertexShader);
-		auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
-		glCompileShader(fragmentShader);
-		auto program = glCreateProgram();
-		glAttachShader(program, vertexShader);
-		glAttachShader(program, fragmentShader);
-		glLinkProgram(program);
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
+		auto vShader = Objects::Shader(Objects::Shader::Type::Vertex, vertexSource);
+		if (!vShader.Compile()) {
+			const auto log = vShader.RetrieveErrorLog(512);
+			fprintf(stderr, "Error compiling vertex shader: %s\n", log.c_str());
+			return;
+		}
+		auto fShader = Objects::Shader(Objects::Shader::Type::Fragment, fragmentSource);
+		if (!fShader.Compile()) {
+			const auto log = fShader.RetrieveErrorLog(512);
+			fprintf(stderr, "Error compiling fragment shader: %s\n", log.c_str());
+			return;
+		}
 
-		glUseProgram(program);
+		auto prog = Objects::ShaderProgram({ &vShader, &fShader });
+		if (!prog.Link()) {
+			const auto log = prog.RetrieveErrorLog(512);
+			fprintf(stderr, "Error linking shader program: %s\n", log.c_str());
+			return;
+		}
+		prog.Bind();
 
 		switch (mode) {
 		case PrimitiveMode::Points:
@@ -216,7 +225,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 
 		glDeleteVertexArrays(1, &vao);
-		glDeleteProgram(program);
 	}
 
 	auto Renderer::DrawPoint(Vec3 p) -> void
