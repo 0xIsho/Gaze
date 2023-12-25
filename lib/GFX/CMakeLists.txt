@@ -13,7 +13,9 @@ set(HEADERS
 	"include/GFX/Renderer.hpp"
 
 	"include/GFX/Platform/OpenGL/Renderer.hpp"
+
 	"include/GFX/Platform/OpenGL/Objects/Object.hpp"
+	"include/GFX/Platform/OpenGL/Objects/IndexBuffer.hpp"
 	"include/GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
 )
 
@@ -24,6 +26,7 @@ set(SOURCES
 	"src/Renderer.cpp"
 
 	"src/Platform/OpenGL/Renderer.cpp"
+	"src/Platform/OpenGL/Objects/IndexBuffer.cpp"
 	"src/Platform/OpenGL/Objects/VertexBuffer.cpp"
 )
 

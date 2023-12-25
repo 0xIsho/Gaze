@@ -1,5 +1,6 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
+#include "GFX/Platform/OpenGL/Objects/IndexBuffer.hpp"
 #include "GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
 
 #include "glad/gl.h"
@@ -146,15 +147,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 		);
 		vbo.Bind();
 
-		auto ebo = GLID(0);
-		glGenBuffers(1, &ebo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(
-			GL_ELEMENT_ARRAY_BUFFER,
-			I64(mesh.Indices().size() * sizeof(mesh.Indices()[0])),
+		auto ebo = Objects::IndexBuffer(
 			mesh.Indices().data(),
-			GL_STATIC_DRAW
+			I64(mesh.Indices().size() * sizeof(mesh.Indices()[0]))
 		);
+		ebo.Bind();
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
@@ -219,7 +216,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 
 		glDeleteVertexArrays(1, &vao);
-		glDeleteBuffers(1, &ebo);
 		glDeleteProgram(program);
 	}
 
