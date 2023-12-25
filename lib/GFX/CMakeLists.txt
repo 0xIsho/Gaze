@@ -13,6 +13,7 @@ set(HEADERS
 	"include/GFX/Renderer.hpp"
 
 	"include/GFX/Platform/OpenGL/Renderer.hpp"
+	"include/GFX/Platform/OpenGL/Objects/Object.hpp"
 )
 
 set(SOURCES
