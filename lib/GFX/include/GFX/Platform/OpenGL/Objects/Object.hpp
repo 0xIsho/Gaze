@@ -9,6 +9,35 @@
 #include <type_traits>
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
+	enum class BufferUsage
+	{
+		StaticDraw,
+		StaticCopy,
+		StaticRead,
+
+		DynamicDraw,
+		DynamicCopy,
+		DynamicRead,
+
+		StreamDraw,
+		StreamCopy,
+		StreamRead,
+	};
+
+	inline constexpr auto ToGLBufferUsage(BufferUsage usage) -> GLenum {
+		switch (usage) {
+		case BufferUsage::StaticDraw:  return GL_STATIC_DRAW;
+		case BufferUsage::StaticCopy:  return GL_STATIC_COPY;
+		case BufferUsage::StaticRead:  return GL_STATIC_READ;
+		case BufferUsage::DynamicDraw: return GL_DYNAMIC_DRAW;
+		case BufferUsage::DynamicCopy: return GL_DYNAMIC_COPY;
+		case BufferUsage::DynamicRead: return GL_DYNAMIC_READ;
+		case BufferUsage::StreamDraw:  return GL_STREAM_DRAW;
+		case BufferUsage::StreamCopy:  return GL_STREAM_COPY;
+		case BufferUsage::StreamRead:  return GL_STREAM_READ;
+		}
+	}
+
 	template<typename T>
 	class Object
 	{

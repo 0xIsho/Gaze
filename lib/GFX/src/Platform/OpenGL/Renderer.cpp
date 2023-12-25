@@ -1,5 +1,7 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
+#include "GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
+
 #include "glad/gl.h"
 
 #include <GLFW/glfw3.h>
@@ -138,15 +140,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 
-		auto vbo = GLID(0);
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(
-			GL_ARRAY_BUFFER,
-			I64(mesh.Vertices().size() * sizeof(mesh.Vertices()[0])),
+		auto vbo = Objects::VertexBuffer(
 			mesh.Vertices().data(),
-			GL_STATIC_DRAW
+			I64(mesh.Vertices().size() * sizeof(mesh.Vertices()[0]))
 		);
+		vbo.Bind();
 
 		auto ebo = GLID(0);
 		glGenBuffers(1, &ebo);
@@ -221,7 +219,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 
 		glDeleteVertexArrays(1, &vao);
-		glDeleteBuffers(1, &vbo);
 		glDeleteBuffers(1, &ebo);
 		glDeleteProgram(program);
 	}
