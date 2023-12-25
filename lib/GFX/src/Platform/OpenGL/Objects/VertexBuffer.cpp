@@ -21,7 +21,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		);
 	}
 
-	auto VertexBuffer::Bind() -> void
+	auto VertexBuffer::Bind() const -> void
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, ID());
 	}
