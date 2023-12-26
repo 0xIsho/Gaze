@@ -63,8 +63,6 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		for (auto shader : shaders) {
 			glAttachShader(ID(), shader->ID());
 		}
-
-		glLinkProgram(ID());
 	}
 
 	auto ShaderProgram::Release(GLID& id) -> void
