@@ -80,6 +80,8 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 			static_cast<T*>(this)->Release(m_ID);
 			swap(*this, other);
+
+			return *this;
 		}
 
 		[[nodiscard]]
