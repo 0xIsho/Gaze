@@ -74,10 +74,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 	struct Renderer::Impl
 	{
 		GLID vaoID;
+		Objects::ShaderProgram program;
 	};
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
 		: GFX::Renderer(std::move(window))
-		, m_pImpl(new Impl())
+		, m_pImpl(nullptr)
 	{
 		const auto currentContextExists = glfwGetCurrentContext() != nullptr;
 		if (!currentContextExists) {
@@ -90,7 +91,48 @@ namespace Gaze::GFX::Platform::OpenGL {
 		EnableDebugOutput();
 #endif
 
-		glGenVertexArrays(1, &m_pImpl->vaoID);
+		const auto* vertexSource = R"(
+			#version 330 core
+			layout (location = 0) in vec3 aPos;
+
+			void main()
+			{
+				gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+			}
+		)";
+		const auto* fragmentSource = R"(
+			#version 330 core
+			out vec4 FragColor;
+
+			void main()
+			{
+				FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+			}
+		)";
+
+		auto vShader = Objects::Shader(Objects::Shader::Type::Vertex, vertexSource);
+		if (!vShader.Compile()) {
+			const auto log = vShader.RetrieveErrorLog(512);
+			fprintf(stderr, "Error compiling vertex shader: %s\n", log.c_str());
+			return;
+		}
+		auto fShader = Objects::Shader(Objects::Shader::Type::Fragment, fragmentSource);
+		if (!fShader.Compile()) {
+			const auto log = fShader.RetrieveErrorLog(512);
+			fprintf(stderr, "Error compiling fragment shader: %s\n", log.c_str());
+			return;
+		}
+
+		m_pImpl= new Impl({
+			[] { auto vao = GLID(0); glGenVertexArrays(1, &vao); return vao; }(),
+			{ &vShader, &fShader }
+		});
+
+		if (!m_pImpl->program.Link()) {
+			const auto log = fShader.RetrieveErrorLog(512);
+			fprintf(stderr, "Error linking shader program: %s\n", log.c_str());
+			return;
+		}
 
 		if (!currentContextExists) {
 			glfwMakeContextCurrent(nullptr);
@@ -170,45 +212,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
-		const auto* vertexSource = R"(
-			#version 330 core
-			layout (location = 0) in vec3 aPos;
-
-			void main()
-			{
-				gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-			}
-		)";
-		const auto* fragmentSource = R"(
-			#version 330 core
-			out vec4 FragColor;
-
-			void main()
-			{
-				FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-			}
-		)";
-
-		auto vShader = Objects::Shader(Objects::Shader::Type::Vertex, vertexSource);
-		if (!vShader.Compile()) {
-			const auto log = vShader.RetrieveErrorLog(512);
-			fprintf(stderr, "Error compiling vertex shader: %s\n", log.c_str());
-			return;
-		}
-		auto fShader = Objects::Shader(Objects::Shader::Type::Fragment, fragmentSource);
-		if (!fShader.Compile()) {
-			const auto log = fShader.RetrieveErrorLog(512);
-			fprintf(stderr, "Error compiling fragment shader: %s\n", log.c_str());
-			return;
-		}
-
-		auto prog = Objects::ShaderProgram({ &vShader, &fShader });
-		if (!prog.Link()) {
-			const auto log = prog.RetrieveErrorLog(512);
-			fprintf(stderr, "Error linking shader program: %s\n", log.c_str());
-			return;
-		}
-		prog.Bind();
+		m_pImpl->program.Bind();
 
 		switch (mode) {
 		case PrimitiveMode::Points:
