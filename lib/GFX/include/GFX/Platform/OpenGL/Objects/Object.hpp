@@ -69,7 +69,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 		~Object()
 		{
-			static_cast<T*>(this)->Release(m_ID);
+			T::Release(m_ID);
 			GAZE_ASSERT(m_ID == 0, "ID not reset to 0 after GL object release. (Erroneous Release() implementation)");
 		}
 
@@ -78,7 +78,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		{
 			GAZE_ASSERT(this != &other, "Self-Assignment");
 
-			static_cast<T*>(this)->Release(m_ID);
+			T::Release(m_ID);
 			swap(*this, other);
 
 			return *this;
