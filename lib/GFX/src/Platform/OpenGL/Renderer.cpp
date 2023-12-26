@@ -71,8 +71,13 @@ namespace Gaze::GFX::Platform::OpenGL {
 		);
 	}
 
+	struct Renderer::Impl
+	{
+		GLID vaoID;
+	};
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
 		: GFX::Renderer(std::move(window))
+		, m_pImpl(new Impl())
 	{
 		const auto currentContextExists = glfwGetCurrentContext() != nullptr;
 		if (!currentContextExists) {
@@ -86,9 +91,18 @@ namespace Gaze::GFX::Platform::OpenGL {
 #endif
 		glEnable(GL_PROGRAM_POINT_SIZE);
 
+		glGenVertexArrays(1, &m_pImpl->vaoID);
+
 		if (!currentContextExists) {
 			glfwMakeContextCurrent(nullptr);
 		}
+	}
+
+	Renderer::~Renderer()
+	{
+		glDeleteVertexArrays(1, &m_pImpl->vaoID);
+
+		delete m_pImpl;
 	}
 
 	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void
@@ -140,9 +154,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
 	{
-		auto vao = GLID(0);
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
+		glBindVertexArray(m_pImpl->vaoID);
 
 		auto vbo = Objects::VertexBuffer(
 			mesh.Vertices().data(),
@@ -223,8 +235,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 			glDrawElements(GL_TRIANGLE_FAN   , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
 			break;
 		}
-
-		glDeleteVertexArrays(1, &vao);
 	}
 
 	auto Renderer::DrawPoint(Vec3 p) -> void
