@@ -89,7 +89,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 #ifndef NDEBUG
 		EnableDebugOutput();
 #endif
-		glEnable(GL_PROGRAM_POINT_SIZE);
 
 		glGenVertexArrays(1, &m_pImpl->vaoID);
 
@@ -177,7 +176,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			void main()
 			{
-				gl_PointSize = 5;
 				gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 			}
 		)";
