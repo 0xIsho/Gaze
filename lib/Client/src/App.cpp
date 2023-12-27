@@ -44,11 +44,6 @@ namespace Gaze::Client {
 			const auto frameEnd = steady_clock::now();
 			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
 
-			// TODO: Temporary solution to the X server getting overloaded at very high framerates
-			if (deltaTime < 0.001) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			}
-
 			// Delta too large. Assume that a debugger took over and paused
 			// the engine's execution.
 			if (deltaTime > 5.0) {
