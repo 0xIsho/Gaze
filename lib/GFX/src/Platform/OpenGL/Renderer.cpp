@@ -195,7 +195,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glClear(bufferBits);
 	}
 
-	auto Renderer::Render() -> void
+	auto Renderer::Flush() -> void
 	{
 		auto vaoBinding = 0;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vaoBinding);
@@ -234,6 +234,13 @@ namespace Gaze::GFX::Platform::OpenGL {
 			glBindVertexArray(oldVAOID);
 		}
 
+		m_pImpl->vertexBufSects.clear();
+		m_pImpl->indexBufSects.clear();
+	}
+
+	auto Renderer::Render() -> void
+	{
+		Flush();
 		glfwSwapBuffers(static_cast<GLFWwindow*>(Window().Handle()));
 	}
 

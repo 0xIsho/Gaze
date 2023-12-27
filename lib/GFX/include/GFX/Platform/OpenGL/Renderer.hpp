@@ -15,6 +15,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 		auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void override;
 		auto Clear(Buffer buffer = kColorBuffer) -> void override;
+		auto Flush() -> void override;
 		auto Render() -> void override;
 		auto MakeContextCurrent() -> void override;
 		auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void override;
