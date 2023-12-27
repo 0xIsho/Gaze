@@ -17,7 +17,8 @@ namespace Gaze::GFX {
 	class Mesh
 	{
 	public:
-		static constexpr auto kVertexSize = sizeof(Vertex);
+		static constexpr auto kVertexSize = I32(sizeof(Vertex));
+		static constexpr auto kIndexSize = I32(sizeof(U32));
 
 	public:
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);

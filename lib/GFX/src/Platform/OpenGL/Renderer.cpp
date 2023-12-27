@@ -71,11 +71,25 @@ namespace Gaze::GFX::Platform::OpenGL {
 		);
 	}
 
+	struct BufferSection
+	{
+		I32 offset;
+		I32 size;
+		Renderer::PrimitiveMode mode;
+	};
+
 	struct Renderer::Impl
 	{
 		GLID vaoID;
 		Objects::ShaderProgram program;
+		Objects::VertexBuffer vertexBuf;
+		Objects::IndexBuffer indexBuf;
+		std::vector<BufferSection> vertexBufSects;
+		std::vector<BufferSection> indexBufSects;
 	};
+
+	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
+
 	Renderer::Renderer(Mem::Shared<WM::Window> window)
 		: GFX::Renderer(std::move(window))
 		, m_pImpl(nullptr)
@@ -125,7 +139,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 		m_pImpl= new Impl({
 			[] { auto vao = GLID(0); glGenVertexArrays(1, &vao); return vao; }(),
-			{ &vShader, &fShader }
+			{ &vShader, &fShader },
+			Objects::VertexBuffer(nullptr, kStaticBufferSize),
+			Objects::IndexBuffer(nullptr, kStaticBufferSize),
+			{},
+			{}
 		});
 
 		if (!m_pImpl->program.Link()) {
@@ -133,6 +151,15 @@ namespace Gaze::GFX::Platform::OpenGL {
 			fprintf(stderr, "Error linking shader program: %s\n", log.c_str());
 			return;
 		}
+
+		auto oldVAO = 0;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &oldVAO);
+		glBindVertexArray(m_pImpl->vaoID);
+		m_pImpl->vertexBuf.Bind();
+		m_pImpl->indexBuf.Bind();
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(0));
+		glEnableVertexAttribArray(0);
+		glBindVertexArray(GLID(oldVAO));
 
 		if (!currentContextExists) {
 			glfwMakeContextCurrent(nullptr);
@@ -170,6 +197,43 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::Render() -> void
 	{
+		auto vaoBinding = 0;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vaoBinding);
+		auto oldVAOID = GLID(vaoBinding);
+
+		if (oldVAOID != m_pImpl->vaoID) {
+			glBindVertexArray(m_pImpl->vaoID);
+		}
+
+		m_pImpl->program.Bind();
+
+		for (auto i = 0UL; i < m_pImpl->indexBufSects.size(); i++) {
+			const auto& sect = m_pImpl->indexBufSects[i];
+			auto drawMode = GLenum();
+
+			switch (sect.mode) {
+			case PrimitiveMode::Points:        drawMode = GL_POINTS;         break;
+			case PrimitiveMode::Lines:         drawMode = GL_LINES;          break;
+			case PrimitiveMode::LineLoop:      drawMode = GL_LINE_LOOP;      break;
+			case PrimitiveMode::LineStrip:     drawMode = GL_LINE_STRIP;     break;
+			case PrimitiveMode::Triangles:     drawMode = GL_TRIANGLES;      break;
+			case PrimitiveMode::TriangleStrip: drawMode = GL_TRIANGLE_STRIP; break;
+			case PrimitiveMode::TriangleFan:   drawMode = GL_TRIANGLE_FAN;   break;
+			default:                           drawMode = GL_TRIANGLES;      break;
+			}
+
+			glDrawElementsBaseVertex(
+				drawMode,
+				sect.size / Mesh::kIndexSize,
+				GL_UNSIGNED_INT,
+				reinterpret_cast<void*>(sect.offset),
+				m_pImpl->vertexBufSects[i].offset / Mesh::kVertexSize
+			);
+		}
+		if (oldVAOID != m_pImpl->vaoID) {
+			glBindVertexArray(oldVAOID);
+		}
+
 		glfwSwapBuffers(static_cast<GLFWwindow*>(Window().Handle()));
 	}
 
@@ -195,67 +259,68 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
 	{
-		glBindVertexArray(m_pImpl->vaoID);
+		{
+			auto offset = 0;
 
-		auto vbo = Objects::VertexBuffer(
-			mesh.Vertices().data(),
-			I64(mesh.Vertices().size() * sizeof(mesh.Vertices()[0]))
-		);
-		vbo.Bind();
+			if (m_pImpl->vertexBufSects.size() > 0) {
+				offset = m_pImpl->vertexBufSects.back().offset + m_pImpl->vertexBufSects.back().size;
+			}
 
-		auto ebo = Objects::IndexBuffer(
-			mesh.Indices().data(),
-			I64(mesh.Indices().size() * sizeof(mesh.Indices()[0]))
-		);
-		ebo.Bind();
+			m_pImpl->vertexBufSects.emplace_back(
+				BufferSection{
+					offset,
+					I32(mesh.Vertices().size() * mesh.kVertexSize),
+					mode
+				}
+			);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
+			m_pImpl->vertexBuf.Upload(
+				mesh.Vertices().data(),
+				I32(mesh.Vertices().size() * mesh.kVertexSize),
+				offset
+			);
+		}
 
-		m_pImpl->program.Bind();
+		{
+			auto offset = 0;
 
-		switch (mode) {
-		case PrimitiveMode::Points:
-			glDrawElements(GL_POINTS         , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
-		case PrimitiveMode::Lines:
-			glDrawElements(GL_LINES          , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
-		case PrimitiveMode::LineStrip:
-			glDrawElements(GL_LINE_STRIP     , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
-		case PrimitiveMode::LineLoop:
-			glDrawElements(GL_LINE_LOOP      , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
-		case PrimitiveMode::Triangles:
-			glDrawElements(GL_TRIANGLES      , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
-		case PrimitiveMode::TriangleStrip:
-			glDrawElements(GL_TRIANGLE_STRIP , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
-		case PrimitiveMode::TriangleFan:
-			glDrawElements(GL_TRIANGLE_FAN   , I32(mesh.Indices().size()), GL_UNSIGNED_INT, 0);
-			break;
+			if (m_pImpl->indexBufSects.size() > 0) {
+				offset = m_pImpl->indexBufSects.back().offset + m_pImpl->indexBufSects.back().size;
+			}
+
+			m_pImpl->indexBufSects.emplace_back(
+				BufferSection{
+					offset,
+					I32(mesh.Indices().size() * mesh.kIndexSize),
+					mode
+				}
+			);
+
+			m_pImpl->indexBuf.Upload(
+				mesh.Indices().data(),
+				I32(mesh.Indices().size() * Mesh::kIndexSize),
+				offset
+			);
 		}
 	}
 
 	auto Renderer::DrawPoint(Vec3 p) -> void
 	{
-
+		DrawMesh({ {{ p }}, { 0 } }, PrimitiveMode::Points);
 	}
 
 	auto Renderer::DrawLine(Vec3 start, Vec3 end) -> void
 	{
-
+		DrawMesh({ {{ start }, { end }}, { 0, 1 } }, PrimitiveMode::Lines);
 	}
 
 	auto Renderer::DrawTri(const std::array<Vec3, 3>& ps) -> void
 	{
-
+		DrawMesh({ { { ps[0] }, { ps[1] }, { ps[2] } }, { 0, 1, 2 } }, PrimitiveMode::LineLoop);
 	}
 
 	auto Renderer::FillTri(const std::array<Vec3, 3>& ps) -> void
 	{
-
+		DrawMesh({ { { ps[0] }, { ps[1] }, { ps[2] } }, { 0, 1, 2 } }, PrimitiveMode::Triangles);
 	}
 }

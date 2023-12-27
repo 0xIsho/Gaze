@@ -23,4 +23,10 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID());
 	}
+
+	auto IndexBuffer::Upload(const void* data, I64 size, I64 offset) -> void
+	{
+		Bind();
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
+	}
 }

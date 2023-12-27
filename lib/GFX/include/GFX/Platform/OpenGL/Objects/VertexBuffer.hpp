@@ -11,5 +11,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		static auto Release(GLID& id) -> void;
 
 		auto Bind() const -> void;
+
+		auto Upload(const void* data, I64 size, I64 offset) -> void;
 	};
 }

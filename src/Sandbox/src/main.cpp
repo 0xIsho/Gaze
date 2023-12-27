@@ -122,7 +122,25 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		Quit();
 	}
 
-	auto mesh = Gaze::GFX::Mesh{
+	auto mesh1 = Gaze::GFX::Mesh{
+		{
+			{ { -.25F, -.25F, .0F } },
+			{ { -.25F,  .25F, .0F } },
+			{ {  -.5F,   .5F, .0F } },
+			{ { -.75F,  .25F, .0F } },
+			{ { -.75F, -.25F, .0F } },
+			{ {  -.5F,  -.5F, .0F } },
+		},
+		{
+			0, 1,
+			1, 2,
+			2, 3,
+			3, 4,
+			4, 5
+		}
+	};
+
+	auto mesh2 = Gaze::GFX::Mesh{
 		{
 			{ {  .25F, -.25F, .0F } },
 			{ {  .25F,  .25F, .0F } },
@@ -139,11 +157,33 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		}
 	};
 
-	m_Rdr->DrawMesh(mesh, GFX::Renderer::PrimitiveMode::Triangles);
+	auto mesh3 = Gaze::GFX::Mesh{
+		{
+			{ { .25F, -.25F, .0F } },
+			{ { .25F,  .25F, .0F } },
+			{ {  .5F,   .5F, .0F } },
+			{ { .75F,  .25F, .0F } },
+			{ { .75F, -.25F, .0F } },
+			{ {  .5F,  -.5F, .0F } },
+		},
+		{
+			0, 1,
+			1, 2,
+			2, 3,
+			3, 4,
+			4, 5
+		}
+	};
+
+	m_Rdr->DrawMesh(mesh1, GFX::Renderer::PrimitiveMode::LineLoop);
+	m_Rdr->DrawMesh(mesh2, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->DrawMesh(mesh3, GFX::Renderer::PrimitiveMode::LineLoop);
 
 	for (auto i = -.9F; i <= 1.F; i += .1F) {
 		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
 		m_Rdr->DrawLine({ -1.F, .0F, i }, { 1.F, .0F, i });
+
+		m_Rdr->DrawPoint({ i, i, .0F });
 	}
 
 	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
