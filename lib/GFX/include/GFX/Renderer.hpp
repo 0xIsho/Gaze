@@ -19,6 +19,11 @@ namespace Gaze::GFX {
 	class Renderer
 	{
 	public:
+		struct RenderStats
+		{
+			I32 nDrawCalls;
+		};
+
 		enum class PrimitiveMode
 		{
 			Points,
@@ -46,6 +51,7 @@ namespace Gaze::GFX {
 		virtual auto Flush() -> void = 0;
 		virtual auto Render() -> void = 0;
 		virtual auto MakeContextCurrent() -> void = 0;
+		virtual auto Stats() -> RenderStats = 0;
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void = 0;
 		virtual auto SetProjection(glm::mat4 projection) -> void = 0;
 		virtual auto SetCamera(Mem::Shared<Camera> camera) -> void = 0;

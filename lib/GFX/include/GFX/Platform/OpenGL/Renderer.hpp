@@ -18,6 +18,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		auto Flush() -> void override;
 		auto Render() -> void override;
 		auto MakeContextCurrent() -> void override;
+		auto Stats() -> RenderStats;
 		auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void override;
 		auto SetProjection(glm::mat4 projection) -> void override;
 		auto SetCamera(Mem::Shared<Camera> camera) -> void override;

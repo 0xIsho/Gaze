@@ -86,6 +86,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		Objects::IndexBuffer indexBuf;
 		std::vector<BufferSection> vertexBufSects;
 		std::vector<BufferSection> indexBufSects;
+		RenderStats stats;
+		RenderStats statsCurrent;
 	};
 
 	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
@@ -143,7 +145,9 @@ namespace Gaze::GFX::Platform::OpenGL {
 			Objects::VertexBuffer(nullptr, kStaticBufferSize),
 			Objects::IndexBuffer(nullptr, kStaticBufferSize),
 			{},
-			{}
+			{},
+			{ 0 },
+			{ 0 }
 		});
 
 		if (!m_pImpl->program.Link()) {
@@ -229,6 +233,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 				reinterpret_cast<void*>(sect.offset),
 				m_pImpl->vertexBufSects[i].offset / Mesh::kVertexSize
 			);
+			m_pImpl->statsCurrent.nDrawCalls++;
 		}
 		if (oldVAOID != m_pImpl->vaoID) {
 			glBindVertexArray(oldVAOID);
@@ -242,11 +247,19 @@ namespace Gaze::GFX::Platform::OpenGL {
 	{
 		Flush();
 		glfwSwapBuffers(static_cast<GLFWwindow*>(Window().Handle()));
+
+		m_pImpl->stats = m_pImpl->statsCurrent;
+		m_pImpl->statsCurrent = RenderStats();
 	}
 
 	auto Renderer::MakeContextCurrent() -> void
 	{
 		glfwMakeContextCurrent(static_cast<GLFWwindow*>(Window().Handle()));
+	}
+
+	auto Renderer::Stats() -> RenderStats
+	{
+		return m_pImpl->stats;
 	}
 
 	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) -> void

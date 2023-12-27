@@ -191,6 +191,8 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	m_Rdr->DrawLine({ 0, 0, -1 }, { 0, 0, 1 });
 
 	m_Rdr->Render();
+
+	std::cout << "Draw Calls: " << m_Rdr->Stats().nDrawCalls << '\n';
 }
 
 auto MyApp::OnShutdown() -> Status
