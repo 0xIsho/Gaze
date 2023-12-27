@@ -104,6 +104,18 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return log;
 	}
 
+	auto ShaderProgram::UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) -> bool
+	{
+		const auto location = glGetUniformLocation(ID(), name.data());
+		if (location == -1) {
+			return false;
+		}
+
+		glUniformMatrix4fv(location, 1, false, matrix);
+
+		return true;
+	}
+
 	auto ShaderProgram::WasSuccessfullyLinked() const -> bool
 	{
 		auto status = GL_FALSE;

@@ -44,6 +44,8 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 		auto RetrieveErrorLog(I32 nBytes) const -> std::string;
 
+		auto UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) -> bool;
+
 	private:
 		[[nodiscard]]
 		auto WasSuccessfullyLinked() const -> bool;

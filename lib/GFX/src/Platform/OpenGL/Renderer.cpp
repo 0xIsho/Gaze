@@ -76,6 +76,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		I32 offset;
 		I32 size;
 		Renderer::PrimitiveMode mode;
+		glm::mat4 transform;
 	};
 
 	struct Renderer::Impl
@@ -88,6 +89,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		std::vector<BufferSection> indexBufSects;
 		RenderStats stats;
 		RenderStats statsCurrent;
+		Mem::Shared<Camera> camera;
+		glm::mat4 projection;
 	};
 
 	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
@@ -111,9 +114,13 @@ namespace Gaze::GFX::Platform::OpenGL {
 			#version 330 core
 			layout (location = 0) in vec3 aPos;
 
+			uniform mat4 u_model;
+			uniform mat4 u_view;
+			uniform mat4 u_projection;
+
 			void main()
 			{
-				gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+				gl_Position = u_projection * u_view * u_model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 			}
 		)";
 		const auto* fragmentSource = R"(
@@ -147,7 +154,9 @@ namespace Gaze::GFX::Platform::OpenGL {
 			{},
 			{},
 			{ 0 },
-			{ 0 }
+			{ 0 },
+			{ },
+			{ glm::mat4(1.0F) }
 		});
 
 		if (!m_pImpl->program.Link()) {
@@ -201,15 +210,13 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::Flush() -> void
 	{
-		auto vaoBinding = 0;
-		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vaoBinding);
-		auto oldVAOID = GLID(vaoBinding);
-
-		if (oldVAOID != m_pImpl->vaoID) {
-			glBindVertexArray(m_pImpl->vaoID);
-		}
+		glBindVertexArray(m_pImpl->vaoID);
 
 		m_pImpl->program.Bind();
+
+		const auto view = m_pImpl->camera->ComputeViewMatrix();
+		m_pImpl->program.UploadUniformMatrix4FV("u_view", &(view[0][0]));
+		m_pImpl->program.UploadUniformMatrix4FV("u_projection", &(m_pImpl->projection[0][0]));
 
 		for (auto i = 0UL; i < m_pImpl->indexBufSects.size(); i++) {
 			const auto& sect = m_pImpl->indexBufSects[i];
@@ -226,6 +233,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
+			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
+
 			glDrawElementsBaseVertex(
 				drawMode,
 				sect.size / Mesh::kIndexSize,
@@ -234,9 +243,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 				m_pImpl->vertexBufSects[i].offset / Mesh::kVertexSize
 			);
 			m_pImpl->statsCurrent.nDrawCalls++;
-		}
-		if (oldVAOID != m_pImpl->vaoID) {
-			glBindVertexArray(oldVAOID);
 		}
 
 		m_pImpl->vertexBufSects.clear();
@@ -269,12 +275,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::SetProjection(glm::mat4 projection) -> void
 	{
-
+		m_pImpl->projection = std::move(projection);
 	}
 
 	auto Renderer::SetCamera(Mem::Shared<Camera> camera) -> void
 	{
-
+		m_pImpl->camera = std::move(camera);
 	}
 
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
@@ -290,7 +296,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 				BufferSection{
 					offset,
 					I32(mesh.Vertices().size() * mesh.kVertexSize),
-					mode
+					mode,
+					mesh.Transform()
 				}
 			);
 
@@ -312,7 +319,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 				BufferSection{
 					offset,
 					I32(mesh.Indices().size() * mesh.kIndexSize),
-					mode
+					mode,
+					mesh.Transform()
 				}
 			);
 

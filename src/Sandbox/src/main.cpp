@@ -182,8 +182,6 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	for (auto i = -.9F; i <= 1.F; i += .1F) {
 		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
 		m_Rdr->DrawLine({ -1.F, .0F, i }, { 1.F, .0F, i });
-
-		m_Rdr->DrawPoint({ i, i, .0F });
 	}
 
 	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
@@ -191,8 +189,6 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	m_Rdr->DrawLine({ 0, 0, -1 }, { 0, 0, 1 });
 
 	m_Rdr->Render();
-
-	std::cout << "Draw Calls: " << m_Rdr->Stats().nDrawCalls << '\n';
 }
 
 auto MyApp::OnShutdown() -> Status
