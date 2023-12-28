@@ -99,10 +99,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		: GFX::Renderer(std::move(window))
 		, m_pImpl(nullptr)
 	{
-		const auto currentContextExists = glfwGetCurrentContext() != nullptr;
-		if (!currentContextExists) {
-			glfwMakeContextCurrent(static_cast<GLFWwindow*>(Window().Handle()));
-		}
+		auto* oldCurrentContext = glfwGetCurrentContext();
+		glfwMakeContextCurrent(static_cast<GLFWwindow*>(Window().Handle()));
 
 		gladLoadGL(static_cast<GLADloadfunc>(glfwGetProcAddress));
 
@@ -129,7 +127,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			void main()
 			{
-				FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+				FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			}
 		)";
 
@@ -155,7 +153,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			{},
 			{ 0 },
 			{ 0 },
-			{ },
+			{ Mem::MakeShared<Camera>() },
 			{ glm::mat4(1.0F) }
 		});
 
@@ -174,8 +172,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(GLID(oldVAO));
 
-		if (!currentContextExists) {
-			glfwMakeContextCurrent(nullptr);
+		if (oldCurrentContext) {
+			glfwMakeContextCurrent(oldCurrentContext);
 		}
 	}
 
