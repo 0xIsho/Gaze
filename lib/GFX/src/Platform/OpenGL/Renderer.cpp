@@ -107,6 +107,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 		gladLoadGL(static_cast<GLADloadfunc>(glfwGetProcAddress));
 
+		glEnable(GL_DEPTH_TEST);
+
 #ifndef NDEBUG
 		EnableDebugOutput();
 #endif
@@ -192,7 +194,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glClearColor(r, g, b, a);
 	}
 
-	auto Renderer::Clear(Buffer buffer /*= kColorBuffer*/) -> void
+	auto Renderer::Clear(Buffer buffer /*= Buffer(kColorBuffer | kDepthBuffer)*/) -> void
 	{
 		auto bufferBits = 0U;
 

@@ -47,7 +47,7 @@ namespace Gaze::GFX {
 		virtual ~Renderer() = default;
 
 		virtual auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void = 0;
-		virtual auto Clear(Buffer buffer = kColorBuffer) -> void = 0;
+		virtual auto Clear(Buffer buffer = Buffer(kColorBuffer | kDepthBuffer)) -> void = 0;
 		virtual auto Flush() -> void = 0;
 		virtual auto Render() -> void = 0;
 		virtual auto MakeContextCurrent() -> void = 0;
