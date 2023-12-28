@@ -129,11 +129,14 @@ namespace Gaze::GFX::Platform::OpenGL {
 			#version 330 core
 			out vec4 FragColor;
 
-			uniform vec4 u_color;
+			uniform vec4 u_ObjectColor;
+			uniform vec4 u_LightColor;
 
 			void main()
 			{
-				FragColor = u_color;
+				float ambientStrength = 0.1;
+				vec4 ambient = ambientStrength * u_LightColor;
+				FragColor = u_ObjectColor * ambient;
 			}
 		)";
 
@@ -238,7 +241,9 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			const auto mvp = vp * sect.transform;
 			m_pImpl->program.UploadUniformMatrix4FV("u_mvp", &(mvp[0][0]));
-			m_pImpl->program.UploadUniform4FV("u_color", &(sect.material.color[0]));
+			m_pImpl->program.UploadUniform4FV("u_ObjectColor", &(sect.material.color[0]));
+			const float lightColor[] = { 1.0F, 1.0F, 1.0F, 1.0F };
+			m_pImpl->program.UploadUniform4FV("u_LightColor", lightColor);
 
 			glDrawElementsBaseVertex(
 				drawMode,

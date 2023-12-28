@@ -121,69 +121,43 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		Quit();
 	}
 
-	const auto redMat   = GFX::Material{ { 1.F, 0.F, 0.F, 1.F } };
 	const auto greenMat = GFX::Material{ { 0.F, 1.F, 0.F, 1.F } };
-	const auto blueMat  = GFX::Material{ { 0.F, 0.F, 1.F, 1.F } };
 
-	auto mesh1 = Gaze::GFX::Mesh{
+	auto cube = GFX::Mesh{
 		{
-			{ { -.25F, -.25F, .0F } },
-			{ { -.25F,  .25F, .0F } },
-			{ {  -.5F,   .5F, .0F } },
-			{ { -.75F,  .25F, .0F } },
-			{ { -.75F, -.25F, .0F } },
-			{ {  -.5F,  -.5F, .0F } },
+			{{  0.5F,  0.5F,  0.5F }},
+			{{ -0.5F,  0.5F,  0.5F }},
+			{{ -0.5F, -0.5F,  0.5F }},
+			{{  0.5F, -0.5F,  0.5F }},
+			{{ -0.5F,  0.5F, -0.5F }},
+			{{  0.5F,  0.5F, -0.5F }},
+			{{  0.5F, -0.5F, -0.5F }},
+			{{ -0.5F, -0.5F, -0.5F }},
 		},
 		{
-			0, 1,
-			1, 2,
-			2, 3,
-			3, 4,
-			4, 5
+			// Front
+			0, 1, 2,
+			2, 3, 0,
+			// Back
+			4, 5, 6,
+			6, 7, 4,
+			// Left
+			1, 4, 7,
+			7, 2, 1,
+			// Right
+			0, 3, 6,
+			6, 5, 0,
+			// Top
+			0, 5, 4,
+			4, 1, 0,
+			// Bottom
+			2, 7, 6,
+			6, 3, 2
 		}
 	};
-	mesh1.SetMaterial(redMat);
+	cube.SetMaterial(greenMat);
 
-	auto mesh2 = Gaze::GFX::Mesh{
-		{
-			{ {  .25F, -.25F, .0F } },
-			{ {  .25F,  .25F, .0F } },
-			{ {   .0F,   .5F, .0F } },
-			{ { -.25F,  .25F, .0F } },
-			{ { -.25F, -.25F, .0F } },
-			{ {   .0F,  -.5F, .0F } },
-		},
-		{
-			0, 1, 3,
-			1, 2, 3,
-			3, 4, 0,
-			4, 5, 0,
-		}
-	};
-	mesh2.SetMaterial(greenMat);
-
-	auto mesh3 = Gaze::GFX::Mesh{
-		{
-			{ { .25F, -.25F, .0F } },
-			{ { .25F,  .25F, .0F } },
-			{ {  .5F,   .5F, .0F } },
-			{ { .75F,  .25F, .0F } },
-			{ { .75F, -.25F, .0F } },
-			{ {  .5F,  -.5F, .0F } },
-		},
-		{
-			0, 1,
-			1, 2,
-			2, 3,
-			3, 4,
-			4, 5
-		}
-	};
-	mesh3.SetMaterial(blueMat);
-
-	m_Rdr->DrawMesh(mesh1, GFX::Renderer::PrimitiveMode::LineLoop);
-	m_Rdr->DrawMesh(mesh2, GFX::Renderer::PrimitiveMode::Triangles);
-	m_Rdr->DrawMesh(mesh3, GFX::Renderer::PrimitiveMode::LineLoop);
+	m_Rdr->DrawMesh(cube, GFX::Renderer::PrimitiveMode::Triangles);
 
 	for (auto i = -.9F; i <= 1.F; i += .1F) {
 		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
