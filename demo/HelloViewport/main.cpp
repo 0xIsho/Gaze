@@ -36,8 +36,6 @@ auto MyApp::OnInit() -> Status
 	});
 	m_Win->Show();
 
-	m_Rdr->SetClearColor(.8F, .8F, .8F, 1.F);
-	m_Rdr->Clear();
 	m_Rdr->SetClearColor(.2F, .2F, .2F, 1.F);
 
 	return App::Status::Success;
@@ -45,8 +43,9 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
-	m_Rdr->SetViewport(50, 150, 300, 300);
 	m_Rdr->Clear();
+
+	m_Rdr->SetViewport(50, 150, 300, 300);
 	DrawAxis();
 
 	m_Rdr->DrawTri({{
@@ -60,8 +59,9 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		{  .5F, -.5F, 0.F }
 	}});
 
+	m_Rdr->Flush();
+
 	m_Rdr->SetViewport(450, 150, 300, 300);
-	m_Rdr->Clear();
 	DrawAxis();
 
 	m_Rdr->DrawTri({{

@@ -121,29 +121,70 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		Quit();
 	}
 
-	auto mesh = Gaze::GFX::Mesh{
+	auto mesh1 = Gaze::GFX::Mesh{
 		{
-			{  .25F, -.25F, .0F },
-			{  .25F,  .25F,  .0F },
-			{  .0F,   .5F,  .0F },
-			{ -.25F,  .25F,  .0F },
-			{ -.25F, -.25F, .0F },
-			{  .0F,  -.5F,  .0F },
+			{ { -.25F, -.25F, .0F } },
+			{ { -.25F,  .25F, .0F } },
+			{ {  -.5F,   .5F, .0F } },
+			{ { -.75F,  .25F, .0F } },
+			{ { -.75F, -.25F, .0F } },
+			{ {  -.5F,  -.5F, .0F } },
 		},
-		{ 0, 1, 2, 3, 4, 5 }
+		{
+			0, 1,
+			1, 2,
+			2, 3,
+			3, 4,
+			4, 5
+		}
 	};
 
-	m_Rdr->SetColor(.6F, .6F, .6F, 1.F);
+	auto mesh2 = Gaze::GFX::Mesh{
+		{
+			{ {  .25F, -.25F, .0F } },
+			{ {  .25F,  .25F, .0F } },
+			{ {   .0F,   .5F, .0F } },
+			{ { -.25F,  .25F, .0F } },
+			{ { -.25F, -.25F, .0F } },
+			{ {   .0F,  -.5F, .0F } },
+		},
+		{
+			0, 1, 3,
+			1, 2, 3,
+			3, 4, 0,
+			4, 5, 0,
+		}
+	};
+
+	auto mesh3 = Gaze::GFX::Mesh{
+		{
+			{ { .25F, -.25F, .0F } },
+			{ { .25F,  .25F, .0F } },
+			{ {  .5F,   .5F, .0F } },
+			{ { .75F,  .25F, .0F } },
+			{ { .75F, -.25F, .0F } },
+			{ {  .5F,  -.5F, .0F } },
+		},
+		{
+			0, 1,
+			1, 2,
+			2, 3,
+			3, 4,
+			4, 5
+		}
+	};
+
+	m_Rdr->DrawMesh(mesh1, GFX::Renderer::PrimitiveMode::LineLoop);
+	m_Rdr->DrawMesh(mesh2, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->DrawMesh(mesh3, GFX::Renderer::PrimitiveMode::LineLoop);
+
 	for (auto i = -.9F; i <= 1.F; i += .1F) {
 		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
 		m_Rdr->DrawLine({ -1.F, .0F, i }, { 1.F, .0F, i });
 	}
 
-	m_Rdr->SetColor(1.F, 0.F, 0.F, 1.F);
 	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
-	m_Rdr->SetColor(0.F, 1.F, 0.F, 1.F);
 	m_Rdr->DrawLine({ 0, -1, 0 }, { 0, 1, 0 });
-	m_Rdr->SetColor(0.F, 0.F, 1.F, 1.F);
 	m_Rdr->DrawLine({ 0, 0, -1 }, { 0, 0, 1 });
 
 	m_Rdr->Render();

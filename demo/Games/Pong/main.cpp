@@ -72,30 +72,30 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_Input(m_Win)
 	, m_PaddleMesh({
-			{ .0F               , .0F          , .0F },
-			{ .0F               , kPaddleSize.y, .0F },
-			{ kPaddleSize.x      , .0F          , .0F },
-			{ kPaddleSize.x      , kPaddleSize.y, .0F }
+			{{ .0F               , .0F          , .0F }},
+			{{ .0F               , kPaddleSize.y, .0F }},
+			{{ kPaddleSize.x      , .0F          , .0F }},
+			{{ kPaddleSize.x      , kPaddleSize.y, .0F }}
 		}, { 0, 1, 2, 2, 1, 3 })
 	, m_BallMesh({
-			{ .0F      , .0F      , .0F },
-			{ .0F      , kBallSize, .0F },
-			{ kBallSize, .0F      , .0F },
-			{ kBallSize, kBallSize, .0F }
+			{{ .0F      , .0F      , .0F }},
+			{{ .0F      , kBallSize, .0F }},
+			{{ kBallSize, .0F      , .0F }},
+			{{ kBallSize, kBallSize, .0F }}
 		}, { 0, 1, 2, 2, 1, 3 })
 	, m_ScoreMarkerMesh({
-			{ .0F, .0F, .0F },
-			{ .0F, 10.F, .0F }
+			{{ .0F, .0F, .0F }},
+			{{ .0F, 10.F, .0F }}
 		}, { 0, 1 })
 	, m_WallMesh({
-			{ .0F      , .0F           , .0F },
-			{ .0F      , kWallThickness, .0F },
-			{ kWinWidth, .0F           , .0F },
-			{ kWinWidth, kWallThickness, .0F },
+			{{ .0F      , .0F           , .0F }},
+			{{ .0F      , kWallThickness, .0F }},
+			{{ kWinWidth, .0F           , .0F }},
+			{{ kWinWidth, kWallThickness, .0F }},
 		}, { 0, 1, 2, 2, 1, 3 })
 	, m_MidlineMesh({
-			{ kWinWidth / 2, kWallThickness             , .0F },
-			{ kWinWidth / 2, kWinHeight - kWallThickness, .0F }
+			{{ kWinWidth / 2, kWallThickness             , .0F }},
+			{{ kWinWidth / 2, kWinHeight - kWallThickness, .0F }}
 		}, { 0, 1 })
 {
 	srand(U32(time(nullptr)));

@@ -1,7 +1,7 @@
 #include "GFX/API.hpp"
 
 namespace Gaze::GFX {
-	static auto s_API = API::kSoftware;
+	static auto s_API = API::kOpenGL;
 
 	auto SetAPI(API api) -> void {
 		s_API = api;

@@ -19,6 +19,11 @@ namespace Gaze::GFX {
 	class Renderer
 	{
 	public:
+		struct RenderStats
+		{
+			I32 nDrawCalls;
+		};
+
 		enum class PrimitiveMode
 		{
 			Points,
@@ -30,14 +35,23 @@ namespace Gaze::GFX {
 			TriangleFan
 		};
 
+		enum Buffer : U8
+		{
+			kColorBuffer   = 1 << 0,
+			kDepthBuffer   = 1 << 1,
+			kStencilBuffer = 1 << 2
+		};
+
 	public:
 		Renderer(Mem::Shared<WM::Window> window);
 		virtual ~Renderer() = default;
 
-		virtual auto SetColor(F32 r, F32 g, F32 b, F32 a) -> void = 0;
 		virtual auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void = 0;
-		virtual auto Clear() -> void = 0;
+		virtual auto Clear(Buffer buffer = kColorBuffer) -> void = 0;
+		virtual auto Flush() -> void = 0;
 		virtual auto Render() -> void = 0;
+		virtual auto MakeContextCurrent() -> void = 0;
+		virtual auto Stats() -> RenderStats = 0;
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void = 0;
 		virtual auto SetProjection(glm::mat4 projection) -> void = 0;
 		virtual auto SetCamera(Mem::Shared<Camera> camera) -> void = 0;

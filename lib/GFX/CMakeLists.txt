@@ -1,14 +1,10 @@
 set(TARGET GFX)
 
+add_subdirectory("vendor/")
+
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glm REQUIRED)
-
-if(UNIX)
-	find_package(X11 REQUIRED)
-else()
-	message(FATAL_ERROR "The renderer does not support the target platform: ${CMAKE_HOST_SYSTEM_NAME}")
-endif()
 
 set(HEADERS
 	"include/GFX/API.hpp"
@@ -16,12 +12,12 @@ set(HEADERS
 	"include/GFX/Mesh.hpp"
 	"include/GFX/Renderer.hpp"
 
-	"include/GFX/Platform/Software/Renderer.hpp"
+	"include/GFX/Platform/OpenGL/Renderer.hpp"
 
-	$<$<BOOL:UNIX>:
-		"include/GFX/Platform/Software/Linux/Renderer.hpp"
-		"include/GFX/Platform/Software/Linux/X11/Renderer.hpp"
-	>
+	"include/GFX/Platform/OpenGL/Objects/Object.hpp"
+	"include/GFX/Platform/OpenGL/Objects/IndexBuffer.hpp"
+	"include/GFX/Platform/OpenGL/Objects/Shader.hpp"
+	"include/GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
 )
 
 set(SOURCES
@@ -30,9 +26,10 @@ set(SOURCES
 	"src/Mesh.cpp"
 	"src/Renderer.cpp"
 
-	$<$<BOOL:UNIX>:
-		"src/Platform/Software/Linux/X11/Renderer.cpp"
-	>
+	"src/Platform/OpenGL/Renderer.cpp"
+	"src/Platform/OpenGL/Objects/IndexBuffer.cpp"
+	"src/Platform/OpenGL/Objects/Shader.cpp"
+	"src/Platform/OpenGL/Objects/VertexBuffer.cpp"
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -44,11 +41,6 @@ target_include_directories(${TARGET}
 		"include/"
 
 		${GLM_INCLUDE_DIRS}
-
-	PRIVATE
-		$<$<BOOL:UNIX>:
-			${X11_INCLUDE_DIR}
-		>
 )
 
 target_link_libraries(${TARGET}
@@ -59,11 +51,8 @@ target_link_libraries(${TARGET}
 
 	PRIVATE
 		OpenGL::GL
+		Gaze::GLAD
 		glfw
-
-		$<$<BOOL:UNIX>:
-			${X11_LIBRARIES}
-		>
 )
 
 if (GAZE_BUILD_TESTS)
