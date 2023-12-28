@@ -10,6 +10,7 @@ namespace Gaze::GFX {
 		: m_Vertices(std::move(vertices))
 		, m_Indices(std::move(indices))
 		, m_Transform(1.0F)
+		, m_Material({ { 1.F, 1.F, 1.F, 1.F } })
 	{
 	}
 

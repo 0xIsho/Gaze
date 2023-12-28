@@ -2,6 +2,8 @@
 
 #include "Core/Type.hpp"
 
+#include "GFX/Material.hpp"
+
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
@@ -36,10 +38,17 @@ namespace Gaze::GFX {
 		auto Rotate(F32 radians, const glm::vec3& axis) -> void;
 		auto Scale(const glm::vec3& scale) -> void;
 
+		[[nodiscard]]
+		auto Material() -> struct Material;
+		[[nodiscard]]
+		auto Material() const -> const struct Material&;
+		auto SetMaterial(struct Material mat) -> void;
+
 	private:
 		std::vector<Vertex> m_Vertices;
 		std::vector<U32> m_Indices;
 		glm::mat4 m_Transform;
+		struct Material m_Material;
 	};
 
 	inline auto Mesh::Vertices() const -> const std::vector<Vertex>&
@@ -55,5 +64,21 @@ namespace Gaze::GFX {
 	inline auto Mesh::Transform() const -> const glm::mat4&
 	{
 		return m_Transform;
+	}
+
+
+	inline auto Mesh::Material() -> struct Material
+	{
+		return m_Material;
+	}
+
+	inline auto Mesh::Material() const -> const struct Material&
+	{
+		return m_Material;
+	}
+
+	inline auto Mesh::SetMaterial(struct Material mat) -> void
+	{
+		m_Material = std::move(mat);
 	}
 }

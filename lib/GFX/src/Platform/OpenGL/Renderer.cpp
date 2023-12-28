@@ -76,7 +76,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 		I32 offset;
 		I32 size;
 		Renderer::PrimitiveMode mode;
+
+		// TODO: These are the same properies in Mesh. The duplication should be fixed somehow
 		glm::mat4 transform;
+		Material material;
 	};
 
 	struct Renderer::Impl
@@ -123,9 +126,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 			#version 330 core
 			out vec4 FragColor;
 
+			uniform vec4 u_color;
+
 			void main()
 			{
-				FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				FragColor = u_color;
 			}
 		)";
 
@@ -230,6 +235,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			const auto mvp = vp * sect.transform;
 			m_pImpl->program.UploadUniformMatrix4FV("u_mvp", &(mvp[0][0]));
+			m_pImpl->program.UploadUniform4FV("u_color", &(sect.material.color[0]));
 
 			glDrawElementsBaseVertex(
 				drawMode,
@@ -293,7 +299,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset,
 					I32(mesh.Vertices().size() * mesh.kVertexSize),
 					mode,
-					mesh.Transform()
+					mesh.Transform(),
+					mesh.Material()
 				}
 			);
 
@@ -316,7 +323,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset,
 					I32(mesh.Indices().size() * mesh.kIndexSize),
 					mode,
-					mesh.Transform()
+					mesh.Transform(),
+					mesh.Material()
 				}
 			);
 

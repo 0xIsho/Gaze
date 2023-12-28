@@ -121,6 +121,10 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		Quit();
 	}
 
+	const auto redMat   = GFX::Material{ { 1.F, 0.F, 0.F, 1.F } };
+	const auto greenMat = GFX::Material{ { 0.F, 1.F, 0.F, 1.F } };
+	const auto blueMat  = GFX::Material{ { 0.F, 0.F, 1.F, 1.F } };
+
 	auto mesh1 = Gaze::GFX::Mesh{
 		{
 			{ { -.25F, -.25F, .0F } },
@@ -138,6 +142,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 			4, 5
 		}
 	};
+	mesh1.SetMaterial(redMat);
 
 	auto mesh2 = Gaze::GFX::Mesh{
 		{
@@ -155,6 +160,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 			4, 5, 0,
 		}
 	};
+	mesh2.SetMaterial(greenMat);
 
 	auto mesh3 = Gaze::GFX::Mesh{
 		{
@@ -173,6 +179,7 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 			4, 5
 		}
 	};
+	mesh3.SetMaterial(blueMat);
 
 	m_Rdr->DrawMesh(mesh1, GFX::Renderer::PrimitiveMode::LineLoop);
 	m_Rdr->DrawMesh(mesh2, GFX::Renderer::PrimitiveMode::Triangles);

@@ -3,6 +3,7 @@
 #include "Object.hpp"
 
 #include <string>
+#include <string_view>
 #include <initializer_list>
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
@@ -44,9 +45,12 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 		auto RetrieveErrorLog(I32 nBytes) const -> std::string;
 
+		auto UploadUniform4FV(std::string name, const float vec[4]) -> bool;
 		auto UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) -> bool;
 
 	private:
+		[[nodiscard]]
+		auto RetreiveUniformLocation(std::string_view name) -> int;
 		[[nodiscard]]
 		auto WasSuccessfullyLinked() const -> bool;
 	};

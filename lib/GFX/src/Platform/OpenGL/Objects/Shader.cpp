@@ -104,9 +104,21 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return log;
 	}
 
+	auto ShaderProgram::UploadUniform4FV(std::string name, const float vec[4]) -> bool
+	{
+		const auto location = RetreiveUniformLocation(name);
+		if (location == -1) {
+			return false;
+		}
+
+		glUniform4fv(location, 1, vec);
+
+		return true;
+	}
+
 	auto ShaderProgram::UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) -> bool
 	{
-		const auto location = glGetUniformLocation(ID(), name.data());
+		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
 			return false;
 		}
@@ -114,6 +126,11 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		glUniformMatrix4fv(location, 1, false, matrix);
 
 		return true;
+	}
+
+	auto ShaderProgram::RetreiveUniformLocation(std::string_view name) -> int
+	{
+		return glGetUniformLocation(ID(), name.data());
 	}
 
 	auto ShaderProgram::WasSuccessfullyLinked() const -> bool
