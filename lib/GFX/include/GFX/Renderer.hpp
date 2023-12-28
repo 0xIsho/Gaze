@@ -57,15 +57,10 @@ namespace Gaze::GFX {
 		virtual auto SetCamera(Mem::Shared<Camera> camera) -> void = 0;
 
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void = 0;
-
-		/* ********** 2D Primitive Rendering Functions ********** */
-		// Coordinates are NDC [-1.0F,1.0F]!
-
 		virtual auto DrawPoint(Vec3 p) -> void = 0;
 		virtual auto DrawLine(Vec3 start, Vec3 end) -> void = 0;
 		virtual auto DrawTri(const std::array<Vec3, 3>& ps) -> void = 0;
 		virtual auto FillTri(const std::array<Vec3, 3>& ps) -> void = 0;
-		/**********************************************************/
 
 	protected:
 		[[nodiscard]]
