@@ -1,6 +1,7 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
 #include "GFX/Platform/OpenGL/Objects/IndexBuffer.hpp"
+#include "GFX/Platform/OpenGL/Objects/Object.hpp"
 #include "GFX/Platform/OpenGL/Objects/Shader.hpp"
 #include "GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
 
@@ -152,8 +153,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl= new Impl({
 			[] { auto vao = GLID(0); glGenVertexArrays(1, &vao); return vao; }(),
 			{ &vShader, &fShader },
-			Objects::VertexBuffer(nullptr, kStaticBufferSize),
-			Objects::IndexBuffer(nullptr, kStaticBufferSize),
+			Objects::VertexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
+			Objects::IndexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
 			{},
 			{},
 			{ 0 },
