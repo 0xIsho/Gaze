@@ -57,9 +57,14 @@ namespace Gaze::GFX {
 		virtual auto SetCamera(Mem::Shared<Camera> camera) -> void = 0;
 
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void = 0;
+
+		[[deprecated("Use DrawMesh() instead")]]
 		virtual auto DrawPoint(Vec3 p) -> void = 0;
+		[[deprecated("Use DrawMesh() instead")]]
 		virtual auto DrawLine(Vec3 start, Vec3 end) -> void = 0;
+		[[deprecated("Use DrawMesh() instead")]]
 		virtual auto DrawTri(const std::array<Vec3, 3>& ps) -> void = 0;
+		[[deprecated("Use DrawMesh() instead")]]
 		virtual auto FillTri(const std::array<Vec3, 3>& ps) -> void = 0;
 
 	protected:
