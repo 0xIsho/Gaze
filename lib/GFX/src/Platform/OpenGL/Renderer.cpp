@@ -112,13 +112,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 			#version 330 core
 			layout (location = 0) in vec3 aPos;
 
-			uniform mat4 u_model;
-			uniform mat4 u_view;
-			uniform mat4 u_projection;
+			uniform mat4 u_mvp;
 
 			void main()
 			{
-				gl_Position = u_projection * u_view * u_model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+				gl_Position = u_mvp * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 			}
 		)";
 		const auto* fragmentSource = R"(
@@ -213,8 +211,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl->program.Bind();
 
 		const auto view = m_pImpl->camera->ComputeViewMatrix();
-		m_pImpl->program.UploadUniformMatrix4FV("u_view", &(view[0][0]));
-		m_pImpl->program.UploadUniformMatrix4FV("u_projection", &(m_pImpl->projection[0][0]));
+		const auto vp = m_pImpl->projection * view;
 
 		for (auto i = 0UL; i < m_pImpl->indexBufSects.size(); i++) {
 			const auto& sect = m_pImpl->indexBufSects[i];
@@ -231,7 +228,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
+			const auto mvp = vp * sect.transform;
+			m_pImpl->program.UploadUniformMatrix4FV("u_mvp", &(mvp[0][0]));
 
 			glDrawElementsBaseVertex(
 				drawMode,
