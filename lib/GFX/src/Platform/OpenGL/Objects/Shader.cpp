@@ -104,6 +104,30 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return log;
 	}
 
+	auto ShaderProgram::UploadUniform1F(std::string name, const float val) -> bool
+	{
+		const auto location = RetreiveUniformLocation(name);
+		if (location == -1) {
+			return false;
+		}
+
+		glUniform1f(location, val);
+
+		return true;
+	}
+
+	auto ShaderProgram::UploadUniform3FV(std::string name, const float vec[3]) -> bool
+	{
+		const auto location = RetreiveUniformLocation(name);
+		if (location == -1) {
+			return false;
+		}
+
+		glUniform3fv(location, 1, vec);
+
+		return true;
+	}
+
 	auto ShaderProgram::UploadUniform4FV(std::string name, const float vec[4]) -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);

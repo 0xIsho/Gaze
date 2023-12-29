@@ -45,6 +45,8 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 		auto RetrieveErrorLog(I32 nBytes) const -> std::string;
 
+		auto UploadUniform1F(std::string name, const float val) -> bool;
+		auto UploadUniform3FV(std::string name, const float vec[3]) -> bool;
 		auto UploadUniform4FV(std::string name, const float vec[4]) -> bool;
 		auto UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) -> bool;
 

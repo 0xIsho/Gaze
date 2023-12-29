@@ -5,6 +5,8 @@
 #include "GFX/Platform/OpenGL/Objects/Shader.hpp"
 #include "GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
 
+#include "GFX/Light.hpp"
+
 #include "glad/gl.h"
 
 #include <GLFW/glfw3.h>
@@ -117,26 +119,66 @@ namespace Gaze::GFX::Platform::OpenGL {
 		const auto* vertexSource = R"(
 			#version 330 core
 			layout (location = 0) in vec3 aPos;
+			layout (location = 1) in vec3 a_Normal;
 
-			uniform mat4 u_mvp;
+			uniform mat4 u_model;
+			uniform mat4 u_vp;
+
+			out vec3 normal;
+			out vec3 surfacePos;
 
 			void main()
 			{
-				gl_Position = u_mvp * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+				gl_Position = u_vp * u_model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+
+				normal = a_Normal;
+				surfacePos = vec3(u_model * vec4(aPos, 1.0));
 			}
 		)";
 		const auto* fragmentSource = R"(
 			#version 330 core
+
+			struct Material
+			{
+				vec3 diffuse;
+				vec3 specular;
+				float shininess;
+			};
+
+			struct Light
+			{
+				vec3 position;
+				vec3 diffuse;
+				vec3 specular;
+				float attenuation;
+			};
+
 			out vec4 FragColor;
 
-			uniform vec4 u_ObjectColor;
-			uniform vec4 u_LightColor;
+			uniform Material u_Material;
+			uniform Light u_Light;
+			uniform vec3 u_Ambient;
+			uniform vec3 u_ViewPos;
+
+			in vec3 normal;
+			in vec3 surfacePos;
 
 			void main()
 			{
-				float ambientStrength = 0.1;
-				vec4 ambient = ambientStrength * u_LightColor;
-				FragColor = u_ObjectColor * ambient;
+				vec3 lightDir = normalize(u_Light.position - surfacePos);
+				float diffuseCoefficient = max(dot(normal, lightDir), 0.0);
+				vec3 diffuse = diffuseCoefficient * u_Material.diffuse * u_Light.diffuse;
+				vec3 surfaceToView = normalize(u_ViewPos - surfacePos);
+
+				vec3 specular = vec3(0);
+				if (diffuseCoefficient > 0) {
+					vec3 reflectDir = reflect(-lightDir, normal);
+					specular = u_Material.specular * pow(max(dot(surfaceToView, reflectDir), 0.0), u_Material.shininess) * u_Light.specular;
+				}
+
+				const vec3 gamma = vec3(1.0 / 2.2);
+				float attenuation = 1.0 / (1.0 + u_Light.attenuation * pow(length(u_Light.position - surfacePos), 2));
+				FragColor = vec4(pow(u_Ambient + diffuse + specular, gamma), 1.0);
 			}
 		)";
 
@@ -177,8 +219,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glBindVertexArray(m_pImpl->vaoID);
 		m_pImpl->vertexBuf.Bind();
 		m_pImpl->indexBuf.Bind();
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), static_cast<void*>(0));
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 		glBindVertexArray(GLID(oldVAO));
 
 		if (oldCurrentContext) {
@@ -239,11 +283,25 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			const auto mvp = vp * sect.transform;
-			m_pImpl->program.UploadUniformMatrix4FV("u_mvp", &(mvp[0][0]));
-			m_pImpl->program.UploadUniform4FV("u_ObjectColor", &(sect.material.color[0]));
-			const float lightColor[] = { 1.0F, 1.0F, 1.0F, 1.0F };
-			m_pImpl->program.UploadUniform4FV("u_LightColor", lightColor);
+			const auto ambient = glm::vec3(.1F, .1F, .1F) * glm::vec3(sect.material.diffuse * .25F);
+			const auto light = Light {
+				.position = { 1.0F, 1.0F, -1.0F },
+				.diffuse = { .5F, .5F, .5F },
+				.specular = { 1.0F, 1.0F, 1.0F },
+				.attenuation = .2F
+			};
+
+			m_pImpl->program.UploadUniformMatrix4FV("u_vp", &(vp[0][0]));
+			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
+			m_pImpl->program.UploadUniform3FV("u_ViewPos", &(m_pImpl->camera->Position()[0]));
+			m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
+			m_pImpl->program.UploadUniform3FV("u_Ambient", &(ambient[0]));
+			m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
+			m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
+			m_pImpl->program.UploadUniform1F("u_Light.attenuation", .2F);
+			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.material.diffuse[0]));
+			m_pImpl->program.UploadUniform3FV("u_Material.specular", &(sect.material.specular[0]));
+			m_pImpl->program.UploadUniform1F("u_Material.shininess", sect.material.shininess);
 
 			glDrawElementsBaseVertex(
 				drawMode,

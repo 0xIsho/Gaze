@@ -14,6 +14,7 @@ namespace Gaze::GFX {
 	struct Vertex
 	{
 		glm::vec3 position;
+		glm::vec3 normals;
 	};
 
 	class Mesh

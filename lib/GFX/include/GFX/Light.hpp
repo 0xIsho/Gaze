@@ -3,10 +3,11 @@
 #include <glm/vec3.hpp>
 
 namespace Gaze::GFX {
-	struct Material
+	struct Light
 	{
+		glm::vec3 position;
 		glm::vec3 diffuse;
 		glm::vec3 specular;
-		float shininess;
+		float attenuation;
 	};
 }

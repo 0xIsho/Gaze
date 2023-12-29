@@ -9,6 +9,7 @@ find_package(glm REQUIRED)
 set(HEADERS
 	"include/GFX/API.hpp"
 	"include/GFX/Camera.hpp"
+	"include/GFX/Light.hpp"
 	"include/GFX/Material.hpp"
 	"include/GFX/Mesh.hpp"
 	"include/GFX/Renderer.hpp"

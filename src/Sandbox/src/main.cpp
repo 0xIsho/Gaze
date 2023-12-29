@@ -95,7 +95,7 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
-	constexpr auto cameraSpeed = 0.5F; // adjust accordingly
+	constexpr auto cameraSpeed = 2.0F;
 	if (m_Input.IsKeyPressed(Input::Key::kW)) {
 		m_Cam->Move(cameraSpeed * F32(deltaTime) * m_Cam->Front());
 	}
@@ -121,18 +121,41 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 		Quit();
 	}
 
-	const auto greenMat = GFX::Material{ { 0.F, 1.F, 0.F, 1.F } };
+	const auto greenMat = GFX::Material{
+		{ 0.F, 1.F, 0.F },
+		{ .5F, .5F, .5F },
+		32.F
+	};
 
 	auto cube = GFX::Mesh{
 		{
-			{{  0.5F,  0.5F,  0.5F }},
-			{{ -0.5F,  0.5F,  0.5F }},
-			{{ -0.5F, -0.5F,  0.5F }},
-			{{  0.5F, -0.5F,  0.5F }},
-			{{ -0.5F,  0.5F, -0.5F }},
-			{{  0.5F,  0.5F, -0.5F }},
-			{{  0.5F, -0.5F, -0.5F }},
-			{{ -0.5F, -0.5F, -0.5F }},
+			// Back-Front
+			{{  0.5F, 1.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{ -0.5F, 1.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{ -0.5F, 0.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{  0.5F, 0.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{ -0.5F, 1.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{  0.5F, 1.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{  0.5F, 0.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{ -0.5F, 0.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			// Left-Right
+			{{  0.5F, 1.0F,  0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{ -0.5F, 1.0F,  0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{ -0.5F, 0.0F,  0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{  0.5F, 0.0F,  0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{ -0.5F, 1.0F, -0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{  0.5F, 1.0F, -0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{  0.5F, 0.0F, -0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{ -0.5F, 0.0F, -0.5F }, { -1.0F, 0.0F, 0.0F }},
+			// Bottom-Top
+			{{  0.5F, 1.0F,  0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{ -0.5F, 1.0F,  0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{ -0.5F, 0.0F,  0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{  0.5F, 0.0F,  0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{ -0.5F, 1.0F, -0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{  0.5F, 1.0F, -0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{  0.5F, 0.0F, -0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{ -0.5F, 0.0F, -0.5F }, { 0.0F, -1.0F, 0.0F }},
 		},
 		{
 			// Front
@@ -142,31 +165,31 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 			4, 5, 6,
 			6, 7, 4,
 			// Left
-			1, 4, 7,
-			7, 2, 1,
+			1 + 8, 4 + 8, 7 + 8,
+			7 + 8, 2 + 8, 1 + 8,
 			// Right
-			0, 3, 6,
-			6, 5, 0,
+			0 + 8, 3 + 8, 6 + 8,
+			6 + 8, 5 + 8, 0 + 8,
 			// Top
-			0, 5, 4,
-			4, 1, 0,
+			0 + 16, 5 + 16, 4 + 16,
+			4 + 16, 1 + 16, 0 + 16,
 			// Bottom
-			2, 7, 6,
-			6, 3, 2
+			2 + 16, 7 + 16, 6 + 16,
+			6 + 16, 3 + 16, 2 + 16
 		}
 	};
 	cube.SetMaterial(greenMat);
 
 	m_Rdr->DrawMesh(cube, GFX::Renderer::PrimitiveMode::Triangles);
 
-	for (auto i = -.9F; i <= 1.F; i += .1F) {
-		m_Rdr->DrawLine({ i, .0F, -1.F }, { i, .0F, 1.F });
-		m_Rdr->DrawLine({ -1.F, .0F, i }, { 1.F, .0F, i });
+	for (auto i = -10.F; i <= 10.F; i += .5F) {
+		m_Rdr->DrawLine({ i, .0F, -10.F }, { i, .0F, 10.F });
+		m_Rdr->DrawLine({ -10.F, .0F, i }, { 10.F, .0F, i });
 	}
 
-	m_Rdr->DrawLine({ -1, 0, 0 }, { 1, 0, 0 });
-	m_Rdr->DrawLine({ 0, -1, 0 }, { 0, 1, 0 });
-	m_Rdr->DrawLine({ 0, 0, -1 }, { 0, 0, 1 });
+	m_Rdr->DrawLine({ -10, 0, 0 }, { 10, 0, 0 });
+	m_Rdr->DrawLine({ 0, -10, 0 }, { 0, 10, 0 });
+	m_Rdr->DrawLine({ 0, 0, -10 }, { 0, 0, 10 });
 
 	m_Rdr->Render();
 }
