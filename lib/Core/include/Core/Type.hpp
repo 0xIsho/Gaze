@@ -15,6 +15,8 @@ namespace Gaze {
 	using I32 = std::int32_t;
 	using I64 = std::int64_t;
 
+	using IPtr = I64;
+
 	using F32 = float;
 	using F64 = double;
 

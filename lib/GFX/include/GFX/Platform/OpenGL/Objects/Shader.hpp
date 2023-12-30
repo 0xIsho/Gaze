@@ -38,7 +38,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		ShaderProgram(std::initializer_list<const Shader*> shaders);
 		static auto Release(GLID& id) -> void;
 
-		auto Bind() const -> void;
+		auto Use() const -> void;
 
 		[[nodiscard]]
 		auto Link() const -> bool;

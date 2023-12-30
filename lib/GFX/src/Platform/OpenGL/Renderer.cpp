@@ -217,12 +217,17 @@ namespace Gaze::GFX::Platform::OpenGL {
 		auto oldVAO = 0;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &oldVAO);
 		glBindVertexArray(m_pImpl->vaoID);
-		m_pImpl->vertexBuf.Bind();
-		m_pImpl->indexBuf.Bind();
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), static_cast<void*>(0));
+
+		glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
+		glVertexAttribBinding(0, 0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+		glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normals));
+		glVertexAttribBinding(1, 0);
 		glEnableVertexAttribArray(1);
+
+		m_pImpl->vertexBuf.Bind(0, 0, sizeof(Vertex));
+		m_pImpl->indexBuf.Bind();
+
 		glBindVertexArray(GLID(oldVAO));
 
 		if (oldCurrentContext) {
@@ -263,10 +268,24 @@ namespace Gaze::GFX::Platform::OpenGL {
 	{
 		glBindVertexArray(m_pImpl->vaoID);
 
-		m_pImpl->program.Bind();
+		m_pImpl->program.Use();
 
 		const auto view = m_pImpl->camera->ComputeViewMatrix();
 		const auto vp = m_pImpl->projection * view;
+
+		const auto light = Light {
+			.position = { 1.0F, 1.0F, -1.0F },
+			.diffuse = { .5F, .5F, .5F },
+			.specular = { 1.0F, 1.0F, 1.0F },
+			.attenuation = .2F
+		};
+
+		m_pImpl->program.UploadUniform3FV("u_ViewPos", &(m_pImpl->camera->Position()[0]));
+		m_pImpl->program.UploadUniformMatrix4FV("u_vp", &(vp[0][0]));
+		m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
+		m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
+		m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
+		m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
 
 		for (auto i = 0UL; i < m_pImpl->indexBufSects.size(); i++) {
 			const auto& sect = m_pImpl->indexBufSects[i];
@@ -283,22 +302,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			const auto ambient = glm::vec3(.1F, .1F, .1F) * glm::vec3(sect.material.diffuse * .25F);
-			const auto light = Light {
-				.position = { 1.0F, 1.0F, -1.0F },
-				.diffuse = { .5F, .5F, .5F },
-				.specular = { 1.0F, 1.0F, 1.0F },
-				.attenuation = .2F
-			};
+			const auto ambient = glm::vec3(light.diffuse * sect.material.diffuse * .05F);
 
-			m_pImpl->program.UploadUniformMatrix4FV("u_vp", &(vp[0][0]));
 			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
-			m_pImpl->program.UploadUniform3FV("u_ViewPos", &(m_pImpl->camera->Position()[0]));
-			m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
 			m_pImpl->program.UploadUniform3FV("u_Ambient", &(ambient[0]));
-			m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
-			m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
-			m_pImpl->program.UploadUniform1F("u_Light.attenuation", .2F);
 			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.material.diffuse[0]));
 			m_pImpl->program.UploadUniform3FV("u_Material.specular", &(sect.material.specular[0]));
 			m_pImpl->program.UploadUniform1F("u_Material.shininess", sect.material.shininess);

@@ -2,15 +2,14 @@
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
 	IndexBuffer::IndexBuffer()
-		: Object([] { GLID id; glGenBuffers(1, &id); return id; }())
+		: Object([] { GLID id; glCreateBuffers(1, &id); return id; }())
 	{
 	}
 
 	IndexBuffer::IndexBuffer(const void* data, I64 size, BufferUsage usage /*= BufferUsage::StaticDraw*/)
 		: IndexBuffer()
 	{
-		Bind();
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, ToGLBufferUsage(usage));
+		glNamedBufferData(ID(), size, data, ToGLBufferUsage(usage));
 	}
 
 	auto IndexBuffer::Release(GLID& id) -> void
@@ -26,7 +25,6 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 	auto IndexBuffer::Upload(const void* data, I64 size, I64 offset) -> void
 	{
-		Bind();
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
+		glNamedBufferSubData(ID(), offset, size, data);
 	}
 }

@@ -4,26 +4,19 @@
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
 	VertexBuffer::VertexBuffer()
-		: Object([] { GLID id; glGenBuffers(1, &id); return id; }())
+		: Object([] { GLID id; glCreateBuffers(1, &id); return id; }())
 	{
 	}
 
 	VertexBuffer::VertexBuffer(const void* data, I64 size, BufferUsage usage /*= BufferUsage::StaticDraw*/)
 		: VertexBuffer()
 	{
-		Bind();
-
-		glBufferData(
-			GL_ARRAY_BUFFER,
-			size,
-			data,
-			ToGLBufferUsage(usage)
-		);
+		glNamedBufferData(ID(), size, data, ToGLBufferUsage(usage));
 	}
 
-	auto VertexBuffer::Bind() const -> void
+	auto VertexBuffer::Bind(U32 bindingIndex, IPtr offset, I32 stride) const -> void
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, ID());
+		glBindVertexBuffer(bindingIndex, ID(), offset, stride);
 	}
 
 	auto VertexBuffer::Release(GLID& id) -> void
@@ -34,7 +27,6 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 	auto VertexBuffer::Upload(const void* data, I64 size, I64 offset) -> void
 	{
-		Bind();
-		glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+		glNamedBufferSubData(ID(), offset, size, data);
 	}
 }

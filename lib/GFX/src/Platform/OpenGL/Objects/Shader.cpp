@@ -71,7 +71,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		id = 0;
 	}
 
-	auto ShaderProgram::Bind() const -> void
+	auto ShaderProgram::Use() const -> void
 	{
 		glUseProgram(ID());
 	}
@@ -111,7 +111,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 			return false;
 		}
 
-		glUniform1f(location, val);
+		glProgramUniform1f(ID(), location, val);
 
 		return true;
 	}
@@ -123,7 +123,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 			return false;
 		}
 
-		glUniform3fv(location, 1, vec);
+		glProgramUniform3fv(ID(), location, 1, vec);
 
 		return true;
 	}
@@ -135,7 +135,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 			return false;
 		}
 
-		glUniform4fv(location, 1, vec);
+		glProgramUniform4fv(ID(), location, 1, vec);
 
 		return true;
 	}
@@ -147,7 +147,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 			return false;
 		}
 
-		glUniformMatrix4fv(location, 1, false, matrix);
+		glProgramUniformMatrix4fv(ID(), location, 1, false, matrix);
 
 		return true;
 	}

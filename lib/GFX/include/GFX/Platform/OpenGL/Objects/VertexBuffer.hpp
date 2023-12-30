@@ -10,7 +10,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		VertexBuffer(const void* data, I64 size, BufferUsage usage = BufferUsage::StaticDraw);
 		static auto Release(GLID& id) -> void;
 
-		auto Bind() const -> void;
+		auto Bind(U32 bindingIndex, IPtr offset, I32 stride) const -> void;
 
 		auto Upload(const void* data, I64 size, I64 offset) -> void;
 	};
