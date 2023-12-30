@@ -4,6 +4,7 @@
 #include "GFX/Platform/OpenGL/Objects/Object.hpp"
 #include "GFX/Platform/OpenGL/Objects/Shader.hpp"
 #include "GFX/Platform/OpenGL/Objects/VertexBuffer.hpp"
+#include "GFX/Platform/OpenGL/Objects/VertexArray.hpp"
 
 #include "GFX/Light.hpp"
 
@@ -87,7 +88,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	struct Renderer::Impl
 	{
-		GLID vaoID;
+		Objects::VertexArray vertexArray;
 		Objects::ShaderProgram program;
 		Objects::VertexBuffer vertexBuf;
 		Objects::IndexBuffer indexBuf;
@@ -196,7 +197,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 
 		m_pImpl= new Impl({
-			[] { auto vao = GLID(0); glGenVertexArrays(1, &vao); return vao; }(),
+			{},
 			{ &vShader, &fShader },
 			Objects::VertexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
 			Objects::IndexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
@@ -214,21 +215,30 @@ namespace Gaze::GFX::Platform::OpenGL {
 			return;
 		}
 
-		auto oldVAO = 0;
-		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &oldVAO);
-		glBindVertexArray(m_pImpl->vaoID);
-
-		glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
-		glVertexAttribBinding(0, 0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normals));
-		glVertexAttribBinding(1, 0);
-		glEnableVertexAttribArray(1);
-
-		m_pImpl->vertexBuf.Bind(0, 0, sizeof(Vertex));
-		m_pImpl->indexBuf.Bind();
-
-		glBindVertexArray(GLID(oldVAO));
+		m_pImpl->vertexArray.Bind();
+		m_pImpl->vertexArray.SetIndexBuffer(&m_pImpl->indexBuf);
+		m_pImpl->vertexArray.SetLayout({
+			{
+				Objects::VertexArray::Layout::BufferBinding(0),
+				Objects::VertexArray::Layout::ComponentCount(3),
+				Objects::VertexArray::Layout::DataType::Float,
+				Objects::VertexArray::Layout::Normalized(false),
+				Objects::VertexArray::Layout::RelativeOffset(offsetof(Vertex, position))
+			},
+			{
+				Objects::VertexArray::Layout::BufferBinding(0),
+				Objects::VertexArray::Layout::ComponentCount(3),
+				Objects::VertexArray::Layout::DataType::Float,
+				Objects::VertexArray::Layout::Normalized(false),
+				Objects::VertexArray::Layout::RelativeOffset(offsetof(Vertex, normals))
+			},
+		});
+		m_pImpl->vertexArray.BindVertexBuffer(
+			&m_pImpl->vertexBuf,
+			Objects::VertexArray::Layout::BufferBinding(0),
+			Objects::VertexArray::Offset(0),
+			Objects::VertexArray::Stride(sizeof(Vertex))
+		);
 
 		if (oldCurrentContext) {
 			glfwMakeContextCurrent(oldCurrentContext);
@@ -237,8 +247,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	Renderer::~Renderer()
 	{
-		glDeleteVertexArrays(1, &m_pImpl->vaoID);
-
 		delete m_pImpl;
 	}
 
@@ -266,8 +274,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::Flush() -> void
 	{
-		glBindVertexArray(m_pImpl->vaoID);
-
+		m_pImpl->vertexArray.Bind();
 		m_pImpl->program.Use();
 
 		const auto view = m_pImpl->camera->ComputeViewMatrix();
@@ -302,7 +309,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			const auto ambient = glm::vec3(light.diffuse * sect.material.diffuse * .05F);
+			const auto ambient = light.diffuse * sect.material.diffuse * .05F;
 
 			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
 			m_pImpl->program.UploadUniform3FV("u_Ambient", &(ambient[0]));

@@ -22,6 +22,32 @@ namespace Gaze {
 
 	using Byte = U8;
 
+	template<typename T>
+	struct Tag {};
+
+	template<typename T, typename TagType = Tag<T>>
+	class ValueWrapper
+	{
+	public:
+		constexpr explicit ValueWrapper(T&& val)
+			: m_Value(std::forward<T>(val))
+		{
+		}
+
+		constexpr auto Value() const -> T
+		{
+			return m_Value;
+		}
+
+		constexpr explicit operator T() const
+		{
+			return m_Value;
+		}
+
+	private:
+		T m_Value;
+	};
+
 	namespace Mem {
 		template<typename T>
 		using Unique = std::unique_ptr<T>;
