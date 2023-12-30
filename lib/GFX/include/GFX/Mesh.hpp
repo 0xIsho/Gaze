@@ -67,7 +67,6 @@ namespace Gaze::GFX {
 		return m_Transform;
 	}
 
-
 	inline auto Mesh::Material() -> struct Material
 	{
 		return m_Material;
