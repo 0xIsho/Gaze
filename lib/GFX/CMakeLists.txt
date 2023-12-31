@@ -12,6 +12,7 @@ set(HEADERS
 	"include/GFX/Light.hpp"
 	"include/GFX/Material.hpp"
 	"include/GFX/Mesh.hpp"
+	"include/GFX/Primitives.hpp"
 	"include/GFX/Renderer.hpp"
 
 	"include/GFX/Platform/OpenGL/Renderer.hpp"
@@ -27,6 +28,7 @@ set(SOURCES
 	"src/API.cpp"
 	"src/Camera.cpp"
 	"src/Mesh.cpp"
+	"src/Primitives.cpp"
 	"src/Renderer.cpp"
 
 	"src/Platform/OpenGL/Renderer.cpp"

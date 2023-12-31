@@ -7,6 +7,7 @@
 
 #include "GFX/Camera.hpp"
 #include "GFX/Renderer.hpp"
+#include "GFX/Primitives.hpp"
 
 #include "Input/Input.hpp"
 
@@ -182,14 +183,30 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 
 	m_Rdr->DrawMesh(cube, GFX::Renderer::PrimitiveMode::Triangles);
 
+	m_Rdr->DrawMesh(GFX::CreateTriangle({{
+		{  5.0F, 3.0F,  0.0F },
+		{  0.0F, 3.0F, -5.0F },
+		{ -5.0F, 3.0F,  5.0F },
+	}}), GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->DrawMesh(GFX::CreateTriangle({{
+		{  5.0F, -3.0F,  0.0F },
+		{  0.0F, -3.0F, -5.0F },
+		{ -5.0F, -3.0F,  5.0F },
+	}}), GFX::Renderer::PrimitiveMode::Triangles);
+
+	auto plane = GFX::CreateQuad({ 0.0F, -1.0F, 0.0F }, 10, 10);
+	m_Rdr->DrawMesh(plane, GFX::Renderer::PrimitiveMode::Triangles);
+	plane.SetPosition({ 0.0F, 1.0F, 0.0F });
+	m_Rdr->DrawMesh(plane, GFX::Renderer::PrimitiveMode::Triangles);
+
 	for (auto i = -10.F; i <= 10.F; i += .5F) {
-		m_Rdr->DrawLine({ i, .0F, -10.F }, { i, .0F, 10.F });
-		m_Rdr->DrawLine({ -10.F, .0F, i }, { 10.F, .0F, i });
+		m_Rdr->DrawMesh(GFX::CreateLine({ i, .0F, -10.F }, { i, .0F, 10.F }), GFX::Renderer::PrimitiveMode::Lines);
+		m_Rdr->DrawMesh(GFX::CreateLine({ -10.F, .0F, i }, { 10.F, .0F, i }), GFX::Renderer::PrimitiveMode::Lines);
 	}
 
-	m_Rdr->DrawLine({ -10, 0, 0 }, { 10, 0, 0 });
-	m_Rdr->DrawLine({ 0, -10, 0 }, { 0, 10, 0 });
-	m_Rdr->DrawLine({ 0, 0, -10 }, { 0, 0, 10 });
+	m_Rdr->DrawMesh(GFX::CreateLine({ -10, 0, 0 }, { 10, 0, 0 }), GFX::Renderer::PrimitiveMode::Lines);
+	m_Rdr->DrawMesh(GFX::CreateLine({ 0, -10, 0 }, { 0, 10, 0 }), GFX::Renderer::PrimitiveMode::Lines);
+	m_Rdr->DrawMesh(GFX::CreateLine({ 0, 0, -10 }, { 0, 0, 10 }), GFX::Renderer::PrimitiveMode::Lines);
 
 	m_Rdr->Render();
 }

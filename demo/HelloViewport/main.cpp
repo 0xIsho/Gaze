@@ -3,6 +3,7 @@
 #include "Core/Type.hpp"
 #include "WM/Window.hpp"
 #include "GFX/Renderer.hpp"
+#include "GFX/Primitives.hpp"
 
 using namespace Gaze;
 
@@ -48,32 +49,27 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	m_Rdr->SetViewport(50, 150, 300, 300);
 	DrawAxis();
 
-	m_Rdr->DrawTri({{
+	const auto tri1 = GFX::CreateTriangle({{
 		{ -.5F,  .5F, 0.F },
 		{ -.5F, -.5F, 0.F },
 		{  .5F, -.5F, 0.F }
 	}});
-	m_Rdr->FillTri({{
+	const auto tri2 = GFX::CreateTriangle({{
 		{  .5F,  .5F, 0.F },
 		{ -.5F,  .5F, 0.F },
 		{  .5F, -.5F, 0.F }
 	}});
+
+	m_Rdr->DrawMesh(tri1, GFX::Renderer::PrimitiveMode::LineLoop);
+	m_Rdr->DrawMesh(tri2, GFX::Renderer::PrimitiveMode::Triangles);
 
 	m_Rdr->Flush();
 
 	m_Rdr->SetViewport(450, 150, 300, 300);
 	DrawAxis();
 
-	m_Rdr->DrawTri({{
-		{ -.5F,  .5F, 0.F },
-		{  .5F, -.5F, 0.F },
-		{  .5F,  .5F, 0.F }
-	}});
-	m_Rdr->FillTri({{
-		{ -.5F,  .5F, 0.F },
-		{ -.5F, -.5F, 0.F },
-		{  .5F, -.5F, 0.F }
-	}});
+	m_Rdr->DrawMesh(tri1, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->DrawMesh(tri2, GFX::Renderer::PrimitiveMode::LineLoop);
 
 	m_Rdr->Render();
 }
@@ -85,8 +81,8 @@ auto MyApp::OnShutdown() -> Status
 
 auto MyApp::DrawAxis() -> void
 {
-	m_Rdr->DrawLine({ -1.F,  0.F, 0.F }, { 1.F, 0.F, 0.F });
-	m_Rdr->DrawLine({  0.F, -1.F, 0.F }, { 0.F, 1.F, 0.F });
+	m_Rdr->DrawMesh(GFX::CreateLine({ -1.F,  0.F, 0.F }, { 1.F, 0.F, 0.F }), GFX::Renderer::PrimitiveMode::Lines);
+	m_Rdr->DrawMesh(GFX::CreateLine({  0.F, -1.F, 0.F }, { 0.F, 1.F, 0.F }), GFX::Renderer::PrimitiveMode::Lines);
 }
 
 GAZE_REGISTER_APP(MyApp);

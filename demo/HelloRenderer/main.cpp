@@ -3,6 +3,7 @@
 #include "Core/Type.hpp"
 #include "WM/Window.hpp"
 #include "GFX/Renderer.hpp"
+#include "GFX/Primitives.hpp"
 
 using namespace Gaze;
 
@@ -42,23 +43,23 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 {
 	m_Rdr->Clear();
 
-	m_Rdr->DrawLine({ -1.F,  0.F, 0.F }, { 1.F, 0.F, 0.F });
-	m_Rdr->DrawLine({  0.F, -1.F, 0.F }, { 0.F, 1.F, 0.F });
+	m_Rdr->DrawMesh(GFX::CreateLine({ -1.F,  0.F, 0.F }, { 1.F, 0.F, 0.F }), GFX::Renderer::PrimitiveMode::Lines);
+	m_Rdr->DrawMesh(GFX::CreateLine({  0.F, -1.F, 0.F }, { 0.F, 1.F, 0.F }), GFX::Renderer::PrimitiveMode::Lines);
 
-	m_Rdr->DrawTri({{
+	m_Rdr->DrawMesh(GFX::CreateTriangle({{
 		{ -.5F,  .5F, 0.F },
 		{ -.5F, -.5F, 0.F },
 		{  .5F, -.5F, 0.F }
-	}});
-	m_Rdr->FillTri({{
+	}}), GFX::Renderer::PrimitiveMode::LineLoop);
+	m_Rdr->DrawMesh(GFX::CreateTriangle({{
 		{  .5F,  .5F, 0.F },
 		{ -.5F,  .5F, 0.F },
 		{  .5F, -.5F, 0.F }
-	}});
+	}}), GFX::Renderer::PrimitiveMode::Triangles);
 
 	for (auto i = -1.F; i <= 1.F; i += .1F) {
 		for (auto j = -1.F; j <= 1.F; j += .1F) {
-			m_Rdr->DrawPoint({ i, j, 0.F });
+			m_Rdr->DrawMesh(GFX::CreatePoint({ i, j, 0.F }), GFX::Renderer::PrimitiveMode::Points);
 		}
 	}
 

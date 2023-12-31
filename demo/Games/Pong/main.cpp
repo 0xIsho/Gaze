@@ -6,6 +6,7 @@
 
 #include "GFX/Mesh.hpp"
 #include "GFX/Renderer.hpp"
+#include "GFX/Primitives.hpp"
 
 #include "Input/Input.hpp"
 #include "Input/KeyCode.hpp"
@@ -54,12 +55,10 @@ private:
 	GFX::Mesh m_PaddleMesh;
 	GFX::Mesh m_BallMesh;
 	GFX::Mesh m_ScoreMarkerMesh;
-	GFX::Mesh m_WallMesh;
-	const GFX::Mesh m_MidlineMesh;
+	GFX::Mesh m_MidlineMesh;
 
 	static constexpr auto kWinWidth = 800;
 	static constexpr auto kWinHeight = 400;
-	static constexpr auto kWallThickness = 30.F;
 	static constexpr auto kPaddleSize = glm::vec2(10.F, 50.F);
 	static constexpr auto kPaddleSpeed = 200.0F;
 	static constexpr auto kBallSize = 10.F;
@@ -71,33 +70,14 @@ MyApp::MyApp(int argc, char** argv)
 	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_Input(m_Win)
-	, m_PaddleMesh({
-			{{ .0F               , .0F          , .0F }},
-			{{ .0F               , kPaddleSize.y, .0F }},
-			{{ kPaddleSize.x      , .0F          , .0F }},
-			{{ kPaddleSize.x      , kPaddleSize.y, .0F }}
-		}, { 0, 1, 2, 2, 1, 3 })
-	, m_BallMesh({
-			{{ .0F      , .0F      , .0F }},
-			{{ .0F      , kBallSize, .0F }},
-			{{ kBallSize, .0F      , .0F }},
-			{{ kBallSize, kBallSize, .0F }}
-		}, { 0, 1, 2, 2, 1, 3 })
-	, m_ScoreMarkerMesh({
-			{{ .0F, .0F, .0F }},
-			{{ .0F, 10.F, .0F }}
-		}, { 0, 1 })
-	, m_WallMesh({
-			{{ .0F      , .0F           , .0F }},
-			{{ .0F      , kWallThickness, .0F }},
-			{{ kWinWidth, .0F           , .0F }},
-			{{ kWinWidth, kWallThickness, .0F }},
-		}, { 0, 1, 2, 2, 1, 3 })
-	, m_MidlineMesh({
-			{{ kWinWidth / 2, kWallThickness             , .0F }},
-			{{ kWinWidth / 2, kWinHeight - kWallThickness, .0F }}
-		}, { 0, 1 })
+	, m_PaddleMesh(GFX::CreateQuad({ }, kPaddleSize.x, kPaddleSize.y))
+	, m_BallMesh(GFX::CreateQuad({ }, kBallSize, kBallSize))
+	, m_ScoreMarkerMesh(GFX::CreateLine({ .0F, .0F, .0F }, { .0F, 10.F, .0F }))
+	, m_MidlineMesh(GFX::CreateLine({ kWinWidth / 2, .0F, .0F }, { kWinWidth / 2, kWinHeight, .0F }))
 {
+	m_PaddleMesh.Rotate(glm::radians(-90.0F), { 1.0F, .0F, .0F });
+	m_BallMesh.Rotate(glm::radians(-90.0F), { 1.0F, .0F, .0F });
+
 	srand(U32(time(nullptr)));
 	Reset();
 }
@@ -149,11 +129,6 @@ auto MyApp::OnShutdown() -> Status
 
 auto MyApp::RenderPlayground() -> void
 {
-	m_WallMesh.SetPosition({ .0F, .0F, .0F });
-	m_Rdr->DrawMesh(m_WallMesh, GFX::Renderer::PrimitiveMode::Triangles);
-	m_WallMesh.SetPosition({ .0F, kWinHeight - kWallThickness, .0F });
-	m_Rdr->DrawMesh(m_WallMesh, GFX::Renderer::PrimitiveMode::Triangles);
-
 	m_Rdr->DrawMesh(m_MidlineMesh, GFX::Renderer::PrimitiveMode::Lines);
 }
 
@@ -171,16 +146,8 @@ auto MyApp::RenderPlayers() -> void
 
 auto MyApp::RenderScoreboard() -> void
 {
-	auto p1ScoreboardPos = glm::vec3{
-		kWinWidth / 4 - (m_P1Score + 10),
-		kWallThickness + 10,
-		.0F
-	};
-	auto p2ScoreboardPos = glm::vec3{
-		kWinWidth - kWinWidth / 4 - (m_P2Score + 10),
-		kWallThickness + 10,
-		.0F
-	};
+	auto p1ScoreboardPos = glm::vec3{ kWinWidth / 4 - (m_P1Score + 10)            , 10, .0F };
+	auto p2ScoreboardPos = glm::vec3{ kWinWidth - kWinWidth / 4 - (m_P2Score + 10), 10, .0F };
 
 	for (auto i = 0; i < m_P1Score; i++) {
 		m_ScoreMarkerMesh.SetPosition(p1ScoreboardPos);
@@ -212,18 +179,18 @@ auto MyApp::HandleInput(F64 deltaTime) -> void
 
 auto MyApp::HandleCollision() -> void
 {
-	m_P1Pos.y = std::clamp(m_P1Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleSize.y);
-	m_P2Pos.y = std::clamp(m_P2Pos.y, kWallThickness, kWinHeight - kWallThickness - kPaddleSize.y);
+	m_P1Pos.y = std::clamp(m_P1Pos.y, .0F, kWinHeight - kPaddleSize.y / 2);
+	m_P2Pos.y = std::clamp(m_P2Pos.y, .0F, kWinHeight - kPaddleSize.y / 2);
 
 	if (
-		const auto top = m_BallPos.y <= kWallThickness,
-		bottom = m_BallPos.y + kBallSize >= kWinHeight - kWallThickness;
+		const auto top = m_BallPos.y <= .0F,
+		bottom = m_BallPos.y + kBallSize >= kWinHeight;
 		top || bottom
 	) {
 		if (top) {
-			m_BallPos.y = kWallThickness + 1;
+			m_BallPos.y = 1;
 		} else {
-			m_BallPos.y = kWinHeight - kBallSize - kWallThickness - 1;
+			m_BallPos.y = kWinHeight - kBallSize - 1;
 		}
 
 		m_BallDir.y *= -1;
@@ -243,21 +210,25 @@ auto MyApp::HandleCollision() -> void
 		return;
 	}
 
-	if (m_BallPos.x + kBallSize >= m_P1Pos.x && m_BallPos.x <= m_P1Pos.x + kPaddleSize.x &&
-		m_BallPos.y + kBallSize >= m_P1Pos.y && m_BallPos.y <= m_P1Pos.y + kPaddleSize.y) {
-		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P1Pos + glm::vec3{ kPaddleSize.x / 2 - 10, kPaddleSize.y / 2, .0F }));
+	const auto p1PaddleBox = glm::vec3{ m_P1Pos.x - kPaddleSize.x / 2, m_P1Pos.y - kPaddleSize.y / 2, .0F };
+	const auto p2PaddleBox = glm::vec3{ m_P2Pos.x - kPaddleSize.x / 2, m_P2Pos.y - kPaddleSize.y / 2, .0F };
+	const auto ballBox     = glm::vec3{ m_BallPos.x - kBallSize / 2  , m_BallPos.y - kBallSize / 2  , .0F };
+
+	if (ballBox.x + kBallSize >= p1PaddleBox.x && ballBox.x <= p1PaddleBox.x + kPaddleSize.x &&
+		ballBox.y + kBallSize >= p1PaddleBox.y && ballBox.y <= p1PaddleBox.y + kPaddleSize.y) {
+		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (p1PaddleBox + glm::vec3{ kPaddleSize.x / 2 - 10, kPaddleSize.y / 2, .0F }));
 	}
-	if (m_BallPos.x + kBallSize >= m_P2Pos.x && m_BallPos.x <= m_P2Pos.x + kPaddleSize.x &&
-		m_BallPos.y + kBallSize >= m_P2Pos.y && m_BallPos.y <= m_P2Pos.y + kPaddleSize.y) {
-		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (m_P2Pos + glm::vec3{ kPaddleSize.x / 2 + 10, kPaddleSize.y / 2, .0F }));
+	if (ballBox.x + kBallSize >= p2PaddleBox.x && ballBox.x <= p2PaddleBox.x + kPaddleSize.x &&
+		ballBox.y + kBallSize >= p2PaddleBox.y && ballBox.y <= p2PaddleBox.y + kPaddleSize.y) {
+		m_BallDir = glm::normalize((m_BallPos + kBallSize / 2) - (p2PaddleBox + glm::vec3{ kPaddleSize.x / 2 + 10, kPaddleSize.y / 2, .0F }));
 	}
 }
 
 auto MyApp::Reset() -> void
 {
-	m_P1Pos = { kWallThickness, kWinHeight / 2 - kPaddleSize.y / 2, .0F };
-	m_P2Pos = { kWinWidth - kWallThickness - kPaddleSize.x, kWinHeight / 2 - kPaddleSize.y / 2, .0F };
-	m_BallPos = { kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2, .0F };
+	m_P1Pos   = { 30.F               , F32(kWinHeight) / 2, .0F };
+	m_P2Pos   = { kWinWidth - 30.0F  , F32(kWinHeight) / 2, .0F };
+	m_BallPos = { F32(kWinWidth) / 2, F32(kWinHeight) / 2, .0F };
 
 	m_BallDir = { rand() - RAND_MAX / 2, rand() - RAND_MAX / 2 };
 	m_BallDir = glm::normalize(m_BallDir);
