@@ -3,6 +3,7 @@
 
 #include "Debug/Assert.hpp"
 
+#include "Events/MouseEvent.hpp"
 #include "Events/WindowEvent.hpp"
 
 #include <GLFW/glfw3.h>
@@ -44,6 +45,9 @@ namespace Gaze::WM {
 		});
 		glfwSetCursorPosCallback(m_Handle, [](auto* window, auto x, auto y) {
 			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			auto event = Events::MouseMove(x, y);
+			self->m_CbEvent(event);
 
 			if (self->m_CbMouseMove) {
 				self->m_CbMouseMove(x, y);
