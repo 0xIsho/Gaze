@@ -11,6 +11,9 @@
 #include "Input/Input.hpp"
 #include "Input/KeyCode.hpp"
 
+#include "Events/Dispatcher.hpp"
+#include "Events/WindowEvent.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <ctime>
@@ -84,9 +87,12 @@ MyApp::MyApp(int argc, char** argv)
 
 auto MyApp::OnInit() -> Status
 {
-	m_Win->OnClose([this] {
-		Quit();
+	m_Win->OnEvent([this](auto& event) {
+		Events::Dispatcher(event).Dispatch<Events::WindowClose>([this](auto&) {
+			Quit();
+		});
 	});
+
 	m_Win->Show();
 
 	m_Rdr->SetProjection(glm::ortho(.0F, F32(kWinWidth), F32(kWinHeight), .0F, .1F, 10.F));

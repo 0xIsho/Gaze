@@ -4,6 +4,8 @@
 #include "WM/Window.hpp"
 #include "GFX/Renderer.hpp"
 #include "GFX/Primitives.hpp"
+#include "Events/Dispatcher.hpp"
+#include "Events/WindowEvent.hpp"
 
 using namespace Gaze;
 
@@ -32,9 +34,12 @@ MyApp::MyApp(int argc, char** argv)
 
 auto MyApp::OnInit() -> Status
 {
-	m_Win->OnClose([this] {
-		Quit();
+	m_Win->OnEvent([this](auto& event) {
+		Events::Dispatcher(event).Dispatch<Events::WindowClose>([this](auto&) {
+			Quit();
+		});
 	});
+
 	m_Win->Show();
 
 	m_Rdr->SetClearColor(.2F, .2F, .2F, 1.F);

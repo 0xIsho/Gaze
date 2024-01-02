@@ -5,6 +5,7 @@ append_common_compiler_options(${TARGET})
 target_link_libraries(${TARGET}
 	PRIVATE
 		Gaze::Client
+		Gaze::Events
 		Gaze::Input
 		Gaze::Core
 		Gaze::GFX

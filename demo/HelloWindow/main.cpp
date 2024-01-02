@@ -2,6 +2,9 @@
 
 #include "WM/Window.hpp"
 
+#include "Events/WindowEvent.hpp"
+#include "Events/Dispatcher.hpp"
+
 using namespace Gaze;
 
 class MyApp : public Gaze::Client::App
@@ -26,8 +29,10 @@ MyApp::MyApp(int argc, char** argv)
 
 auto MyApp::OnInit() -> Status
 {
-	m_Win.OnClose([this] {
-		Quit();
+	m_Win.OnEvent([this](auto& event) {
+		Events::Dispatcher(event).Dispatch<Events::WindowClose>([this](auto&) {
+			Quit();
+		});
 	});
 
 	m_Win.Show();
