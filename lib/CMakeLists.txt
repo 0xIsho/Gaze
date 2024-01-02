@@ -2,6 +2,7 @@ set(LIBS
 	Client
 	Core
 	Debug
+	Events
 	GFX
 	Input
 	WM

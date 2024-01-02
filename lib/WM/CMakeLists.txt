@@ -22,6 +22,8 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
+	PUBLIC
+		Gaze::Events
 	PRIVATE
 		Gaze::Debug
 

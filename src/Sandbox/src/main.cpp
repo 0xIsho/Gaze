@@ -2,6 +2,9 @@
 
 #include "Core/Type.hpp"
 
+#include "Events/Dispatcher.hpp"
+#include "Events/WindowEvent.hpp"
+
 #include "WM/Core.hpp"
 #include "WM/Window.hpp"
 
@@ -50,10 +53,6 @@ MyApp::MyApp(int argc, char** argv)
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->Clear();
 
-	m_Win->OnClose([this] {
-		Quit();
-	});
-
 	m_Win->OnMouseMove([this] (auto x, auto y) {
 		static auto lastX = 1280.0 / 2;
 		static auto lastY = 640.0 / 2;
@@ -85,6 +84,14 @@ MyApp::MyApp(int argc, char** argv)
 
 auto MyApp::OnInit() -> Status
 {
+	m_Win->OnEvent([this](auto& event) {
+		auto dispacher = Events::Dispatcher(event);
+
+		dispacher.Dispatch<Events::WindowClose>([this](auto& event) {
+			Quit();
+		});
+	});
+
 	m_Win->Show();
 
 	m_Rdr->SetProjection(glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 100.F));

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Events/Event.hpp"
+
 #include <string>
 #include <functional>
 #include <string_view>
@@ -12,6 +14,7 @@ namespace Gaze::WM {
 	public:
 		using CloseCallback = std::function<void()>;
 		using MouseMoveCallback = std::function<void(double, double)>;
+		using EventCallback = std::function<void(Events::Event&)>;
 
 	public:
 		Window(std::string_view title, int width, int height);
@@ -28,6 +31,7 @@ namespace Gaze::WM {
 
 		auto OnClose(CloseCallback callback) -> void;
 		auto OnMouseMove(MouseMoveCallback callback) -> void;
+		auto OnEvent(EventCallback callback) -> void;
 
 		[[nodiscard]] auto Width() const -> int;
 		[[nodiscard]] auto Height() const -> int;
@@ -41,6 +45,7 @@ namespace Gaze::WM {
 
 		CloseCallback m_CbClose;
 		MouseMoveCallback m_CbMouseMove;
+		EventCallback m_CbEvent = [] (auto&) { };
 	};
 
 	inline auto Window::Width() const -> int
@@ -56,5 +61,10 @@ namespace Gaze::WM {
 	inline auto Window::Handle() const -> void*
 	{
 		return reinterpret_cast<void*>(m_Handle);
+	}
+
+	inline auto Window::OnEvent(EventCallback callback) -> void
+	{
+		m_CbEvent = std::move(callback);
 	}
 }

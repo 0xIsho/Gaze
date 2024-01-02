@@ -3,6 +3,8 @@
 
 #include "Debug/Assert.hpp"
 
+#include "Events/WindowEvent.hpp"
+
 #include <GLFW/glfw3.h>
 
 #include <stdexcept>
@@ -27,6 +29,8 @@ namespace Gaze::WM {
 		glfwSetWindowUserPointer(m_Handle, reinterpret_cast<void*>(this));
 		glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* win) {
 			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(win));
+			auto event = Events::WindowClose();
+			self->m_CbEvent(event);
 
 			if (self->m_CbClose) {
 				self->m_CbClose();
