@@ -36,6 +36,12 @@ namespace Gaze::WM {
 				self->m_CbClose();
 			}
 		});
+
+		glfwSetWindowFocusCallback(m_Handle, [](GLFWwindow* win, int focused) {
+			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(win));
+			auto event = Events::WindowFocus(focused == GLFW_TRUE ? true : false);
+			self->m_CbEvent(event);
+		});
 		glfwSetCursorPosCallback(m_Handle, [](auto* window, auto x, auto y) {
 			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
