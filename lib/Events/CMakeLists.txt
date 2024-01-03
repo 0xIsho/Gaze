@@ -19,6 +19,11 @@ target_include_directories(${TARGET}
 		"include/"
 )
 
+target_link_libraries(${TARGET}
+	INTERFACE
+		Gaze::Input
+)
+
 if (GAZE_BUILD_TESTS)
 	add_subdirectory("tests/")
 endif()

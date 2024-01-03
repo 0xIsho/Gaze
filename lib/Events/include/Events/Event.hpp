@@ -16,6 +16,8 @@ namespace Gaze::Events
 			WindowFocus,
 
 			MouseMove,
+			MouseButtonPressed,
+			MouseButtonReleased,
 		};
 
 		static constexpr auto kEventType = Type::Generic;

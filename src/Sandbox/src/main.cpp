@@ -6,6 +6,7 @@
 #include "Events/MouseEvent.hpp"
 #include "Events/WindowEvent.hpp"
 
+#include "Input/KeyCode.hpp"
 #include "WM/Core.hpp"
 #include "WM/Window.hpp"
 
@@ -90,6 +91,44 @@ auto MyApp::OnInit() -> Status
 
 			lastX = event.X();
 			lastY = event.Y();
+		});
+
+		dispatcher.Dispatch<Events::MouseButtonPressed>([](auto& event) {
+			printf(
+				"Mouse button pressed:\n"
+				"  - Button: %d\n"
+				"  - Modifiers: kModShift    : %s\n"
+				"               kModControl  : %s\n"
+				"               kModAlt      : %s\n"
+				"               kModSuper    : %s\n"
+				"               kModCapsLock : %s\n"
+				"               kModNumLock  : %s\n",
+				int(event.Button()),
+				event.Mods() & Input::Mod::kModShift    ? "On" : "Off",
+				event.Mods() & Input::Mod::kModControl  ? "On" : "Off",
+				event.Mods() & Input::Mod::kModAlt      ? "On" : "Off",
+				event.Mods() & Input::Mod::kModSuper    ? "On" : "Off",
+				event.Mods() & Input::Mod::kModCapsLock ? "On" : "Off",
+				event.Mods() & Input::Mod::kModNumLock  ? "On" : "Off");
+		});
+
+		dispatcher.Dispatch<Events::MouseButtonReleased>([](auto& event) {
+			printf(
+				"Mouse button released:\n"
+				"  - Button: %d\n"
+				"  - Modifiers: kModShift    : %s\n"
+				"               kModControl  : %s\n"
+				"               kModAlt      : %s\n"
+				"               kModSuper    : %s\n"
+				"               kModCapsLock : %s\n"
+				"               kModNumLock  : %s\n",
+				int(event.Button()),
+				event.Mods() & Input::Mod::kModShift    ? "On" : "Off",
+				event.Mods() & Input::Mod::kModControl  ? "On" : "Off",
+				event.Mods() & Input::Mod::kModAlt      ? "On" : "Off",
+				event.Mods() & Input::Mod::kModSuper    ? "On" : "Off",
+				event.Mods() & Input::Mod::kModCapsLock ? "On" : "Off",
+				event.Mods() & Input::Mod::kModNumLock  ? "On" : "Off");
 		});
 	});
 

@@ -27,6 +27,9 @@ namespace Gaze::WM {
 			throw std::runtime_error("Failed to create a window.");
 		}
 
+		// Enable Num/CapsLock state reporting in input callbacks
+		glfwSetInputMode(m_Handle, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
+
 		glfwSetWindowUserPointer(m_Handle, reinterpret_cast<void*>(this));
 		glfwSetWindowCloseCallback(m_Handle, [](GLFWwindow* win) {
 			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(win));
@@ -44,6 +47,20 @@ namespace Gaze::WM {
 
 			auto event = Events::MouseMove(x, y);
 			self->m_CbEvent(event);
+		});
+		glfwSetMouseButtonCallback(m_Handle, [](auto* window, auto button, auto action, auto mods) {
+			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			if (action == GLFW_PRESS) {
+				auto event = Events::MouseButtonPressed(Input::MouseButton(button), Input::Mod(mods));
+				self->m_CbEvent(event);
+			} else if (action == GLFW_RELEASE) {
+				auto event = Events::MouseButtonReleased(Input::MouseButton(button), Input::Mod(mods));
+				self->m_CbEvent(event);
+			} else {
+				// TODO: More graceful handling
+				GAZE_ASSERT(false, "Unsupported mouse button event.");
+			}
 		});
 	}
 

@@ -130,4 +130,29 @@ namespace Gaze::Input {
 		kRightSuper   = 347,
 		kMenu         = 348
 	};
+
+	enum class MouseButton
+	{
+		k1      = 0,
+		k2      = 1,
+		k3      = 2,
+		k4      = 3,
+		k5      = 4,
+		k6      = 5,
+		k7      = 6,
+		k8      = 7,
+		kLeft   = k1,
+		kRight  = k2,
+		kMiddle = k3,
+	};
+
+	enum Mod
+	{
+		kModShift    = 0x0001,
+		kModControl  = 0x0002,
+		kModAlt      = 0x0004,
+		kModSuper    = 0x0008,
+		kModCapsLock = 0x0010,
+		kModNumLock  = 0x0020,
+	};
 }
