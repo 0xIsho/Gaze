@@ -61,11 +61,14 @@ auto MyApp::OnInit() -> Status
 	m_Win->OnEvent([this](auto& event) {
 		auto dispatcher = Events::Dispatcher(event);
 
-		dispatcher.Dispatch<Events::WindowClose>([this](auto& /*event*/) {
+		dispatcher.Dispatch<Events::WindowClose>([this](auto& event) {
+			printf("%s\n", ToString(event).c_str());
 			Quit();
 		});
 
-		dispatcher.Dispatch<Events::MouseMove>([this](auto& event) {
+		dispatcher.Dispatch<Events::MouseMove>([this](Events::MouseMove& event) {
+			printf("%s\n", ToString(event).c_str());
+
 			static auto lastX = 1280.0 / 2;
 			static auto lastY = 640.0 / 2;
 			constexpr auto sensitivity = .5;
@@ -93,42 +96,16 @@ auto MyApp::OnInit() -> Status
 			lastY = event.Y();
 		});
 
+		dispatcher.Dispatch<Events::WindowFocus>([](auto& event) {
+			printf("%s\n", ToString(event).c_str());
+		});
+
 		dispatcher.Dispatch<Events::MouseButtonPressed>([](auto& event) {
-			printf(
-				"Mouse button pressed:\n"
-				"  - Button: %d\n"
-				"  - Modifiers: kModShift    : %s\n"
-				"               kModControl  : %s\n"
-				"               kModAlt      : %s\n"
-				"               kModSuper    : %s\n"
-				"               kModCapsLock : %s\n"
-				"               kModNumLock  : %s\n",
-				int(event.Button()),
-				event.Mods() & Input::Mod::kModShift    ? "On" : "Off",
-				event.Mods() & Input::Mod::kModControl  ? "On" : "Off",
-				event.Mods() & Input::Mod::kModAlt      ? "On" : "Off",
-				event.Mods() & Input::Mod::kModSuper    ? "On" : "Off",
-				event.Mods() & Input::Mod::kModCapsLock ? "On" : "Off",
-				event.Mods() & Input::Mod::kModNumLock  ? "On" : "Off");
+			printf("%s\n", ToString(event).c_str());
 		});
 
 		dispatcher.Dispatch<Events::MouseButtonReleased>([](auto& event) {
-			printf(
-				"Mouse button released:\n"
-				"  - Button: %d\n"
-				"  - Modifiers: kModShift    : %s\n"
-				"               kModControl  : %s\n"
-				"               kModAlt      : %s\n"
-				"               kModSuper    : %s\n"
-				"               kModCapsLock : %s\n"
-				"               kModNumLock  : %s\n",
-				int(event.Button()),
-				event.Mods() & Input::Mod::kModShift    ? "On" : "Off",
-				event.Mods() & Input::Mod::kModControl  ? "On" : "Off",
-				event.Mods() & Input::Mod::kModAlt      ? "On" : "Off",
-				event.Mods() & Input::Mod::kModSuper    ? "On" : "Off",
-				event.Mods() & Input::Mod::kModCapsLock ? "On" : "Off",
-				event.Mods() & Input::Mod::kModNumLock  ? "On" : "Off");
+			printf("%s\n", ToString(event).c_str());
 		});
 	});
 
