@@ -3,6 +3,7 @@
 #include "Core/Type.hpp"
 
 #include "Events/Dispatcher.hpp"
+#include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
 #include "Events/WindowEvent.hpp"
 
@@ -107,6 +108,19 @@ auto MyApp::OnInit() -> Status
 		dispatcher.Dispatch<Events::MouseButtonReleased>([](auto& event) {
 			printf("%s\n", ToString(event).c_str());
 		});
+
+		dispatcher.Dispatch<Events::KeyPressed>([](auto& event) {
+			printf("%s\n", ToString(event).c_str());
+		});
+
+		dispatcher.Dispatch<Events::KeyRepeat>([](auto& event) {
+			printf("%s\n", ToString(event).c_str());
+		});
+
+		dispatcher.Dispatch<Events::KeyReleased>([](auto& event) {
+			printf("%s\n", ToString(event).c_str());
+		});
+
 	});
 
 	m_Win->Show();

@@ -3,6 +3,7 @@ set(TARGET Events)
 set(HEADERS
 	"include/Events/Dispatcher.hpp"
 	"include/Events/Event.hpp"
+	"include/Events/KeyEvent.hpp"
 	"include/Events/MouseEvent.hpp"
 	"include/Events/WindowEvent.hpp"
 )

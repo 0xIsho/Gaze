@@ -3,6 +3,7 @@
 
 #include "Debug/Assert.hpp"
 
+#include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
 #include "Events/WindowEvent.hpp"
 
@@ -60,6 +61,23 @@ namespace Gaze::WM {
 			} else {
 				// TODO: More graceful handling
 				GAZE_ASSERT(false, "Unsupported mouse button event.");
+			}
+		});
+		glfwSetKeyCallback(m_Handle, [](auto* window, auto keycode, auto scancode, auto action, auto mods) {
+			const auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			if(action == GLFW_PRESS) {
+				auto event = Events::KeyPressed(Input::Key(keycode), scancode, Input::Mod(mods));
+				self->m_CbEvent(event);
+			} else if (action == GLFW_REPEAT) {
+				auto event = Events::KeyRepeat(Input::Key(keycode), scancode, Input::Mod(mods));
+				self->m_CbEvent(event);
+			} else if (action == GLFW_RELEASE) {
+				auto event = Events::KeyReleased(Input::Key(keycode), scancode, Input::Mod(mods));
+				self->m_CbEvent(event);
+			} else {
+				// TODO: More graceful handling
+				GAZE_ASSERT(false, "Unsupported key event.");
 			}
 		});
 	}

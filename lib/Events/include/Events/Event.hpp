@@ -21,6 +21,10 @@ namespace Gaze::Events
 			MouseMove,
 			MouseButtonPressed,
 			MouseButtonReleased,
+
+			KeyPressed,
+			KeyRepeat,
+			KeyReleased
 		};
 
 		static constexpr auto kEventType = Type::Generic;
@@ -53,6 +57,9 @@ namespace Gaze {
 		case Events::Event::Type::MouseMove:           return "MouseMove";
 		case Events::Event::Type::MouseButtonPressed:  return "MouseButtonPressed";
 		case Events::Event::Type::MouseButtonReleased: return "MouseButtonReleased";
+		case Events::Event::Type::KeyPressed:          return "KeyPressed";
+		case Events::Event::Type::KeyRepeat:           return "KeyRepeat";
+		case Events::Event::Type::KeyReleased:         return "KeyReleased";
 		}
 
 		return "Unknown";
