@@ -13,6 +13,7 @@
 #include <GLFW/glfw3.h>
 
 #include <cstdio>
+#include <unordered_map>
 
 namespace Gaze::GFX::Platform::OpenGL {
 	static auto EnableDebugOutput()
