@@ -13,15 +13,15 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 	{
 	public:
 		using BufferBinding = ValueWrapper<U32, struct BufferBindingTag>;
-		using Offset = ValueWrapper<U32, struct OffsetTag>;
-		using Stride = ValueWrapper<I32, struct StrideTag>;
+		using Offset        = ValueWrapper<U32, struct OffsetTag>;
+		using Stride        = ValueWrapper<I32, struct StrideTag>;
 
 	public:
 		struct Layout
 		{
-			using BufferBinding = VertexArray::BufferBinding;
+			using BufferBinding  = VertexArray::BufferBinding;
 			using ComponentCount = ValueWrapper<I32, struct ComponentCountTag>;
-			using Normalized = ValueWrapper<bool>;
+			using Normalized     = ValueWrapper<bool>;
 			using RelativeOffset = ValueWrapper<U32, struct RelativeOffsetTag>;
 
 			enum class DataType
@@ -35,10 +35,10 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 				Double,
 			};
 
-			BufferBinding bufferBinding;
+			BufferBinding  bufferBinding;
 			ComponentCount componentCount;
-			DataType type;
-			Normalized normalized;
+			DataType       type;
+			Normalized     normalized;
 			RelativeOffset relativeOffset;
 		};
 
@@ -55,6 +55,6 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		noexcept -> void;
 
 		auto SetLayout(std::initializer_list<Layout> layout) noexcept -> void;
-		auto SetIndexBuffer(IndexBuffer* buffer) noexcept -> void;
+		auto SetIndexBuffer(IndexBuffer* buffer)             noexcept -> void;
 	};
 }

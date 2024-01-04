@@ -14,12 +14,9 @@ namespace Gaze::Events {
 			, m_Mods(mods)
 		{}
 
-		[[nodiscard]]
-		auto Keycode()  const noexcept { return m_Key; }
-		[[nodiscard]]
-		auto Scancode() const noexcept { return m_Scancode; }
-		[[nodiscard]]
-		auto Mods()     const noexcept { return m_Mods; }
+		[[nodiscard]] auto Keycode()  const noexcept { return m_Key; }
+		[[nodiscard]] auto Scancode() const noexcept { return m_Scancode; }
+		[[nodiscard]] auto Mods()     const noexcept { return m_Mods; }
 
 	private:
 		Input::Key m_Key;

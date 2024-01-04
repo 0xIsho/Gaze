@@ -18,8 +18,7 @@ namespace Gaze::Events {
 			: m_Focused(focused)
 		{}
 
-		[[nodiscard]]
-		auto IsFocused() const noexcept -> bool { return m_Focused; }
+		[[nodiscard]] auto IsFocused() const noexcept -> bool { return m_Focused; }
 
 	private:
 		bool m_Focused;

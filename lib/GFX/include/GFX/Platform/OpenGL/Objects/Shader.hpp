@@ -16,16 +16,14 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		};
 
 	public:
-		Shader(Type type, std::string_view source)       noexcept;
-		static auto Release(GLID& id)                    noexcept -> void;
-		[[nodiscard]]
-		auto Compile()                             const noexcept -> bool;
-		[[nodiscard]]
-		auto RetrieveErrorLog(I32 nBytes)          const noexcept -> std::string;
+		Shader(Type type, std::string_view source)             noexcept;
+		static auto Release(GLID& id)                          noexcept -> void;
+		[[nodiscard]] auto Compile()                     const noexcept -> bool;
+		[[nodiscard]] auto RetrieveErrorLog(I32 nBytes)  const noexcept -> std::string;
 
 	private:
 		[[nodiscard]]
-		auto WasSuccessfullyCompiled()             const noexcept -> bool;
+		auto WasSuccessfullyCompiled()                   const noexcept -> bool;
 	};
 
 	class ShaderProgram : public Object<ShaderProgram>
@@ -37,8 +35,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 
 		auto Use()                                                       const noexcept -> void;
 
-		[[nodiscard]]
-		auto Link()                                                      const noexcept -> bool;
+		[[nodiscard]] auto Link()                                        const noexcept -> bool;
 
 		auto RetrieveErrorLog(I32 nBytes)                                const          -> std::string;
 
@@ -48,9 +45,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		auto UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) noexcept -> bool;
 
 	private:
-		[[nodiscard]]
-		auto RetreiveUniformLocation(std::string_view name)                    noexcept -> int;
-		[[nodiscard]]
-		auto WasSuccessfullyLinked()                                     const noexcept -> bool;
+		[[nodiscard]] auto RetreiveUniformLocation(std::string_view name)      noexcept -> int;
+		[[nodiscard]] auto WasSuccessfullyLinked()                       const noexcept -> bool;
 	};
 }

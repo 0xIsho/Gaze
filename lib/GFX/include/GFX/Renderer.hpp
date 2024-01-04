@@ -58,10 +58,8 @@ namespace Gaze::GFX {
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)                      -> void = 0;
 
 	protected:
-		[[nodiscard]]
-		auto Window()                                            const noexcept -> const WM::Window&;
-		[[nodiscard]]
-		auto Window()                                                  noexcept -> WM::Window&;
+		[[nodiscard]] auto Window() const noexcept -> const WM::Window&;
+		[[nodiscard]] auto Window()       noexcept -> WM::Window&;
 
 	private:
 		Mem::Shared<WM::Window> m_Window;

@@ -16,10 +16,8 @@ namespace Gaze::Events {
 			, m_Y(y)
 		{}
 
-		[[nodiscard]]
-		auto X() const noexcept { return m_X; }
-		[[nodiscard]]
-		auto Y() const noexcept { return m_Y; }
+		[[nodiscard]] auto X() const noexcept { return m_X; }
+		[[nodiscard]] auto Y() const noexcept { return m_Y; }
 
 	private:
 		double m_X;
@@ -34,10 +32,8 @@ namespace Gaze::Events {
 			, m_Mods(mods)
 		{}
 
-		[[nodiscard]]
-		auto Button() const noexcept { return m_Button; }
-		[[nodiscard]]
-		auto Mods()   const noexcept { return m_Mods; }
+		[[nodiscard]] auto Button() const noexcept { return m_Button; }
+		[[nodiscard]] auto Mods()   const noexcept { return m_Mods; }
 
 	private:
 		Input::MouseButton m_Button;

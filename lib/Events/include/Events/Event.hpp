@@ -32,10 +32,9 @@ namespace Gaze::Events
 	public:
 		virtual ~Event() = default;
 
-		[[nodiscard]]
-		auto Handled()              const noexcept -> bool { return m_Handled; }
-		auto SetHandled(bool value)       noexcept -> void { m_Handled = value; }
-		virtual auto GetType()      const noexcept -> Type { return Type::Generic; }
+		[[nodiscard]] auto Handled()              const noexcept -> bool { return m_Handled; }
+		              auto SetHandled(bool value)       noexcept -> void { m_Handled = value; }
+		virtual       auto GetType()              const noexcept -> Type { return Type::Generic; }
 
 	private:
 		bool m_Handled = false;
