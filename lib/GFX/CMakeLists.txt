@@ -61,6 +61,11 @@ target_link_libraries(${TARGET}
 		glfw
 )
 
+target_precompile_headers(${TARGET}
+	PRIVATE
+		"include/GFX/pch.hpp"
+)
+
 if (GAZE_BUILD_TESTS)
 	add_subdirectory("tests/")
 endif()
