@@ -8,11 +8,11 @@
 #include "GFX/Renderer.hpp"
 #include "GFX/Primitives.hpp"
 
-#include "Input/Input.hpp"
 #include "Input/KeyCode.hpp"
 
 #include "Events/Dispatcher.hpp"
 #include "Events/WindowEvent.hpp"
+#include "Events/KeyEvent.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -36,18 +36,18 @@ private:
 	auto RenderPlayground() -> void;
 	auto RenderPlayers() -> void;
 	auto RenderScoreboard() -> void;
-	auto HandleInput(F64 deltaTime) -> void;
 	auto HandleCollision() -> void;
 	auto Reset() -> void;
 
 private:
 	Mem::Shared<WM::Window> m_Win;
 	Mem::Unique<GFX::Renderer> m_Rdr;
-	Input::Handler m_Input;
 
 	glm::vec3 m_P1Pos;
+	glm::vec3 m_P1Dir;
 	I32 m_P1Score{};
 	glm::vec3 m_P2Pos;
+	glm::vec3 m_P2Dir;
 	I32 m_P2Score{};
 
 	glm::vec3 m_BallPos;
@@ -72,7 +72,6 @@ MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
-	, m_Input(m_Win)
 	, m_PaddleMesh(GFX::CreateQuad({ }, kPaddleSize.x, kPaddleSize.y))
 	, m_BallMesh(GFX::CreateQuad({ }, kBallSize, kBallSize))
 	, m_ScoreMarkerMesh(GFX::CreateLine({ .0F, .0F, .0F }, { .0F, 10.F, .0F }))
@@ -88,8 +87,44 @@ MyApp::MyApp(int argc, char** argv)
 auto MyApp::OnInit() -> Status
 {
 	m_Win->OnEvent([this](auto& event) {
-		Events::Dispatcher(event).Dispatch<Events::WindowClose>([this](auto&) {
+		auto dispatcher = Events::Dispatcher(event);
+
+		dispatcher.Dispatch<Events::WindowClose>([this](auto&) {
 			Quit();
+		});
+
+		dispatcher.Dispatch<Events::KeyPressed>([this](auto& event) {
+			if (event.Keycode() == Input::Key::kW) {
+				m_P1Dir.y -= 1;
+			}
+			if (event.Keycode() == Input::Key::kS) {
+				m_P1Dir.y += 1;
+			}
+			if (event.Keycode() == Input::Key::kUp) {
+				m_P2Dir.y -= 1;
+			}
+			if (event.Keycode() == Input::Key::kDown) {
+				m_P2Dir.y += 1;
+			}
+		});
+
+		dispatcher.Dispatch<Events::KeyReleased>([this](auto& event) {
+			if (event.Keycode() == Input::Key::kEnter || event.Keycode() == Input::Key::kSpace) {
+				m_GameStarted = true;
+			}
+
+			if (event.Keycode() == Input::Key::kW) {
+				m_P1Dir.y += 1;
+			}
+			if (event.Keycode() == Input::Key::kS) {
+				m_P1Dir.y -= 1;
+			}
+			if (event.Keycode() == Input::Key::kUp) {
+				m_P2Dir.y += 1;
+			}
+			if (event.Keycode() == Input::Key::kDown) {
+				m_P2Dir.y -= 1;
+			}
 		});
 	});
 
@@ -102,10 +137,6 @@ auto MyApp::OnInit() -> Status
 
 auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 {
-	if (m_Input.IsKeyPressed(Input::Key::kEnter) || m_Input.IsKeyPressed(Input::Key::kSpace)) {
-		m_GameStarted = true;
-	}
-
 	m_Rdr->Clear();
 
 	RenderPlayground();
@@ -121,10 +152,12 @@ auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
 		return;
 	}
 
+	m_P1Pos += m_P1Dir * kPaddleSpeed * F32(deltaTime);
+	m_P2Pos += m_P2Dir * kPaddleSpeed * F32(deltaTime);
+
 	m_BallPos.x += m_BallDir.x * kBallSpeed * F32(deltaTime);
 	m_BallPos.y += m_BallDir.y * kBallSpeed * F32(deltaTime);
 
-	HandleInput(deltaTime);
 	HandleCollision();
 }
 
@@ -164,22 +197,6 @@ auto MyApp::RenderScoreboard() -> void
 		m_ScoreMarkerMesh.SetPosition(p2ScoreboardPos);
 		m_Rdr->DrawMesh(m_ScoreMarkerMesh, GFX::Renderer::PrimitiveMode::Lines);
 		p2ScoreboardPos.x += 5;
-	}
-}
-
-auto MyApp::HandleInput(F64 deltaTime) -> void
-{
-	if (m_Input.IsKeyPressed(Input::Key::kW)) {
-		m_P1Pos.y -= kPaddleSpeed * F32(deltaTime);
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kS)) {
-		m_P1Pos.y += kPaddleSpeed * F32(deltaTime);
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kUp)) {
-		m_P2Pos.y -= kPaddleSpeed * F32(deltaTime);
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kDown)) {
-		m_P2Pos.y += kPaddleSpeed * F32(deltaTime);
 	}
 }
 
@@ -235,6 +252,9 @@ auto MyApp::Reset() -> void
 	m_P1Pos   = { 30.F               , F32(kWinHeight) / 2, .0F };
 	m_P2Pos   = { kWinWidth - 30.0F  , F32(kWinHeight) / 2, .0F };
 	m_BallPos = { F32(kWinWidth) / 2, F32(kWinHeight) / 2, .0F };
+
+	m_P1Dir = {};
+	m_P2Dir = {};
 
 	m_BallDir = { rand() - RAND_MAX / 2, rand() - RAND_MAX / 2 };
 	m_BallDir = glm::normalize(m_BallDir);

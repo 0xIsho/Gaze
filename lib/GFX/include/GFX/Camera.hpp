@@ -22,6 +22,8 @@ namespace Gaze::GFX {
 		auto SetFront(glm::vec3 vec) -> void { m_Front = std::move(vec); }
 		[[nodiscard]]
 		auto Up() const -> const glm::vec3& { return m_Up; }
+		[[nodiscard]]
+		auto Right() const -> glm::vec3 { return glm::normalize(glm::cross(m_Front, m_Up)); }
 
 	private:
 		glm::vec3 m_Position { .0F, .0F, 1.0F };

@@ -8,14 +8,13 @@
 #include "Events/WindowEvent.hpp"
 
 #include "Input/KeyCode.hpp"
+
 #include "WM/Core.hpp"
 #include "WM/Window.hpp"
 
 #include "GFX/Camera.hpp"
 #include "GFX/Renderer.hpp"
 #include "GFX/Primitives.hpp"
-
-#include "Input/Input.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -32,13 +31,15 @@ public:
 private:
 	auto OnInit() -> Status override;
 	auto OnUpdate(F64 deltaTime) -> void override;
+	auto OnFixedUpdate(F64 deltaTime) -> void override;
 	auto OnShutdown() -> Status override;
 
 private:
 	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
-	Gaze::Input::Handler m_Input;
 	Gaze::Mem::Shared<Gaze::GFX::Camera> m_Cam;
+
+	glm::vec3 m_CameraDir{};
 
 	double m_Yaw{};
 	double m_Pitch{};
@@ -47,7 +48,6 @@ private:
 MyApp::MyApp(int argc, char** argv)
 	: App(argc, argv)
 	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
-	, m_Input(m_Win)
 	, m_Cam(Mem::MakeShared<Gaze::GFX::Camera>())
 {
 	m_Cam->SetPosition({ 1.F, 1.F, 1.F });
@@ -109,16 +109,54 @@ auto MyApp::OnInit() -> Status
 			printf("%s\n", ToString(event).c_str());
 		});
 
-		dispatcher.Dispatch<Events::KeyPressed>([](auto& event) {
-			printf("%s\n", ToString(event).c_str());
+		dispatcher.Dispatch<Events::KeyPressed>([this](auto& event) {
+			if (event.Keycode() == Input::Key::kW) {
+				m_CameraDir.z += 1;
+			}
+			if (event.Keycode() == Input::Key::kS) {
+				m_CameraDir.z -= 1;
+			}
+			if (event.Keycode() == Input::Key::kE) {
+				m_CameraDir.y += 1;
+			}
+			if (event.Keycode() == Input::Key::kQ) {
+				m_CameraDir.y -= 1;
+			}
+			if (event.Keycode() == Input::Key::kD) {
+				m_CameraDir.x += 1;
+			}
+			if (event.Keycode() == Input::Key::kA) {
+				m_CameraDir.x -= 1;
+			}
 		});
 
 		dispatcher.Dispatch<Events::KeyRepeat>([](auto& event) {
 			printf("%s\n", ToString(event).c_str());
 		});
 
-		dispatcher.Dispatch<Events::KeyReleased>([](auto& event) {
-			printf("%s\n", ToString(event).c_str());
+		dispatcher.Dispatch<Events::KeyReleased>([this](auto& event) {
+			if (event.Keycode() == Input::Key::kEscape) {
+				Quit();
+			}
+
+			if (event.Keycode() == Input::Key::kW) {
+				m_CameraDir.z -= 1;
+			}
+			if (event.Keycode() == Input::Key::kS) {
+				m_CameraDir.z += 1;
+			}
+			if (event.Keycode() == Input::Key::kE) {
+				m_CameraDir.y -= 1;
+			}
+			if (event.Keycode() == Input::Key::kQ) {
+				m_CameraDir.y += 1;
+			}
+			if (event.Keycode() == Input::Key::kD) {
+				m_CameraDir.x -= 1;
+			}
+			if (event.Keycode() == Input::Key::kA) {
+				m_CameraDir.x += 1;
+			}
 		});
 
 	});
@@ -132,33 +170,9 @@ auto MyApp::OnInit() -> Status
 	return Status::Success;
 }
 
-auto MyApp::OnUpdate(F64 deltaTime) -> void
+auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 {
-	constexpr auto cameraSpeed = 2.0F;
-	if (m_Input.IsKeyPressed(Input::Key::kW)) {
-		m_Cam->Move(cameraSpeed * F32(deltaTime) * m_Cam->Front());
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kS)) {
-		m_Cam->Move(cameraSpeed * F32(deltaTime) * -m_Cam->Front());
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kE)) {
-		m_Cam->Move(cameraSpeed * F32(deltaTime) * m_Cam->Up());
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kQ)) {
-		m_Cam->Move(cameraSpeed * F32(deltaTime) * -m_Cam->Up());
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kA)) {
-		m_Cam->Move(cameraSpeed * F32(deltaTime) * -glm::normalize(glm::cross(m_Cam->Front(), m_Cam->Up())));
-	}
-	if (m_Input.IsKeyPressed(Input::Key::kD)) {
-		m_Cam->Move(cameraSpeed * F32(deltaTime) * glm::normalize(glm::cross(m_Cam->Front(), m_Cam->Up())));
-	}
-
 	m_Rdr->Clear();
-
-	if (m_Input.IsKeyPressed(Gaze::Input::Key::kEscape)) {
-		Quit();
-	}
 
 	const auto greenMat = GFX::Material{
 		{ 0.F, 1.F, 0.F },
@@ -247,6 +261,14 @@ auto MyApp::OnUpdate(F64 deltaTime) -> void
 	m_Rdr->DrawMesh(GFX::CreateLine({ 0, 0, -10 }, { 0, 0, 10 }), GFX::Renderer::PrimitiveMode::Lines);
 
 	m_Rdr->Render();
+}
+
+auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
+{
+	constexpr auto cameraSpeed = 2.0F;
+	m_Cam->Move(m_Cam->Front()  * m_CameraDir.z * cameraSpeed * F32(deltaTime));
+	m_Cam->Move(m_Cam->Up()     * m_CameraDir.y * cameraSpeed * F32(deltaTime));
+	m_Cam->Move(m_Cam->Right()  * m_CameraDir.x * cameraSpeed * F32(deltaTime));
 }
 
 auto MyApp::OnShutdown() -> Status
