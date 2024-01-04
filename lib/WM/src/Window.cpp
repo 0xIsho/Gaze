@@ -110,12 +110,12 @@ namespace Gaze::WM {
 		return *this;
 	}
 
-	auto Window::Show() -> void
+	auto Window::Show() noexcept -> void
 	{
 		glfwShowWindow(m_Handle);
 	}
 
-	auto Window::Hide() -> void
+	auto Window::Hide() noexcept -> void
 	{
 		GAZE_ASSERT(m_Handle != nullptr, "Window::Hide() called with a null handle. Call Window::Show() first.");
 
@@ -124,7 +124,7 @@ namespace Gaze::WM {
 		}
 	}
 
-	auto Window::Close() -> void
+	auto Window::Close() noexcept -> void
 	{
 		GAZE_ASSERT(m_Handle != nullptr, "Window::Close() called with a null handle. Call Window::Show() first.");
 

@@ -51,7 +51,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 	public:
 		using GLID = U32;
 
-		friend auto swap(Object& first, Object& second) -> void
+		friend auto swap(Object& first, Object& second) noexcept -> void
 		{
 			using std::swap;
 
@@ -85,13 +85,13 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		}
 
 		[[nodiscard]]
-		auto ID() const -> GLID
+		auto ID() const noexcept -> GLID
 		{
 			return m_ID;
 		}
 
 	protected:
-		explicit Object(GLID id)
+		explicit Object(GLID id) noexcept
 			: m_ID(id)
 		{
 		}

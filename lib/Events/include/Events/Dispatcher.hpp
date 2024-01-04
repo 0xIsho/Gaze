@@ -8,7 +8,7 @@ namespace Gaze::Events {
 	class Dispatcher
 	{
 	public:
-		Dispatcher(Event& event)
+		Dispatcher(Event& event) noexcept
 			: m_Event(event)
 		{}
 

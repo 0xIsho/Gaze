@@ -43,39 +43,39 @@ namespace Gaze::GFX {
 		};
 
 	public:
-		Renderer(Mem::Shared<WM::Window> window);
+		Renderer(Mem::Shared<WM::Window> window) noexcept;
 		virtual ~Renderer() = default;
 
-		virtual auto SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void = 0;
-		virtual auto Clear(Buffer buffer = Buffer(kColorBuffer | kDepthBuffer)) -> void = 0;
-		virtual auto Flush() -> void = 0;
-		virtual auto Render() -> void = 0;
-		virtual auto MakeContextCurrent() -> void = 0;
-		virtual auto Stats() -> RenderStats = 0;
-		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height) -> void = 0;
-		virtual auto SetProjection(glm::mat4 projection) -> void = 0;
-		virtual auto SetCamera(Mem::Shared<Camera> camera) -> void = 0;
-
-		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void = 0;
-
-		[[deprecated("Use DrawMesh() instead")]]
-		virtual auto DrawPoint(Vec3 p) -> void = 0;
-		[[deprecated("Use DrawMesh() instead")]]
-		virtual auto DrawLine(Vec3 start, Vec3 end) -> void = 0;
-		[[deprecated("Use DrawMesh() instead")]]
-		virtual auto DrawTri(const std::array<Vec3, 3>& ps) -> void = 0;
-		[[deprecated("Use DrawMesh() instead")]]
-		virtual auto FillTri(const std::array<Vec3, 3>& ps) -> void = 0;
+		virtual auto SetClearColor(F32 r, F32 g, F32 b, F32 a)                  noexcept -> void = 0;
+		virtual auto Clear(Buffer buffer = Buffer(kColorBuffer | kDepthBuffer)) noexcept -> void = 0;
+		virtual auto Flush()                                                    noexcept -> void = 0;
+		virtual auto Render()                                                   noexcept -> void = 0;
+		virtual auto MakeContextCurrent()                                       noexcept -> void = 0;
+		virtual auto Stats()                                                    noexcept -> RenderStats = 0;
+		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height)           noexcept -> void = 0;
+		virtual auto SetProjection(glm::mat4 projection)                        noexcept -> void = 0;
+		virtual auto SetCamera(Mem::Shared<Camera> camera)                      noexcept -> void = 0;
+		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)                      -> void = 0;
 
 	protected:
 		[[nodiscard]]
-		auto Window() const -> const WM::Window& { return *m_Window.get(); }
+		auto Window()                                            const noexcept -> const WM::Window&;
 		[[nodiscard]]
-		auto Window() -> WM::Window& { return *m_Window.get(); }
+		auto Window()                                                  noexcept -> WM::Window&;
 
 	private:
 		Mem::Shared<WM::Window> m_Window;
 	};
+
+	inline auto Renderer::Window() const noexcept -> const WM::Window&
+	{
+		return *m_Window.get();
+	}
+	inline auto Renderer::Window() noexcept -> WM::Window&
+	{
+		return *m_Window.get();
+	}
+
 
 	auto CreateRenderer(Mem::Shared<WM::Window> window) -> Mem::Unique<Renderer>;
 }

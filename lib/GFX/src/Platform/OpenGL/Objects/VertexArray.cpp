@@ -3,28 +3,33 @@
 #include <utility>
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
-	VertexArray::VertexArray()
+	VertexArray::VertexArray() noexcept
 		: Object([] { GLID id; glCreateVertexArrays(1, &id); return id; }())
 	{
 	}
 
-	auto VertexArray::Release(GLID& id) -> void
+	auto VertexArray::Release(GLID& id) noexcept -> void
 	{
 		glDeleteVertexArrays(1, &id);
 		id = 0;
 	}
 
-	auto VertexArray::Bind() const -> void
+	auto VertexArray::Bind() const noexcept -> void
 	{
 		glBindVertexArray(ID());
 	}
 
-	auto VertexArray::BindVertexBuffer(VertexBuffer* buffer, BufferBinding binding, Offset offset, Stride stride) -> void
+	auto VertexArray::BindVertexBuffer(
+		VertexBuffer* buffer,
+		BufferBinding binding,
+		Offset offset,
+		Stride stride
+	) noexcept -> void
 	{
 		glVertexArrayVertexBuffer(ID(), binding.Value(), buffer->ID(), offset.Value(), stride.Value());
 	}
 
-	static auto ToOpenGLType(VertexArray::Layout::DataType type) -> GLenum
+	static auto ToOpenGLType(VertexArray::Layout::DataType type) noexcept -> GLenum
 	{
 		using DataType = VertexArray::Layout::DataType;
 
@@ -45,7 +50,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 #endif
 	}
 
-	auto VertexArray::SetLayout(std::initializer_list<Layout> layout) -> void
+	auto VertexArray::SetLayout(std::initializer_list<Layout> layout) noexcept -> void
 	{
 		for (auto i = 0UL; i < layout.size(); i++) {
 			const auto& elem = *(layout.begin() + i);
@@ -62,7 +67,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		}
 	}
 
-	auto VertexArray::SetIndexBuffer(IndexBuffer* buffer) -> void
+	auto VertexArray::SetIndexBuffer(IndexBuffer* buffer) noexcept -> void
 	{
 		glVertexArrayElementBuffer(ID(), buffer->ID());
 	}

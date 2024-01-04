@@ -8,7 +8,7 @@
 #include <chrono>
 
 namespace Gaze::Client {
-	App::App(int /*argc*/, char** /*argv*/)
+	App::App(int /*argc*/, char** /*argv*/) noexcept
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
 	}
@@ -18,8 +18,8 @@ namespace Gaze::Client {
 		m_IsRunning = false;
 	}
 
-	auto App::Run() -> Status
-	{
+	auto App::Run() noexcept -> Status
+	try {
 		using namespace std::chrono;
 
 		if (OnInit() == Status::Success) {
@@ -55,9 +55,11 @@ namespace Gaze::Client {
 		}
 
 		return OnShutdown();
+	} catch (...) {
+		return Status::Fail;
 	}
 
-	auto App::Quit() -> void
+	auto App::Quit() noexcept -> void
 	{
 		m_IsRunning = false;
 	}

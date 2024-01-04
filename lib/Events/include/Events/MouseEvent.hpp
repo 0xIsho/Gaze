@@ -11,15 +11,15 @@ namespace Gaze::Events {
 		GAZE_REGISTER_EVENT(MouseMove)
 
 	public:
-		MouseMove(double x, double y)
+		MouseMove(double x, double y) noexcept
 			: m_X(x)
 			, m_Y(y)
 		{}
 
 		[[nodiscard]]
-		auto X() const { return m_X; }
+		auto X() const noexcept { return m_X; }
 		[[nodiscard]]
-		auto Y() const { return m_Y; }
+		auto Y() const noexcept { return m_Y; }
 
 	private:
 		double m_X;
@@ -29,15 +29,15 @@ namespace Gaze::Events {
 	class MouseButton : public Event
 	{
 	public:
-		MouseButton(Input::MouseButton button, Input::Mod mods)
+		MouseButton(Input::MouseButton button, Input::Mod mods) noexcept
 			: m_Button(button)
 			, m_Mods(mods)
 		{}
 
 		[[nodiscard]]
-		auto Button() const { return m_Button; }
+		auto Button() const noexcept { return m_Button; }
 		[[nodiscard]]
-		auto Mods() const { return m_Mods; }
+		auto Mods()   const noexcept { return m_Mods; }
 
 	private:
 		Input::MouseButton m_Button;
@@ -50,7 +50,7 @@ namespace Gaze::Events {
 		GAZE_REGISTER_EVENT(MouseButtonPressed);
 
 	public:
-		MouseButtonPressed(Input::MouseButton button, Input::Mod mods)
+		MouseButtonPressed(Input::MouseButton button, Input::Mod mods) noexcept
 			: MouseButton(button, mods)
 		{}
 	};
@@ -61,7 +61,7 @@ namespace Gaze::Events {
 		GAZE_REGISTER_EVENT(MouseButtonReleased);
 
 	public:
-		MouseButtonReleased(Input::MouseButton button, Input::Mod mods)
+		MouseButtonReleased(Input::MouseButton button, Input::Mod mods) noexcept
 			: MouseButton(button, mods)
 		{}
 	};

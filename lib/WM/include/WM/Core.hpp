@@ -2,9 +2,9 @@
 
 namespace Gaze::WM {
 	[[nodiscard]]
-	auto Init() -> bool;
-	auto Terminate() -> void;
+	auto Init()          noexcept -> bool;
+	auto Terminate()     noexcept -> void;
 	[[nodiscard]]
-	auto IsInitialized() -> bool;
-	auto PollEvents() -> void;
+	auto IsInitialized() noexcept -> bool;
+	auto PollEvents()    noexcept -> void;
 }

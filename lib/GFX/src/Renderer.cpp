@@ -7,7 +7,7 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
 namespace Gaze::GFX {
-	Renderer::Renderer(Mem::Shared<WM::Window> window)
+	Renderer::Renderer(Mem::Shared<WM::Window> window) noexcept
 		: m_Window(std::move(window))
 	{
 	}

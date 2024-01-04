@@ -102,7 +102,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
 
-	Renderer::Renderer(Mem::Shared<WM::Window> window)
+	Renderer::Renderer(Mem::Shared<WM::Window> window) noexcept
 		: GFX::Renderer(std::move(window))
 		, m_pImpl(nullptr)
 	{
@@ -185,14 +185,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 		auto vShader = Objects::Shader(Objects::Shader::Type::Vertex, vertexSource);
 		if (!vShader.Compile()) {
-			const auto log = vShader.RetrieveErrorLog(512);
-			fprintf(stderr, "Error compiling vertex shader: %s\n", log.c_str());
 			return;
 		}
 		auto fShader = Objects::Shader(Objects::Shader::Type::Fragment, fragmentSource);
 		if (!fShader.Compile()) {
-			const auto log = fShader.RetrieveErrorLog(512);
-			fprintf(stderr, "Error compiling fragment shader: %s\n", log.c_str());
 			return;
 		}
 
@@ -210,8 +206,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		});
 
 		if (!m_pImpl->program.Link()) {
-			const auto log = fShader.RetrieveErrorLog(512);
-			fprintf(stderr, "Error linking shader program: %s\n", log.c_str());
 			return;
 		}
 
@@ -250,12 +244,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 		delete m_pImpl;
 	}
 
-	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 a) -> void
+	auto Renderer::SetClearColor(F32 r, F32 g, F32 b, F32 a) noexcept -> void
 	{
 		glClearColor(r, g, b, a);
 	}
 
-	auto Renderer::Clear(Buffer buffer /*= Buffer(kColorBuffer | kDepthBuffer)*/) -> void
+	auto Renderer::Clear(Buffer buffer) noexcept -> void
 	{
 		auto bufferBits = 0U;
 
@@ -272,7 +266,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glClear(bufferBits);
 	}
 
-	auto Renderer::Flush() -> void
+	auto Renderer::Flush() noexcept -> void
 	{
 		m_pImpl->vertexArray.Bind();
 		m_pImpl->program.Use();
@@ -331,7 +325,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl->indexBufSects.clear();
 	}
 
-	auto Renderer::Render() -> void
+	auto Renderer::Render() noexcept -> void
 	{
 		Flush();
 		glfwSwapBuffers(static_cast<GLFWwindow*>(Window().Handle()));
@@ -340,27 +334,27 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl->statsCurrent = RenderStats();
 	}
 
-	auto Renderer::MakeContextCurrent() -> void
+	auto Renderer::MakeContextCurrent() noexcept -> void
 	{
 		glfwMakeContextCurrent(static_cast<GLFWwindow*>(Window().Handle()));
 	}
 
-	auto Renderer::Stats() -> RenderStats
+	auto Renderer::Stats() noexcept -> RenderStats
 	{
 		return m_pImpl->stats;
 	}
 
-	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) -> void
+	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) noexcept -> void
 	{
 		glViewport(x, y, width, height);
 	}
 
-	auto Renderer::SetProjection(glm::mat4 projection) -> void
+	auto Renderer::SetProjection(glm::mat4 projection) noexcept -> void
 	{
 		m_pImpl->projection = std::move(projection);
 	}
 
-	auto Renderer::SetCamera(Mem::Shared<Camera> camera) -> void
+	auto Renderer::SetCamera(Mem::Shared<Camera> camera) noexcept -> void
 	{
 		m_pImpl->camera = std::move(camera);
 	}
@@ -414,25 +408,5 @@ namespace Gaze::GFX::Platform::OpenGL {
 				offset
 			);
 		}
-	}
-
-	auto Renderer::DrawPoint(Vec3 p) -> void
-	{
-		DrawMesh({ {{ p }}, { 0 } }, PrimitiveMode::Points);
-	}
-
-	auto Renderer::DrawLine(Vec3 start, Vec3 end) -> void
-	{
-		DrawMesh({ {{ start }, { end }}, { 0, 1 } }, PrimitiveMode::Lines);
-	}
-
-	auto Renderer::DrawTri(const std::array<Vec3, 3>& ps) -> void
-	{
-		DrawMesh({ { { ps[0] }, { ps[1] }, { ps[2] } }, { 0, 1, 2 } }, PrimitiveMode::LineLoop);
-	}
-
-	auto Renderer::FillTri(const std::array<Vec3, 3>& ps) -> void
-	{
-		DrawMesh({ { { ps[0] }, { ps[1] }, { ps[2] } }, { 0, 1, 2 } }, PrimitiveMode::Triangles);
 	}
 }

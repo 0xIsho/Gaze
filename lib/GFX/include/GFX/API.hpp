@@ -5,6 +5,6 @@ namespace Gaze::GFX {
 		kOpenGL
 	};
 
-	auto SetAPI(API api) -> void;
-	auto GetAPI() -> API;
+	auto SetAPI(API api) noexcept -> void;
+	auto GetAPI()        noexcept -> API;
 }

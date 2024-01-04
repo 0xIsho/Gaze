@@ -7,7 +7,7 @@ namespace Gaze::Events
 {
 #define GAZE_REGISTER_EVENT(type) \
 	static constexpr auto kEventType = Type::type; \
-	auto GetType() const -> Type override { return Type::type; }
+	auto GetType() const noexcept -> Type override { return Type::type; }
 
 	class Event
 	{
@@ -33,13 +33,9 @@ namespace Gaze::Events
 		virtual ~Event() = default;
 
 		[[nodiscard]]
-		auto Handled() const -> bool { return m_Handled; }
-		auto SetHandled(bool value) -> void { m_Handled = value; }
-
-		virtual auto GetType() const -> Type
-		{
-			return Type::Generic;
-		}
+		auto Handled()              const noexcept -> bool { return m_Handled; }
+		auto SetHandled(bool value)       noexcept -> void { m_Handled = value; }
+		virtual auto GetType()      const noexcept -> Type { return Type::Generic; }
 
 	private:
 		bool m_Handled = false;

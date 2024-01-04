@@ -29,17 +29,17 @@ namespace Gaze {
 	class ValueWrapper
 	{
 	public:
-		constexpr explicit ValueWrapper(T&& val)
+		constexpr explicit ValueWrapper(T&& val) noexcept
 			: m_Value(std::forward<T>(val))
 		{
 		}
 
-		constexpr auto Value() const -> T
+		constexpr auto Value() const noexcept -> T
 		{
 			return m_Value;
 		}
 
-		constexpr explicit operator T() const
+		constexpr explicit operator T() const noexcept
 		{
 			return m_Value;
 		}

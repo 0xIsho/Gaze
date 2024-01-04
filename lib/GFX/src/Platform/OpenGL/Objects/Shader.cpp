@@ -1,29 +1,29 @@
 #include "GFX/Platform/OpenGL/Objects/Shader.hpp"
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
-	Shader::Shader(Type type, std::string source)
+	Shader::Shader(Type type, std::string_view source) noexcept
 		: Object([type] {
 			return glCreateShader(type == Type::Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
 		}())
 	{
-		const auto* src = source.c_str();
+		const auto* src = source.data();
 		glShaderSource(ID(), 1, &src, nullptr);
 	}
 
-	auto Shader::Release(GLID& id) -> void
+	auto Shader::Release(GLID& id) noexcept -> void
 	{
 		glDeleteShader(id);
 		id = 0;
 	}
 
-	auto Shader::Compile() const -> bool
+	auto Shader::Compile() const noexcept -> bool
 	{
 		glCompileShader(ID());
 
 		return WasSuccessfullyCompiled();
 	}
 
-	auto Shader::RetrieveErrorLog(I32 nBytes) const -> std::string
+	auto Shader::RetrieveErrorLog(I32 nBytes) const noexcept -> std::string
 	{
 		if (WasSuccessfullyCompiled()) {
 			return "";
@@ -44,7 +44,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return log;
 	}
 
-	auto Shader::WasSuccessfullyCompiled() const -> bool
+	auto Shader::WasSuccessfullyCompiled() const noexcept -> bool
 	{
 		auto status = GL_FALSE;
 		glGetShaderiv(ID(), GL_COMPILE_STATUS, &status);
@@ -52,12 +52,12 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return status == GL_TRUE;
 	}
 
-	ShaderProgram::ShaderProgram()
+	ShaderProgram::ShaderProgram() noexcept
 		: Object([] { return glCreateProgram(); }())
 	{
 	}
 
-	ShaderProgram::ShaderProgram(std::initializer_list<const Shader*> shaders)
+	ShaderProgram::ShaderProgram(std::initializer_list<const Shader*> shaders) noexcept
 		: ShaderProgram()
 	{
 		for (auto shader : shaders) {
@@ -65,18 +65,18 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		}
 	}
 
-	auto ShaderProgram::Release(GLID& id) -> void
+	auto ShaderProgram::Release(GLID& id) noexcept -> void
 	{
 		glDeleteProgram(id);
 		id = 0;
 	}
 
-	auto ShaderProgram::Use() const -> void
+	auto ShaderProgram::Use() const noexcept -> void
 	{
 		glUseProgram(ID());
 	}
 
-	auto ShaderProgram::Link() const -> bool
+	auto ShaderProgram::Link() const noexcept -> bool
 	{
 		glLinkProgram(ID());
 
@@ -104,7 +104,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return log;
 	}
 
-	auto ShaderProgram::UploadUniform1F(std::string name, const float val) -> bool
+	auto ShaderProgram::UploadUniform1F(std::string name, const float val) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -116,7 +116,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::UploadUniform3FV(std::string name, const float vec[3]) -> bool
+	auto ShaderProgram::UploadUniform3FV(std::string name, const float vec[3]) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -128,7 +128,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::UploadUniform4FV(std::string name, const float vec[4]) -> bool
+	auto ShaderProgram::UploadUniform4FV(std::string name, const float vec[4]) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -140,7 +140,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) -> bool
+	auto ShaderProgram::UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -152,12 +152,12 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::RetreiveUniformLocation(std::string_view name) -> int
+	auto ShaderProgram::RetreiveUniformLocation(std::string_view name) noexcept -> int
 	{
 		return glGetUniformLocation(ID(), name.data());
 	}
 
-	auto ShaderProgram::WasSuccessfullyLinked() const -> bool
+	auto ShaderProgram::WasSuccessfullyLinked() const noexcept -> bool
 	{
 		auto status = GL_FALSE;
 		glGetProgramiv(ID(), GL_LINK_STATUS, &status);

@@ -14,12 +14,12 @@ namespace Gaze::Events {
 	public:
 		GAZE_REGISTER_EVENT(WindowFocus);
 
-		WindowFocus(bool focused)
+		WindowFocus(bool focused) noexcept
 			: m_Focused(focused)
 		{}
 
 		[[nodiscard]]
-		auto IsFocused() const -> bool { return m_Focused; }
+		auto IsFocused() const noexcept -> bool { return m_Focused; }
 
 	private:
 		bool m_Focused;

@@ -14,22 +14,22 @@ namespace Gaze::GFX {
 	{
 	}
 
-	auto Mesh::SetPosition(const glm::vec3& position) -> void
+	auto Mesh::SetPosition(const glm::vec3& position) noexcept -> void
 	{
 		m_Transform[3] = glm::vec4(position, 1.0F);
 	}
 
-	auto Mesh::Translate(const glm::vec3& translation) -> void
+	auto Mesh::Translate(const glm::vec3& translation) noexcept -> void
 	{
 		m_Transform = glm::translate(m_Transform, translation);
 	}
 
-	auto Mesh::Rotate(F32 radians, const glm::vec3& axis) -> void
+	auto Mesh::Rotate(F32 radians, const glm::vec3& axis) noexcept -> void
 	{
 		m_Transform *= glm::mat4_cast(glm::angleAxis(radians, axis));
 	}
 
-	auto Mesh::Scale(const glm::vec3& scale) -> void
+	auto Mesh::Scale(const glm::vec3& scale) noexcept -> void
 	{
 		m_Transform[0][0] = scale[0];
 		m_Transform[1][1] = scale[1];

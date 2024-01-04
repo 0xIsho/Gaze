@@ -27,23 +27,23 @@ namespace Gaze::GFX {
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);
 
 		[[nodiscard]]
-		auto Vertices() const -> const std::vector<Vertex>&;
+		auto Vertices()                                 const noexcept -> const std::vector<Vertex>&;
 		[[nodiscard]]
-		auto Indices() const -> const std::vector<U32>&;
+		auto Indices()                                  const noexcept -> const std::vector<U32>&;
 		[[nodiscard]]
-		auto Transform() const -> const glm::mat4&;
+		auto Transform()                                const noexcept -> const glm::mat4&;
 
-		auto SetPosition(const glm::vec3& position) -> void;
+		auto SetPosition(const glm::vec3& position)           noexcept -> void;
 
-		auto Translate(const glm::vec3& translation) -> void;
-		auto Rotate(F32 radians, const glm::vec3& axis) -> void;
-		auto Scale(const glm::vec3& scale) -> void;
+		auto Translate(const glm::vec3& translation)          noexcept -> void;
+		auto Rotate(F32 radians, const glm::vec3& axis)       noexcept -> void;
+		auto Scale(const glm::vec3& scale)                    noexcept -> void;
 
 		[[nodiscard]]
-		auto Material() -> struct Material;
+		auto Material()                                       noexcept -> struct Material&;
 		[[nodiscard]]
-		auto Material() const -> const struct Material&;
-		auto SetMaterial(struct Material mat) -> void;
+		auto Material()                                 const noexcept -> const struct Material&;
+		auto SetMaterial(struct Material mat)                 noexcept -> void;
 
 	private:
 		std::vector<Vertex> m_Vertices;
@@ -52,32 +52,32 @@ namespace Gaze::GFX {
 		struct Material m_Material;
 	};
 
-	inline auto Mesh::Vertices() const -> const std::vector<Vertex>&
+	inline auto Mesh::Vertices() const noexcept -> const std::vector<Vertex>&
 	{
 		return m_Vertices;
 	}
 
-	inline auto Mesh::Indices() const -> const std::vector<U32>&
+	inline auto Mesh::Indices() const noexcept -> const std::vector<U32>&
 	{
 		return m_Indices;
 	}
 
-	inline auto Mesh::Transform() const -> const glm::mat4&
+	inline auto Mesh::Transform() const noexcept -> const glm::mat4&
 	{
 		return m_Transform;
 	}
 
-	inline auto Mesh::Material() -> struct Material
+	inline auto Mesh::Material() noexcept -> struct Material&
 	{
 		return m_Material;
 	}
 
-	inline auto Mesh::Material() const -> const struct Material&
+	inline auto Mesh::Material() const noexcept -> const struct Material&
 	{
 		return m_Material;
 	}
 
-	inline auto Mesh::SetMaterial(struct Material mat) -> void
+	inline auto Mesh::SetMaterial(struct Material mat) noexcept -> void
 	{
 		m_Material = std::move(mat);
 	}

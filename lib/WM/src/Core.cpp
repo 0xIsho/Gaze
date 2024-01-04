@@ -7,7 +7,7 @@
 namespace Gaze::WM {
 	static auto s_IsInitialized = false;
 
-	auto Init() -> bool
+	auto Init() noexcept -> bool
 	{
 		s_IsInitialized = glfwInit() == GLFW_TRUE;
 
@@ -29,18 +29,18 @@ namespace Gaze::WM {
 		return s_IsInitialized;
 	}
 
-	auto Terminate() -> void
+	auto Terminate() noexcept -> void
 	{
 		glfwTerminate();
 		s_IsInitialized = false;
 	}
 
-	auto IsInitialized() -> bool
+	auto IsInitialized() noexcept -> bool
 	{
 		return s_IsInitialized;
 	}
 
-	auto PollEvents() -> void
+	auto PollEvents() noexcept -> void
 	{
 		glfwPollEvents();
 	}

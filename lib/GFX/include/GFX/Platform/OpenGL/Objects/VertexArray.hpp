@@ -43,13 +43,18 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		};
 
 	public:
-		VertexArray();
-		static auto Release(GLID& id) -> void;
+		VertexArray() noexcept;
+		static auto Release(GLID& id) noexcept -> void;
 
-		auto Bind() const -> void;
-		auto BindVertexBuffer(VertexBuffer* buffer, BufferBinding binding, Offset offset, Stride stride) -> void;
+		auto Bind() const noexcept -> void;
+		auto BindVertexBuffer(
+			VertexBuffer* buffer,
+			BufferBinding binding,
+			Offset offset,
+			Stride stride)
+		noexcept -> void;
 
-		auto SetLayout(std::initializer_list<Layout> layout) -> void;
-		auto SetIndexBuffer(IndexBuffer* buffer) -> void;
+		auto SetLayout(std::initializer_list<Layout> layout) noexcept -> void;
+		auto SetIndexBuffer(IndexBuffer* buffer) noexcept -> void;
 	};
 }

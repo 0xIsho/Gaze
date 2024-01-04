@@ -8,18 +8,18 @@ namespace Gaze::Events {
 	class Key : public Event
 	{
 	public:
-		Key(Input::Key key, int scancode, Input::Mod mods)
+		Key(Input::Key key, int scancode, Input::Mod mods) noexcept
 			: m_Key(key)
 			, m_Scancode(scancode)
 			, m_Mods(mods)
 		{}
 
 		[[nodiscard]]
-		auto Keycode() const { return m_Key; }
+		auto Keycode()  const noexcept { return m_Key; }
 		[[nodiscard]]
-		auto Scancode() const { return m_Scancode; }
+		auto Scancode() const noexcept { return m_Scancode; }
 		[[nodiscard]]
-		auto Mods() const { return m_Mods; }
+		auto Mods()     const noexcept { return m_Mods; }
 
 	private:
 		Input::Key m_Key;
@@ -33,7 +33,7 @@ namespace Gaze::Events {
 		GAZE_REGISTER_EVENT(KeyPressed);
 
 	public:
-		KeyPressed(Input::Key key, int scancode, Input::Mod mods)
+		KeyPressed(Input::Key key, int scancode, Input::Mod mods) noexcept
 			: Key(key, scancode, mods)
 		{}
 	};
@@ -44,7 +44,7 @@ namespace Gaze::Events {
 		GAZE_REGISTER_EVENT(KeyRepeat);
 
 	public:
-		KeyRepeat(Input::Key key, int scancode, Input::Mod mods)
+		KeyRepeat(Input::Key key, int scancode, Input::Mod mods) noexcept
 			: Key(key, scancode, mods)
 		{}
 	};
@@ -55,7 +55,7 @@ namespace Gaze::Events {
 		GAZE_REGISTER_EVENT(KeyReleased);
 
 	public:
-		KeyReleased(Input::Key key, int scancode, Input::Mod mods)
+		KeyReleased(Input::Key key, int scancode, Input::Mod mods) noexcept
 			: Key(key, scancode, mods)
 		{}
 	};

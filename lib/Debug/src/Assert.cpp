@@ -3,7 +3,12 @@
 #include <iostream>
 
 namespace Gaze::Debug {
-	auto AssertFail(std::string_view expr, std::string_view msg, std::string_view file, int line) -> void
+	auto AssertFail(
+		std::string_view expr,
+		std::string_view msg,
+		std::string_view file,
+		int line
+	) noexcept -> void
 	{
 		std::cerr
 			<< "*** Assertion Failure ***\n"

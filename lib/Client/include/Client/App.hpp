@@ -13,12 +13,12 @@ namespace Gaze::Client {
 		};
 
 	public:
-		App(int argc, char** argv);
+		App(int argc, char** argv) noexcept;
 		virtual ~App();
 
 		[[nodiscard]]
-		auto Run() -> Status;
-		auto Quit() -> void;
+		auto Run() noexcept -> Status;
+		auto Quit() noexcept -> void;
 
 	private:
 		virtual auto OnInit() -> Status = 0;

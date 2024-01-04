@@ -17,21 +17,21 @@ namespace Gaze::WM {
 	public:
 		Window(std::string_view title, int width, int height);
 		Window(const Window&) = delete;
-		Window(Window&& other) noexcept;
+		Window(Window&& other)                     noexcept;
 		~Window();
 
 		auto operator=(const Window&) -> Window& = delete;
-		auto operator=(Window&& other) noexcept -> Window&;
+		auto operator=(Window&& other)             noexcept -> Window&;
 
-		auto Show() -> void;
-		auto Hide() -> void;
-		auto Close() -> void;
+		auto Show()                                noexcept -> void;
+		auto Hide()                                noexcept -> void;
+		auto Close()                               noexcept -> void;
 
-		auto OnEvent(EventCallback callback) -> void;
+		auto OnEvent(EventCallback callback)       noexcept -> void;
 
-		[[nodiscard]] auto Width() const -> int;
-		[[nodiscard]] auto Height() const -> int;
-		[[nodiscard]] auto Handle() const -> void*;
+		[[nodiscard]] auto Width()           const noexcept -> int;
+		[[nodiscard]] auto Height()          const noexcept -> int;
+		[[nodiscard]] auto Handle()          const noexcept -> void*;
 
 	private:
 		GLFWwindow* m_Handle = nullptr;
@@ -42,22 +42,22 @@ namespace Gaze::WM {
 		EventCallback m_CbEvent = [] (auto&) { };
 	};
 
-	inline auto Window::Width() const -> int
+	inline auto Window::Width() const noexcept -> int
 	{
 		return m_Width;
 	}
 
-	inline auto Window::Height() const -> int
+	inline auto Window::Height() const noexcept-> int
 	{
 		return m_Height;
 	}
 
-	inline auto Window::Handle() const -> void*
+	inline auto Window::Handle() const noexcept -> void*
 	{
 		return reinterpret_cast<void*>(m_Handle);
 	}
 
-	inline auto Window::OnEvent(EventCallback callback) -> void
+	inline auto Window::OnEvent(EventCallback callback) noexcept -> void
 	{
 		m_CbEvent = std::move(callback);
 	}
