@@ -67,7 +67,7 @@ auto MyApp::OnInit() -> Status
 			Quit();
 		});
 
-		dispatcher.Dispatch<Events::MouseMove>([this](Events::MouseMove& event) {
+		dispatcher.Dispatch<Events::MouseMove>([this](auto& event) {
 			printf("%s\n", ToString(event).c_str());
 
 			static auto lastX = 1280.0 / 2;

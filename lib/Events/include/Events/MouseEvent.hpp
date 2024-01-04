@@ -110,12 +110,12 @@ namespace Gaze {
 				}
 				return "Unknown";
 			}(),
-			event.Mods() & Input::Mod::kModShift ?    "On" : "Off",
-			event.Mods() & Input::Mod::kModControl ?  "On" : "Off",
-			event.Mods() & Input::Mod::kModAlt ?      "On" : "Off",
-			event.Mods() & Input::Mod::kModSuper ?    "On" : "Off",
+			event.Mods() & Input::Mod::kModShift    ? "On" : "Off",
+			event.Mods() & Input::Mod::kModControl  ? "On" : "Off",
+			event.Mods() & Input::Mod::kModAlt      ? "On" : "Off",
+			event.Mods() & Input::Mod::kModSuper    ? "On" : "Off",
 			event.Mods() & Input::Mod::kModCapsLock ? "On" : "Off",
-			event.Mods() & Input::Mod::kModNumLock ?  "On" : "Off"
+			event.Mods() & Input::Mod::kModNumLock  ? "On" : "Off"
 		);
 	}
 
