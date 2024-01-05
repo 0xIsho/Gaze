@@ -41,9 +41,9 @@ namespace Gaze::GFX {
 
 	private:
 		std::vector<Vertex> m_Vertices;
-		std::vector<U32> m_Indices;
-		glm::mat4 m_Transform;
-		struct Material m_Material;
+		std::vector<U32>    m_Indices;
+		glm::mat4           m_Transform;
+		struct Material     m_Material;
 	};
 
 	inline auto Mesh::Vertices() const noexcept -> const std::vector<Vertex>&

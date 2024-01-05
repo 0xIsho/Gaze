@@ -9,14 +9,14 @@ namespace Gaze::GFX {
 	class Camera
 	{
 	public:
-		[[nodiscard]] auto ComputeViewMatrix()        const noexcept -> glm::mat4;
-		              auto Move(glm::vec3 dir)              noexcept -> void;
-		[[nodiscard]] auto Position()                 const noexcept -> const glm::vec3&;
-		              auto SetPosition(glm::vec3 vec)       noexcept -> void;
-		[[nodiscard]] auto Front()                    const noexcept -> const glm::vec3&;
-		              auto SetFront(glm::vec3 vec)          noexcept -> void;
-		[[nodiscard]] auto Up()                       const noexcept -> const glm::vec3&;
-		[[nodiscard]] auto Right()                    const noexcept -> glm::vec3;
+		[[nodiscard]] auto ComputeViewMatrix()  const noexcept -> glm::mat4;
+		              auto Move(glm::vec3 dir)        noexcept -> void;
+		[[nodiscard]] auto Position()           const noexcept -> const glm::vec3&;
+		              auto SetPosition(glm::vec3 vec) noexcept -> void;
+		[[nodiscard]] auto Front()              const noexcept -> const glm::vec3&;
+		              auto SetFront(glm::vec3 vec)    noexcept -> void;
+		[[nodiscard]] auto Up()                 const noexcept -> const glm::vec3&;
+		[[nodiscard]] auto Right()              const noexcept -> glm::vec3;
 
 	private:
 		glm::vec3 m_Position { .0F, .0F,  1.F };

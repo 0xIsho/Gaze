@@ -20,7 +20,7 @@ namespace Gaze::Events {
 
 	private:
 		Input::Key m_Key;
-		int m_Scancode;
+		int        m_Scancode;
 		Input::Mod m_Mods;
 	};
 

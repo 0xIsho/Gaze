@@ -37,7 +37,7 @@ namespace Gaze::Events {
 
 	private:
 		Input::MouseButton m_Button;
-		Input::Mod m_Mods;
+		Input::Mod         m_Mods;
 	};
 
 	class MouseButtonPressed : public MouseButton
