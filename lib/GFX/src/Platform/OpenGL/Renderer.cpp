@@ -120,7 +120,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 		const auto* vertexSource = R"(
 			#version 330 core
-			layout (location = 0) in vec3 aPos;
+			layout (location = 0) in vec3 a_Position;
 			layout (location = 1) in vec3 a_Normal;
 
 			uniform mat4 u_model;
@@ -131,10 +131,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			void main()
 			{
-				gl_Position = u_vp * u_model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+				gl_Position = u_vp * u_model * vec4(a_Position, 1.0);
 
 				normal = a_Normal;
-				surfacePos = vec3(u_model * vec4(aPos, 1.0));
+				surfacePos = vec3(u_model * vec4(a_Position, 1.0));
 			}
 		)";
 		const auto* fragmentSource = R"(
@@ -152,6 +152,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 				vec3 position;
 				vec3 diffuse;
 				vec3 specular;
+				float ambientCoefficient;
 				float attenuation;
 			};
 
@@ -159,7 +160,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			uniform Material u_Material;
 			uniform Light u_Light;
-			uniform vec3 u_Ambient;
 			uniform vec3 u_ViewPos;
 
 			in vec3 normal;
@@ -170,17 +170,19 @@ namespace Gaze::GFX::Platform::OpenGL {
 				vec3 lightDir = normalize(u_Light.position - surfacePos);
 				float diffuseCoefficient = max(dot(normal, lightDir), 0.0);
 				vec3 diffuse = diffuseCoefficient * u_Material.diffuse * u_Light.diffuse;
-				vec3 surfaceToView = normalize(u_ViewPos - surfacePos);
 
 				vec3 specular = vec3(0);
 				if (diffuseCoefficient > 0) {
-					vec3 reflectDir = reflect(-lightDir, normal);
-					specular = u_Material.specular * pow(max(dot(surfaceToView, reflectDir), 0.0), u_Material.shininess) * u_Light.specular;
+					vec3 surfaceToView = normalize(u_ViewPos - surfacePos);
+					float specularCoefficient = pow(max(0.0, dot(surfaceToView, reflect(-lightDir, normal))), u_Material.shininess);
+					specular = specularCoefficient * u_Material.specular * u_Light.specular;
 				}
 
-				const vec3 gamma = vec3(1.0 / 2.2);
+				vec3 ambient = u_Light.ambientCoefficient * u_Light.diffuse * u_Material.diffuse.rgb;
 				float attenuation = 1.0 / (1.0 + u_Light.attenuation * pow(length(u_Light.position - surfacePos), 2));
-				FragColor = vec4(pow(u_Ambient + diffuse + specular, gamma), 1.0);
+
+				const vec3 gamma = vec3(1.0 / 2.2);
+				FragColor = vec4(pow(ambient + attenuation * (diffuse + specular), gamma), 1.0);
 			}
 		)";
 
@@ -279,6 +281,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			.position = { 1.0F, 1.0F, -1.0F },
 			.diffuse = { .5F, .5F, .5F },
 			.specular = { 1.0F, 1.0F, 1.0F },
+			.ambientCoefficient = .05F,
 			.attenuation = .2F
 		};
 
@@ -287,6 +290,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
 		m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
 		m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
+		m_pImpl->program.UploadUniform1F("u_Light.ambientCoefficient", light.ambientCoefficient);
 		m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
 
 		for (auto i = 0UL; i < m_pImpl->indexBufSects.size(); i++) {
@@ -304,10 +308,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			const auto ambient = light.diffuse * sect.material.diffuse * .05F;
-
 			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
-			m_pImpl->program.UploadUniform3FV("u_Ambient", &(ambient[0]));
 			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.material.diffuse[0]));
 			m_pImpl->program.UploadUniform3FV("u_Material.specular", &(sect.material.specular[0]));
 			m_pImpl->program.UploadUniform1F("u_Material.shininess", sect.material.shininess);
