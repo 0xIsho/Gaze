@@ -26,18 +26,18 @@ namespace Gaze::GFX {
 	public:
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);
 
-		[[nodiscard]] auto Vertices()                                 const noexcept -> const std::vector<Vertex>&;
-		[[nodiscard]] auto Indices()                                  const noexcept -> const std::vector<U32>&;
-		[[nodiscard]] auto Transform()                                const noexcept -> const glm::mat4&;
+		[[nodiscard]] auto Vertices()             const noexcept -> const std::vector<Vertex>&;
+		[[nodiscard]] auto Indices()              const noexcept -> const std::vector<U32>&;
+		[[nodiscard]] auto Transform()            const noexcept -> const glm::mat4&;
 
-		auto SetPosition(const glm::vec3& position)                         noexcept -> void;
-		auto Translate(const glm::vec3& translation)                        noexcept -> void;
-		auto Rotate(F32 radians, const glm::vec3& axis)                     noexcept -> void;
-		auto Scale(const glm::vec3& scale)                                  noexcept -> void;
+		auto SetPosition(const glm::vec3& position)     noexcept -> void;
+		auto Translate(const glm::vec3& translation)    noexcept -> void;
+		auto Rotate(F32 radians, const glm::vec3& axis) noexcept -> void;
+		auto Scale(const glm::vec3& scale)              noexcept -> void;
 
-		[[nodiscard]] auto Material()                                       noexcept -> struct Material&;
-		[[nodiscard]] auto Material()                                 const noexcept -> const struct Material&;
-		auto SetMaterial(struct Material mat)                               noexcept -> void;
+		[[nodiscard]] auto Material()                   noexcept -> struct Material&;
+		[[nodiscard]] auto Material()             const noexcept -> const struct Material&;
+		auto SetMaterial(struct Material mat)           noexcept -> void;
 
 	private:
 		std::vector<Vertex> m_Vertices;
