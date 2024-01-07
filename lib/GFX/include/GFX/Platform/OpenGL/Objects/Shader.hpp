@@ -29,23 +29,26 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 	class ShaderProgram : public Object<ShaderProgram>
 	{
 	public:
-		ShaderProgram()                                                        noexcept;
-		ShaderProgram(std::initializer_list<const Shader*> shaders)            noexcept;
-		static auto Release(GLID& id)                                          noexcept -> void;
+		ShaderProgram()                                                               noexcept;
+		ShaderProgram(std::initializer_list<const Shader*> shaders)                   noexcept;
+		static auto Release(GLID& id)                                                 noexcept -> void;
 
-		auto Use()                                                       const noexcept -> void;
+		auto Use()                                                              const noexcept -> void;
 
-		[[nodiscard]] auto Link()                                        const noexcept -> bool;
+		[[nodiscard]] auto Link()                                               const noexcept -> bool;
 
-		auto RetrieveErrorLog(I32 nBytes)                                const          -> std::string;
+		auto RetrieveErrorLog(I32 nBytes)                                       const          -> std::string;
 
-		auto UploadUniform1F(std::string name, const float val)                noexcept -> bool;
-		auto UploadUniform3FV(std::string name, const float vec[3])            noexcept -> bool;
-		auto UploadUniform4FV(std::string name, const float vec[4])            noexcept -> bool;
-		auto UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) noexcept -> bool;
+		auto UploadUniform1F(const std::string& name, const float val)                noexcept -> bool;
+		auto UploadUniform3FV(const std::string& name, const float vec[3])            noexcept -> bool;
+		auto UploadUniform4FV(const std::string& name, const float vec[4])            noexcept -> bool;
+		auto UploadUniformMatrix4FV(const std::string& name, const F32 matrix[4 * 4]) noexcept -> bool;
 
 	private:
-		[[nodiscard]] auto RetreiveUniformLocation(std::string_view name)      noexcept -> int;
-		[[nodiscard]] auto WasSuccessfullyLinked()                       const noexcept -> bool;
+		[[nodiscard]] auto RetreiveUniformLocation(const std::string& name)           noexcept -> int;
+		[[nodiscard]] auto WasSuccessfullyLinked()                              const noexcept -> bool;
+
+	private:
+		mutable std::unordered_map<std::string, int> m_UniformLocationCache;
 	};
 }

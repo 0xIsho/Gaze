@@ -104,7 +104,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return log;
 	}
 
-	auto ShaderProgram::UploadUniform1F(std::string name, const float val) noexcept -> bool
+	auto ShaderProgram::UploadUniform1F(const std::string& name, const float val) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -116,7 +116,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::UploadUniform3FV(std::string name, const float vec[3]) noexcept -> bool
+	auto ShaderProgram::UploadUniform3FV(const std::string& name, const float vec[3]) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -128,7 +128,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::UploadUniform4FV(std::string name, const float vec[4]) noexcept -> bool
+	auto ShaderProgram::UploadUniform4FV(const std::string& name, const float vec[4]) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -140,7 +140,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::UploadUniformMatrix4FV(std::string name, const F32 matrix[4 * 4]) noexcept -> bool
+	auto ShaderProgram::UploadUniformMatrix4FV(const std::string& name, const F32 matrix[4 * 4]) noexcept -> bool
 	{
 		const auto location = RetreiveUniformLocation(name);
 		if (location == -1) {
@@ -152,9 +152,19 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		return true;
 	}
 
-	auto ShaderProgram::RetreiveUniformLocation(std::string_view name) noexcept -> int
+	auto ShaderProgram::RetreiveUniformLocation(const std::string& name) noexcept -> int
 	{
-		return glGetUniformLocation(ID(), name.data());
+		if (!m_UniformLocationCache.contains(name)) {
+			const auto loc = glGetUniformLocation(ID(), name.data());
+
+			if (loc == -1) {
+				return -1;
+			}
+
+			m_UniformLocationCache.insert({ name, loc });
+		}
+
+		return m_UniformLocationCache[name];
 	}
 
 	auto ShaderProgram::WasSuccessfullyLinked() const noexcept -> bool
