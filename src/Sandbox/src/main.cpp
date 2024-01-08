@@ -62,14 +62,11 @@ auto MyApp::OnInit() -> Status
 	m_Win->OnEvent([this](auto& event) {
 		auto dispatcher = Events::Dispatcher(event);
 
-		dispatcher.Dispatch<Events::WindowClose>([this](auto& event) {
-			printf("%s\n", ToString(event).c_str());
+		dispatcher.Dispatch<Events::WindowClose>([this](auto&) {
 			Quit();
 		});
 
 		dispatcher.Dispatch<Events::MouseMove>([this](auto& event) {
-			printf("%s\n", ToString(event).c_str());
-
 			static auto lastX = 1280.0 / 2;
 			static auto lastY = 640.0 / 2;
 			constexpr auto sensitivity = .5;
@@ -97,18 +94,6 @@ auto MyApp::OnInit() -> Status
 			lastY = event.Y();
 		});
 
-		dispatcher.Dispatch<Events::WindowFocus>([](auto& event) {
-			printf("%s\n", ToString(event).c_str());
-		});
-
-		dispatcher.Dispatch<Events::MouseButtonPressed>([](auto& event) {
-			printf("%s\n", ToString(event).c_str());
-		});
-
-		dispatcher.Dispatch<Events::MouseButtonReleased>([](auto& event) {
-			printf("%s\n", ToString(event).c_str());
-		});
-
 		dispatcher.Dispatch<Events::KeyPressed>([this](auto& event) {
 			if (event.Keycode() == Input::Key::kW) {
 				m_CameraDir.z += 1;
@@ -128,10 +113,6 @@ auto MyApp::OnInit() -> Status
 			if (event.Keycode() == Input::Key::kA) {
 				m_CameraDir.x -= 1;
 			}
-		});
-
-		dispatcher.Dispatch<Events::KeyRepeat>([](auto& event) {
-			printf("%s\n", ToString(event).c_str());
 		});
 
 		dispatcher.Dispatch<Events::KeyReleased>([this](auto& event) {
