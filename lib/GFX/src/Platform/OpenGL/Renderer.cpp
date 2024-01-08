@@ -82,23 +82,23 @@ namespace Gaze::GFX::Platform::OpenGL {
 		I32 size;
 
 		Renderer::PrimitiveMode mode;
-		Mesh::Properties properties;
+		Mesh::Properties        properties;
 	};
 
 	struct Renderer::Impl
 	{
-		Objects::VertexArray vertexArray;
-		Objects::ShaderProgram program;
-		Objects::VertexBuffer vertexBuf;
-		Objects::IndexBuffer indexBuf;
-		std::vector<BufferSection> vertexBufSects;
+		Objects::VertexArray                 vertexArray;
+		Objects::ShaderProgram               program;
+		Objects::VertexBuffer                vertexBuf;
+		Objects::IndexBuffer                 indexBuf;
+		std::vector<BufferSection>           vertexBufSects;
 		std::vector<BufferSection>::iterator vertexBufSectsCursor;
-		std::vector<BufferSection> indexBufSects;
+		std::vector<BufferSection>           indexBufSects;
 		std::vector<BufferSection>::iterator indexBufSectsCursor;
-		RenderStats stats;
-		RenderStats statsCurrent;
-		Mem::Shared<Camera> camera;
-		glm::mat4 projection;
+		Mem::Shared<Camera>                  camera;
+		glm::mat4                            projection;
+		RenderStats                          stats;
+		RenderStats                          statsCurrent;
 	};
 
 	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
@@ -196,18 +196,18 @@ namespace Gaze::GFX::Platform::OpenGL {
 		}
 
 		m_pImpl= new Impl({
-			{},
-			{ &vShader, &fShader },
-			Objects::VertexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
-			Objects::IndexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
-			{},
-			{},
-			{},
-			{},
-			{ 0 },
-			{ 0 },
-			{ Mem::MakeShared<Camera>() },
-			{ glm::mat4(1.0F) }
+			.vertexArray          = {},
+			.program              = { &vShader, &fShader },
+			.vertexBuf            = Objects::VertexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
+			.indexBuf             = Objects::IndexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
+			.vertexBufSects       = {},
+			.vertexBufSectsCursor = {},
+			.indexBufSects        = {},
+			.indexBufSectsCursor  = {},
+			.camera               = { Mem::MakeShared<Camera>() },
+			.projection           = { glm::mat4(1.0F) },
+			.stats                = {},
+			.statsCurrent         = {},
 		});
 
 		m_pImpl->vertexBufSects.resize(kStaticBufferSize / sizeof(BufferSection));
