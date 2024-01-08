@@ -94,7 +94,9 @@ namespace Gaze::GFX::Platform::OpenGL {
 		Objects::VertexBuffer vertexBuf;
 		Objects::IndexBuffer indexBuf;
 		std::vector<BufferSection> vertexBufSects;
+		std::vector<BufferSection>::iterator vertexBufSectsCursor;
 		std::vector<BufferSection> indexBufSects;
+		std::vector<BufferSection>::iterator indexBufSectsCursor;
 		RenderStats stats;
 		RenderStats statsCurrent;
 		Mem::Shared<Camera> camera;
@@ -202,11 +204,18 @@ namespace Gaze::GFX::Platform::OpenGL {
 			Objects::IndexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
 			{},
 			{},
+			{},
+			{},
 			{ 0 },
 			{ 0 },
 			{ Mem::MakeShared<Camera>() },
 			{ glm::mat4(1.0F) }
 		});
+
+		m_pImpl->vertexBufSects.resize(kStaticBufferSize / sizeof(BufferSection));
+		m_pImpl->vertexBufSectsCursor = m_pImpl->vertexBufSects.begin();
+		m_pImpl->indexBufSects.resize(kStaticBufferSize / sizeof(BufferSection));
+		m_pImpl->indexBufSectsCursor = m_pImpl->indexBufSects.begin();
 
 		if (!m_pImpl->program.Link()) {
 			return;
@@ -293,8 +302,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl->program.UploadUniform1F("u_Light.ambientCoefficient", light.ambientCoefficient);
 		m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
 
-		for (auto i = 0UL; i < m_pImpl->indexBufSects.size(); i++) {
-			const auto& sect = m_pImpl->indexBufSects[i];
+		for (auto it = m_pImpl->indexBufSects.cbegin(); it != m_pImpl->indexBufSectsCursor; ++it) {
+			const auto& sect = *it;
 			auto drawMode = GLenum();
 
 			switch (sect.mode) {
@@ -313,18 +322,19 @@ namespace Gaze::GFX::Platform::OpenGL {
 			m_pImpl->program.UploadUniform3FV("u_Material.specular", &(sect.material.specular[0]));
 			m_pImpl->program.UploadUniform1F("u_Material.shininess", sect.material.shininess);
 
+			const auto idx = std::size_t(std::distance(m_pImpl->indexBufSects.cbegin(), it));
 			glDrawElementsBaseVertex(
 				drawMode,
 				sect.size / Mesh::kIndexSize,
 				GL_UNSIGNED_INT,
 				reinterpret_cast<void*>(sect.offset),
-				m_pImpl->vertexBufSects[i].offset / Mesh::kVertexSize
+				m_pImpl->vertexBufSects[idx].offset / Mesh::kVertexSize
 			);
 			m_pImpl->statsCurrent.nDrawCalls++;
 		}
 
-		m_pImpl->vertexBufSects.clear();
-		m_pImpl->indexBufSects.clear();
+		m_pImpl->vertexBufSectsCursor = m_pImpl->vertexBufSects.begin();
+		m_pImpl->indexBufSectsCursor = m_pImpl->indexBufSects.begin();
 	}
 
 	auto Renderer::Render() noexcept -> void
@@ -366,11 +376,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 		{
 			auto offset = 0;
 
-			if (m_pImpl->vertexBufSects.size() > 0) {
-				offset = m_pImpl->vertexBufSects.back().offset + m_pImpl->vertexBufSects.back().size;
+			if (m_pImpl->vertexBufSectsCursor != m_pImpl->vertexBufSects.begin()) {
+				const auto& last = m_pImpl->vertexBufSectsCursor - 1;
+				offset = last->offset + last->size;
 			}
 
-			m_pImpl->vertexBufSects.emplace_back(
+			*m_pImpl->vertexBufSectsCursor = {
 				BufferSection{
 					offset,
 					I32(mesh.Vertices().size() * mesh.kVertexSize),
@@ -378,7 +389,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 					mesh.Transform(),
 					mesh.Material()
 				}
-			);
+			};
+			m_pImpl->vertexBufSectsCursor++;
 
 			m_pImpl->vertexBuf.Upload(
 				mesh.Vertices().data(),
@@ -390,11 +402,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 		{
 			auto offset = 0;
 
-			if (m_pImpl->indexBufSects.size() > 0) {
-				offset = m_pImpl->indexBufSects.back().offset + m_pImpl->indexBufSects.back().size;
+			if (m_pImpl->indexBufSectsCursor != m_pImpl->indexBufSects.begin()) {
+				const auto& last = m_pImpl->indexBufSectsCursor - 1;
+				offset = last->offset + last->size;
 			}
 
-			m_pImpl->indexBufSects.emplace_back(
+			*m_pImpl->indexBufSectsCursor = {
 				BufferSection{
 					offset,
 					I32(mesh.Indices().size() * mesh.kIndexSize),
@@ -402,7 +415,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 					mesh.Transform(),
 					mesh.Material()
 				}
-			);
+			};
+			m_pImpl->indexBufSectsCursor++;
 
 			m_pImpl->indexBuf.Upload(
 				mesh.Indices().data(),
