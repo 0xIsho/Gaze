@@ -80,11 +80,9 @@ namespace Gaze::GFX::Platform::OpenGL {
 	{
 		I32 offset;
 		I32 size;
-		Renderer::PrimitiveMode mode;
 
-		// TODO: These are the same properies in Mesh. The duplication should be fixed somehow
-		glm::mat4 transform;
-		Material material;
+		Renderer::PrimitiveMode mode;
+		Mesh::Properties properties;
 	};
 
 	struct Renderer::Impl
@@ -317,10 +315,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.transform[0][0]));
-			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.material.diffuse[0]));
-			m_pImpl->program.UploadUniform3FV("u_Material.specular", &(sect.material.specular[0]));
-			m_pImpl->program.UploadUniform1F("u_Material.shininess", sect.material.shininess);
+			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.properties.transform[0][0]));
+			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.properties.material.diffuse[0]));
+			m_pImpl->program.UploadUniform3FV("u_Material.specular", &(sect.properties.material.specular[0]));
+			m_pImpl->program.UploadUniform1F("u_Material.shininess", sect.properties.material.shininess);
 
 			const auto idx = std::size_t(std::distance(m_pImpl->indexBufSects.cbegin(), it));
 			glDrawElementsBaseVertex(
@@ -386,8 +384,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset,
 					I32(mesh.Vertices().size() * mesh.kVertexSize),
 					mode,
-					mesh.Transform(),
-					mesh.Material()
+					{ mesh.Transform(), mesh.Material() }
 				}
 			};
 			m_pImpl->vertexBufSectsCursor++;
@@ -412,8 +409,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset,
 					I32(mesh.Indices().size() * mesh.kIndexSize),
 					mode,
-					mesh.Transform(),
-					mesh.Material()
+					{ mesh.Transform(), mesh.Material() }
 				}
 			};
 			m_pImpl->indexBufSectsCursor++;

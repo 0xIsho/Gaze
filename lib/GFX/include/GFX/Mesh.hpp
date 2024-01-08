@@ -23,6 +23,12 @@ namespace Gaze::GFX {
 		static constexpr auto kVertexSize = I32(sizeof(Vertex));
 		static constexpr auto kIndexSize  = I32(sizeof(U32));
 
+		struct Properties
+		{
+			glm::mat4       transform;
+			struct Material material;
+		};
+
 	public:
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);
 
@@ -42,8 +48,7 @@ namespace Gaze::GFX {
 	private:
 		std::vector<Vertex> m_Vertices;
 		std::vector<U32>    m_Indices;
-		glm::mat4           m_Transform;
-		struct Material     m_Material;
+		Properties          m_Props;
 	};
 
 	inline auto Mesh::Vertices() const noexcept -> const std::vector<Vertex>&
@@ -58,21 +63,21 @@ namespace Gaze::GFX {
 
 	inline auto Mesh::Transform() const noexcept -> const glm::mat4&
 	{
-		return m_Transform;
+		return m_Props.transform;
 	}
 
 	inline auto Mesh::Material() noexcept -> struct Material&
 	{
-		return m_Material;
+		return m_Props.material;
 	}
 
 	inline auto Mesh::Material() const noexcept -> const struct Material&
 	{
-		return m_Material;
+		return m_Props.material;
 	}
 
 	inline auto Mesh::SetMaterial(struct Material mat) noexcept -> void
 	{
-		m_Material = std::move(mat);
+		m_Props.material = std::move(mat);
 	}
 }
