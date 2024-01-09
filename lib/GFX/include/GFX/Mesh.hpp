@@ -17,6 +17,12 @@ namespace Gaze::GFX {
 		glm::vec3 normals;
 	};
 
+	struct Primitive
+	{
+		std::vector<Vertex> vertices;
+		std::vector<U32>    indices;
+	};
+
 	class Mesh
 	{
 	public:
@@ -31,9 +37,9 @@ namespace Gaze::GFX {
 
 	public:
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);
+		Mesh(std::initializer_list<Primitive> primitives);
 
-		[[nodiscard]] auto Vertices()             const noexcept -> const std::vector<Vertex>&;
-		[[nodiscard]] auto Indices()              const noexcept -> const std::vector<U32>&;
+		[[nodiscard]] auto Primitives()           const noexcept -> const std::vector<Primitive>&;
 		[[nodiscard]] auto Transform()            const noexcept -> const glm::mat4&;
 
 		auto SetPosition(const glm::vec3& position)     noexcept -> void;
@@ -46,19 +52,13 @@ namespace Gaze::GFX {
 		auto SetMaterial(struct Material mat)           noexcept -> void;
 
 	private:
-		std::vector<Vertex> m_Vertices;
-		std::vector<U32>    m_Indices;
-		Properties          m_Props;
+		std::vector<Primitive> m_Primitives;
+		Properties             m_Props;
 	};
 
-	inline auto Mesh::Vertices() const noexcept -> const std::vector<Vertex>&
+	inline auto Mesh::Primitives() const noexcept -> const std::vector<Primitive>&
 	{
-		return m_Vertices;
-	}
-
-	inline auto Mesh::Indices() const noexcept -> const std::vector<U32>&
-	{
-		return m_Indices;
+		return m_Primitives;
 	}
 
 	inline auto Mesh::Transform() const noexcept -> const glm::mat4&

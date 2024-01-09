@@ -7,8 +7,12 @@
 
 namespace Gaze::GFX {
 	Mesh::Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices)
-		: m_Vertices(std::move(vertices))
-		, m_Indices(std::move(indices))
+		: Mesh({ Primitive{ std::move(vertices), std::move(indices) } })
+	{
+	}
+
+	Mesh::Mesh(std::initializer_list<Primitive> primitives)
+		: m_Primitives(std::move(primitives))
 		, m_Props(glm::mat4{ 1.0F }, { { 1.F, 1.F, 1.F }, { .5F, .5F, .5F }, 32.F })
 	{
 	}

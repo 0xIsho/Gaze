@@ -374,51 +374,59 @@ namespace Gaze::GFX::Platform::OpenGL {
 		{
 			auto offset = 0;
 
-			if (m_pImpl->vertexBufSectsCursor != m_pImpl->vertexBufSects.begin()) {
-				const auto& last = m_pImpl->vertexBufSectsCursor - 1;
-				offset = last->offset + last->size;
-			}
+			for (auto it = mesh.Primitives().cbegin(); it != mesh.Primitives().cend(); ++it) {
+				const auto& prim = *it;
 
-			*m_pImpl->vertexBufSectsCursor = {
-				BufferSection{
-					offset,
-					I32(mesh.Vertices().size() * mesh.kVertexSize),
-					mode,
-					{ mesh.Transform(), mesh.Material() }
+				if (m_pImpl->vertexBufSectsCursor != m_pImpl->vertexBufSects.begin()) {
+					const auto& last = m_pImpl->vertexBufSectsCursor - 1;
+					offset = last->offset + last->size;
 				}
-			};
-			m_pImpl->vertexBufSectsCursor++;
 
-			m_pImpl->vertexBuf.Upload(
-				mesh.Vertices().data(),
-				I32(mesh.Vertices().size() * mesh.kVertexSize),
-				offset
-			);
+				*m_pImpl->vertexBufSectsCursor = {
+					BufferSection{
+						offset,
+						I32(prim.vertices.size() * mesh.kVertexSize),
+						mode,
+						{ mesh.Transform(), mesh.Material() }
+					}
+				};
+				m_pImpl->vertexBufSectsCursor++;
+
+				m_pImpl->vertexBuf.Upload(
+					prim.vertices.data(),
+					I32(prim.vertices.size() * mesh.kVertexSize),
+					offset
+				);
+			}
 		}
 
 		{
 			auto offset = 0;
 
-			if (m_pImpl->indexBufSectsCursor != m_pImpl->indexBufSects.begin()) {
-				const auto& last = m_pImpl->indexBufSectsCursor - 1;
-				offset = last->offset + last->size;
-			}
+			for (auto it = mesh.Primitives().cbegin(); it != mesh.Primitives().cend(); ++it) {
+				const auto& prim = *it;
 
-			*m_pImpl->indexBufSectsCursor = {
-				BufferSection{
-					offset,
-					I32(mesh.Indices().size() * mesh.kIndexSize),
-					mode,
-					{ mesh.Transform(), mesh.Material() }
+				if (m_pImpl->indexBufSectsCursor != m_pImpl->indexBufSects.begin()) {
+					const auto& last = m_pImpl->indexBufSectsCursor - 1;
+					offset = last->offset + last->size;
 				}
-			};
-			m_pImpl->indexBufSectsCursor++;
 
-			m_pImpl->indexBuf.Upload(
-				mesh.Indices().data(),
-				I32(mesh.Indices().size() * Mesh::kIndexSize),
-				offset
-			);
+				*m_pImpl->indexBufSectsCursor = {
+					BufferSection{
+						offset,
+						I32(prim.indices.size() * mesh.kIndexSize),
+						mode,
+						{ mesh.Transform(), mesh.Material() }
+					}
+				};
+				m_pImpl->indexBufSectsCursor++;
+
+				m_pImpl->indexBuf.Upload(
+					prim.indices.data(),
+					I32(prim.indices.size() * Mesh::kIndexSize),
+					offset
+				);
+			}
 		}
 	}
 }
