@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Type.hpp"
-#include "Core/Platform.hpp"
+#include "Core/PlatformUtils.hpp"
 
 #include "Debug/Assert.hpp"
 
@@ -38,11 +38,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		case BufferUsage::StreamRead:  return GL_STREAM_READ;
 		}
 
-#if GAZE_COMPILER_CLANG == 1 || GAZE_COMPILER_GNU == 1
-		__builtin_unreachable();
-#else
-#	error "__builtin_unreachable() equivalent missing"
-#endif
+		GAZE_UNREACHABLE();
 	}
 
 	template<typename T>

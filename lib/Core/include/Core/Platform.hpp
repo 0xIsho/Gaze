@@ -64,17 +64,4 @@
 #	define GAZE_COMPILER_PATCH 0
 #endif
 
-// Engine helpers
-#if defined(GAZE_COMPILER_CLANG) || defined(GAZE_COMPILER_GNU)
-#	if defined(__has_builtin)
-#		if __has_builtin(__builtin_expect)
-#			define GAZE_EXPECT(expr, val) __builtin_expect(expr, val)
-#		endif
-#	endif
-#endif
-
-#if !defined(GAZE_EXPECT)
-#	define GAZE_EXPECT(expr, val) (expr)
-#endif
-
 #endif // GAZE_CORE_PLATFORM_HPP

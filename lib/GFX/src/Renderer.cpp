@@ -1,7 +1,7 @@
 #include "GFX/Renderer.hpp"
 
 #include "Core/Type.hpp"
-#include "Core/Platform.hpp"
+#include "Core/PlatformUtils.hpp"
 
 #include "GFX/API.hpp"
 #include "GFX/Platform/OpenGL/Renderer.hpp"
@@ -18,12 +18,6 @@ namespace Gaze::GFX {
 		case API::kOpenGL: return Mem::MakeUnique<Platform::OpenGL::Renderer>(std::move(window));
 		}
 
-#if GAZE_COMPILER_CLANG == 1 || GAZE_COMPILER_GNU == 1
-		__builtin_unreachable();
-#else
-#	error "__builtin_unreachable() equivalent missing"
-#endif
-
-		return nullptr;
+		GAZE_UNREACHABLE();
 	}
 }

@@ -1,5 +1,7 @@
 #include "GFX/Platform/OpenGL/Objects/VertexArray.hpp"
 
+#include "Core/PlatformUtils.hpp"
+
 #include <utility>
 
 namespace Gaze::GFX::Platform::OpenGL::Objects {
@@ -43,11 +45,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		case DataType::Double:    return GL_DOUBLE;
 		}
 
-#if GAZE_COMPILER_CLANG == 1 || GAZE_COMPILER_GNU == 1
-		__builtin_unreachable();
-#else
-#	error "__builtin_unreachable() equivalent missing"
-#endif
+		GAZE_UNREACHABLE();
 	}
 
 	auto VertexArray::SetLayout(std::initializer_list<Layout> layout) noexcept -> void
