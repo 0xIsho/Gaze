@@ -13,6 +13,7 @@
 #include <GLFW/glfw3.h>
 
 #include <cstdio>
+#include <format>
 #include <type_traits>
 #include <unordered_map>
 
@@ -159,45 +160,55 @@ namespace Gaze::GFX::Platform::OpenGL {
 				float ambientCoefficient;
 				float attenuation;
 			};
+			const int kMaxLights = 8;
 
 			out vec4 FragColor;
 
 			uniform Material u_Material;
 			uniform Light u_Light;
+			uniform Light u_Lights[kMaxLights];
+			uniform int u_nLights;
 			uniform vec3 u_ViewPos;
 
 			in vec3 normal;
 			in vec3 surfacePos;
 
-			void main()
+			vec3 ComputeLight(Light light, vec3 normal, vec3 surfacePos, vec3 surfaceToView)
 			{
-				vec3 lightDir = normalize(u_Light.position - surfacePos);
-				float diffuseCoefficient = max(dot(normal, lightDir), 0.0);
-				vec3 diffuse = diffuseCoefficient * u_Material.diffuse * u_Light.diffuse;
+				vec3 surfaceToLight = normalize(light.position - surfacePos);
+				float diffuseCoefficient = max(dot(normal, surfaceToLight), 0.0);
+				vec3 diffuse = diffuseCoefficient * u_Material.diffuse * light.diffuse;
 
 				vec3 specular = vec3(0);
 				if (diffuseCoefficient > 0) {
-					vec3 surfaceToView = normalize(u_ViewPos - surfacePos);
-					float specularCoefficient = pow(max(0.0, dot(surfaceToView, reflect(-lightDir, normal))), u_Material.shininess);
+					float specularCoefficient = pow(max(0.0, dot(surfaceToView, reflect(-surfaceToLight, normal))), u_Material.shininess);
 					specular = specularCoefficient * u_Material.specular * light.diffuse;
 				}
 
-				vec3 ambient = u_Light.ambientCoefficient * u_Light.diffuse * u_Material.diffuse.rgb;
-				float attenuation = 1.0 / (1.0 + u_Light.attenuation * pow(length(u_Light.position - surfacePos), 2));
+				vec3 ambient = light.ambientCoefficient * light.diffuse * u_Material.diffuse.rgb;
+				float attenuation = 1.0 / (1.0 + light.attenuation * pow(length(light.position - surfacePos), 2));
 
+				return ambient + attenuation * (diffuse + specular);
+			}
+
+			void main()
+			{
 				const vec3 gamma = vec3(1.0 / 2.2);
-				FragColor = vec4(pow(ambient + attenuation * (diffuse + specular), gamma), 1.0);
+
+				vec3 linearColor = vec3(0);
+				vec3 surfaceToView = normalize(u_ViewPos - surfacePos);
+				for (int i = 0; i < u_nLights; i++) {
+					linearColor += ComputeLight(u_Lights[i], normal, surfacePos, surfaceToView);
+				}
+
+				FragColor = vec4(pow(linearColor, gamma), 1.0);
 			}
 		)";
 
 		auto vShader = Objects::Shader(Objects::Shader::Type::Vertex, vertexSource);
-		if (!vShader.Compile()) {
-			return;
-		}
+		GAZE_ASSERT(vShader.Compile(), "Failed to compile Vertex shader");
 		auto fShader = Objects::Shader(Objects::Shader::Type::Fragment, fragmentSource);
-		if (!fShader.Compile()) {
-			return;
-		}
+		GAZE_ASSERT(fShader.Compile(), "Failed to compile Fragment shader");
 
 		m_pImpl= new Impl({
 			.vertexArray          = {},
@@ -214,14 +225,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 			.statsCurrent         = {},
 		});
 
+		GAZE_ASSERT(m_pImpl->program.Link(), "Failed to link shader program");
+
 		m_pImpl->vertexBufSects.resize(kStaticBufferSize / sizeof(BufferSection));
 		m_pImpl->vertexBufSectsCursor = m_pImpl->vertexBufSects.begin();
 		m_pImpl->indexBufSects.resize(kStaticBufferSize / sizeof(BufferSection));
 		m_pImpl->indexBufSectsCursor = m_pImpl->indexBufSects.begin();
-
-		if (!m_pImpl->program.Link()) {
-			return;
-		}
 
 		m_pImpl->vertexArray.Bind();
 		m_pImpl->vertexArray.SetIndexBuffer(&m_pImpl->indexBuf);
@@ -306,12 +315,15 @@ namespace Gaze::GFX::Platform::OpenGL {
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
 
-			const auto light = sect.lights[0];
+			for (auto i = 0; const auto& light : sect.lights) {
+				const auto uniform = std::format("u_Lights[{}]", i++);
 
-			m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
-			m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
-			m_pImpl->program.UploadUniform1F("u_Light.ambientCoefficient", light.ambientCoefficient);
-			m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
+				m_pImpl->program.UploadUniform3FV(std::format("{}.position", uniform), &(light.position[0]));
+				m_pImpl->program.UploadUniform3FV(std::format("{}.diffuse", uniform),  &(light.diffuse[0]));
+				m_pImpl->program.UploadUniform1F(std::format("{}.ambientCoefficient", uniform), light.ambientCoefficient);
+				m_pImpl->program.UploadUniform1F(std::format("{}.attenuation", uniform), light.attenuation);
+			}
+			m_pImpl->program.UploadUniform1I("u_nLights", sect.nLights);
 
 			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.properties.transform[0][0]));
 			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.properties.material.diffuse[0]));
