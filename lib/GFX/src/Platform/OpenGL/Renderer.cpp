@@ -13,6 +13,7 @@
 #include <GLFW/glfw3.h>
 
 #include <cstdio>
+#include <type_traits>
 #include <unordered_map>
 
 namespace Gaze::GFX::Platform::OpenGL {
@@ -76,6 +77,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		);
 	}
 
+	static constexpr auto kMaxLights = 8;
+
 	struct BufferSection
 	{
 		I32 offset;
@@ -83,6 +86,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 		Renderer::PrimitiveMode mode;
 		Mesh::Properties        properties;
+		Light                   lights[kMaxLights];
+		I32                     nLights;
 	};
 
 	struct Renderer::Impl
@@ -284,21 +289,8 @@ namespace Gaze::GFX::Platform::OpenGL {
 		const auto view = m_pImpl->camera->ComputeViewMatrix();
 		const auto vp = m_pImpl->projection * view;
 
-		const auto light = Light {
-			.position = { 1.0F, 1.0F, -1.0F },
-			.diffuse = { .5F, .5F, .5F },
-			.specular = { 1.0F, 1.0F, 1.0F },
-			.ambientCoefficient = .05F,
-			.attenuation = .2F
-		};
-
 		m_pImpl->program.UploadUniform3FV("u_ViewPos", &(m_pImpl->camera->Position()[0]));
 		m_pImpl->program.UploadUniformMatrix4FV("u_vp", &(vp[0][0]));
-		m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
-		m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
-		m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
-		m_pImpl->program.UploadUniform1F("u_Light.ambientCoefficient", light.ambientCoefficient);
-		m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
 
 		for (auto it = m_pImpl->indexBufSects.cbegin(); it != m_pImpl->indexBufSectsCursor; ++it) {
 			const auto& sect = *it;
@@ -314,6 +306,14 @@ namespace Gaze::GFX::Platform::OpenGL {
 			case PrimitiveMode::TriangleFan:   drawMode = GL_TRIANGLE_FAN;   break;
 			default:                           drawMode = GL_TRIANGLES;      break;
 			}
+
+			const auto light = sect.lights[0];
+
+			m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
+			m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
+			m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
+			m_pImpl->program.UploadUniform1F("u_Light.ambientCoefficient", light.ambientCoefficient);
+			m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
 
 			m_pImpl->program.UploadUniformMatrix4FV("u_model", &(sect.properties.transform[0][0]));
 			m_pImpl->program.UploadUniform3FV("u_Material.diffuse", &(sect.properties.material.diffuse[0]));
@@ -371,6 +371,23 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::DrawMesh(const Mesh& mesh, PrimitiveMode mode) -> void
 	{
+		const auto lights = Light {
+			.position           = { 0.F, 0.F, 0.F },
+			.diffuse            = { 0.F, 0.F, 0.F },
+			.specular           = { 0.F, 0.F, 0.F },
+			.ambientCoefficient = 1.F,
+			.attenuation        = 1.F
+		};
+
+		DrawMesh(mesh, &lights, 1, mode);
+	}
+
+	auto Renderer::DrawMesh(const Mesh& mesh, const Light lights[], I32 nLights, PrimitiveMode mode) -> void
+	{
+		GAZE_ASSERT(lights != nullptr, "Missing lights");
+		GAZE_ASSERT(nLights > 0, "Must provide at least 1 light source");
+		GAZE_ASSERT(nLights <= 8, "Each Mesh may have a maximum of 8 light sources influencing it");
+
 		{
 			auto offset = 0;
 
@@ -382,14 +399,18 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset = last->offset + last->size;
 				}
 
-				*m_pImpl->vertexBufSectsCursor = {
-					BufferSection{
-						offset,
-						I32(prim.vertices.size() * mesh.kVertexSize),
-						mode,
-						{ mesh.Transform(), mesh.Material() }
-					}
+				auto sect = BufferSection{
+					offset,
+					I32(prim.vertices.size() * mesh.kVertexSize),
+					mode,
+					{ mesh.Transform(), mesh.Material() },
+					{},
+					nLights
 				};
+				static_assert(std::is_standard_layout_v<Light> && std::is_trivially_copyable_v<Light>);
+				memcpy(sect.lights, lights, nLights * sizeof(Light));
+
+				*m_pImpl->vertexBufSectsCursor = sect;
 				m_pImpl->vertexBufSectsCursor++;
 
 				m_pImpl->vertexBuf.Upload(
@@ -411,14 +432,18 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset = last->offset + last->size;
 				}
 
-				*m_pImpl->indexBufSectsCursor = {
-					BufferSection{
-						offset,
-						I32(prim.indices.size() * mesh.kIndexSize),
-						mode,
-						{ mesh.Transform(), mesh.Material() }
-					}
+				auto sect = BufferSection{
+					offset,
+					I32(prim.indices.size() * mesh.kIndexSize),
+					mode,
+					{ mesh.Transform(), mesh.Material() },
+					{},
+					nLights
 				};
+				static_assert(std::is_standard_layout_v<Light> && std::is_trivially_copyable_v<Light>);
+				memcpy(sect.lights, lights, nLights * sizeof(Light));
+
+				*m_pImpl->indexBufSectsCursor = sect;
 				m_pImpl->indexBufSectsCursor++;
 
 				m_pImpl->indexBuf.Upload(
