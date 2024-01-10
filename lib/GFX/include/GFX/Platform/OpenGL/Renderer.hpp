@@ -23,6 +23,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 		auto SetProjection(glm::mat4 projection)              noexcept -> void override;
 		auto SetCamera(Mem::Shared<Camera> camera)            noexcept -> void override;
 		auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)            -> void override;
+		auto DrawMesh(
+			const Mesh& mesh,
+			const Light lights[],
+			I32 nLights,
+			PrimitiveMode mode
+		) -> void override;
 
 	private:
 		Impl* m_pImpl{ nullptr };

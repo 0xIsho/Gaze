@@ -13,6 +13,7 @@
 #include "WM/Window.hpp"
 
 #include "GFX/Camera.hpp"
+#include "GFX/Light.hpp"
 #include "GFX/Renderer.hpp"
 #include "GFX/Primitives.hpp"
 
@@ -155,8 +156,8 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 {
 	m_Rdr->Clear();
 
-	const auto greenMat = GFX::Material{
-		{ 0.F, 1.F, 0.F },
+	const auto whiteMat = GFX::Material{
+		{ 1.F, 1.F, 1.F },
 		{ .5F, .5F, .5F },
 		32.F
 	};
@@ -212,25 +213,39 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 			6 + 16, 3 + 16, 2 + 16
 		}
 	};
-	cube.SetMaterial(greenMat);
+	cube.SetMaterial(whiteMat);
 
-	m_Rdr->DrawMesh(cube, GFX::Renderer::PrimitiveMode::Triangles);
+	const GFX::Light lights[] = {
+		{
+			.position           = { -5.F, 1.F, 5.F },
+			.diffuse            = {  3.F, 0.F, 0.F },
+			.ambientCoefficient = .005F,
+			.attenuation        = .5F,
+		},
+		{
+			.position           = { 5.F, 1.F, 5.F },
+			.diffuse            = { 0.F, 3.F, 0.F },
+			.ambientCoefficient = .005F,
+			.attenuation        = .5F,
+		},
+		{
+			.position           = { 5.F, 1.F, -5.F },
+			.diffuse            = { 0.F, 0.F,  3.F },
+			.ambientCoefficient = .005F,
+			.attenuation        = .5F,
+		},
+		{
+			.position           = { -5.F, 1.F, -5.F },
+			.diffuse            = {  3.F, 3.F,  3.F },
+			.ambientCoefficient = .005F,
+			.attenuation        = .5F,
+		}
+	};
 
-	m_Rdr->DrawMesh(GFX::CreateTriangle({{
-		{  5.0F, 3.0F,  0.0F },
-		{  0.0F, 3.0F, -5.0F },
-		{ -5.0F, 3.0F,  5.0F },
-	}}), GFX::Renderer::PrimitiveMode::Triangles);
-	m_Rdr->DrawMesh(GFX::CreateTriangle({{
-		{  5.0F, -3.0F,  0.0F },
-		{  0.0F, -3.0F, -5.0F },
-		{ -5.0F, -3.0F,  5.0F },
-	}}), GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->DrawMesh(cube, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
 
-	auto plane = GFX::CreateQuad({ 0.0F, -1.0F, 0.0F }, 10, 10);
-	m_Rdr->DrawMesh(plane, GFX::Renderer::PrimitiveMode::Triangles);
-	plane.SetPosition({ 0.0F, 1.0F, 0.0F });
-	m_Rdr->DrawMesh(plane, GFX::Renderer::PrimitiveMode::Triangles);
+	auto plane = GFX::CreateQuad({ 0.0F, 0.0F, 0.0F }, 10, 10);
+	m_Rdr->DrawMesh(plane, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
 
 	for (auto i = -10.F; i <= 10.F; i += .5F) {
 		m_Rdr->DrawMesh(GFX::CreateLine({ i, .0F, -10.F }, { i, .0F, 10.F }), GFX::Renderer::PrimitiveMode::Lines);

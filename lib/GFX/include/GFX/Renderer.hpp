@@ -56,6 +56,12 @@ namespace Gaze::GFX {
 		virtual auto SetProjection(glm::mat4 projection)                        noexcept -> void = 0;
 		virtual auto SetCamera(Mem::Shared<Camera> camera)                      noexcept -> void = 0;
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)                      -> void = 0;
+		virtual auto DrawMesh(
+			const Mesh& mesh,
+			const struct Light lights[],
+			I32 nLights,
+			PrimitiveMode mode
+		) -> void = 0;
 
 	protected:
 		[[nodiscard]] auto Window() const noexcept -> const WM::Window&;
