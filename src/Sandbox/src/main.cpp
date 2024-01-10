@@ -156,8 +156,8 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 {
 	m_Rdr->Clear();
 
-	const auto greenMat = GFX::Material{
-		{ 0.F, 1.F, 0.F },
+	const auto whiteMat = GFX::Material{
+		{ 1.F, 1.F, 1.F },
 		{ .5F, .5F, .5F },
 		32.F
 	};
@@ -213,7 +213,7 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 			6 + 16, 3 + 16, 2 + 16
 		}
 	};
-	cube.SetMaterial(greenMat);
+	cube.SetMaterial(whiteMat);
 
 	const GFX::Light lights[] = {
 		{
