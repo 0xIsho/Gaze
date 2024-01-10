@@ -7,7 +7,6 @@ namespace Gaze::GFX {
 	{
 		glm::vec3 position;
 		glm::vec3 diffuse;
-		glm::vec3 specular;
 		float     ambientCoefficient;
 		float     attenuation;
 	};

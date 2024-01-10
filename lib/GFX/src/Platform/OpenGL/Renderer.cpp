@@ -156,7 +156,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 			{
 				vec3 position;
 				vec3 diffuse;
-				vec3 specular;
 				float ambientCoefficient;
 				float attenuation;
 			};
@@ -180,7 +179,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 				if (diffuseCoefficient > 0) {
 					vec3 surfaceToView = normalize(u_ViewPos - surfacePos);
 					float specularCoefficient = pow(max(0.0, dot(surfaceToView, reflect(-lightDir, normal))), u_Material.shininess);
-					specular = specularCoefficient * u_Material.specular * u_Light.specular;
+					specular = specularCoefficient * u_Material.specular * light.diffuse;
 				}
 
 				vec3 ambient = u_Light.ambientCoefficient * u_Light.diffuse * u_Material.diffuse.rgb;
@@ -311,7 +310,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 			m_pImpl->program.UploadUniform3FV("u_Light.position", &(light.position[0]));
 			m_pImpl->program.UploadUniform3FV("u_Light.diffuse",  &(light.diffuse[0]));
-			m_pImpl->program.UploadUniform3FV("u_Light.specular", &(light.specular[0]));
 			m_pImpl->program.UploadUniform1F("u_Light.ambientCoefficient", light.ambientCoefficient);
 			m_pImpl->program.UploadUniform1F("u_Light.attenuation", light.attenuation);
 
@@ -374,7 +372,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		const auto lights = Light {
 			.position           = { 0.F, 0.F, 0.F },
 			.diffuse            = { 0.F, 0.F, 0.F },
-			.specular           = { 0.F, 0.F, 0.F },
 			.ambientCoefficient = 1.F,
 			.attenuation        = 1.F
 		};
