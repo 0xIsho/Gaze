@@ -2,6 +2,10 @@
 
 #include "Core/Type.hpp"
 
+#include "Net/Server.hpp"
+#include "Net/Client.hpp"
+#include "Net/Packet.hpp"
+
 namespace Gaze::Client {
 	class App
 	{
@@ -13,20 +17,56 @@ namespace Gaze::Client {
 		};
 
 	public:
-		App(int argc, char** argv) noexcept;
+		App(int argc, char** argv);
 		virtual ~App();
 
-		[[nodiscard]] auto Run()  noexcept -> Status;
-		              auto Quit() noexcept -> void;
+		[[nodiscard]] auto Start()           noexcept -> Status;
+		[[nodiscard]] auto IsRunning() const noexcept -> bool;
+		              auto Quit()            noexcept -> void;
 
-	private:
-		virtual auto OnInit() -> Status = 0;
-		virtual auto OnUpdate(F64 deltaTime) -> void = 0;
-		virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
-		virtual auto OnShutdown() -> Status = 0;
+	protected:
+		[[nodiscard]] virtual auto Run()                   -> Status = 0;
+		[[nodiscard]] virtual auto OnInit()                -> Status = 0;
+		              virtual auto OnUpdate(F64 deltaTime) -> void = 0;
+		[[nodiscard]] virtual auto OnShutdown()            -> Status = 0;
+		              virtual auto OnFixedUpdate(F64 /*deltaTime*/) -> void { }
+		virtual auto OnPacketReceived(U32 /*sender*/, Net::Packet /*packet*/) -> void { };
 
-	private:
+	protected:
 		bool m_IsRunning = false;
+	};
+
+	class ClientApp : public App
+	{
+	public:
+		ClientApp(int argc, char** argv);
+		virtual ~ClientApp();
+
+	protected:
+		[[nodiscard]] auto Run() -> Status override;
+
+		auto Send(Net::Packet packet, U8 channel = 0) -> bool;
+
+	private:
+		Net::Client m_Client;
+	};
+
+	class ServerApp : public App
+	{
+	public:
+		ServerApp(int argc, char** argv);
+		virtual ~ServerApp();
+
+	protected:
+		[[nodiscard]] auto Run() -> Status override;
+
+		auto Send(U32 peerID, Net::Packet packet, U8 channel = 0) -> bool;
+		auto Broadcast(Net::Packet packet, U8 channel = 0) -> void;
+
+		virtual auto OnClientConnected(U32 /*clientID*/) -> void { }
+
+	private:
+		Net::Server m_Server;
 	};
 
 	auto CreateApp(int argc, char** argv) -> Mem::Unique<App>;

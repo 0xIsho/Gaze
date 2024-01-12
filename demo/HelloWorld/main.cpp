@@ -4,7 +4,7 @@
 
 using namespace Gaze;
 
-class MyApp : public Client::App
+class MyApp : public Client::ClientApp
 {
 public:
 	MyApp(int argc, char** argv);
@@ -16,7 +16,7 @@ private:
 };
 
 MyApp::MyApp(int argc, char** argv)
-	: App(argc, argv)
+	: ClientApp(argc, argv)
 {
 }
 

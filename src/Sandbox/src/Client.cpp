@@ -19,12 +19,9 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <iostream>
-#include <iomanip>
-
 using namespace Gaze;
 
-class MyApp : public Gaze::Client::App
+class MyApp : public Client::ClientApp
 {
 public:
 	MyApp(int argc, char** argv);
@@ -34,6 +31,7 @@ private:
 	auto OnUpdate(F64 deltaTime) -> void override;
 	auto OnFixedUpdate(F64 deltaTime) -> void override;
 	auto OnShutdown() -> Status override;
+	auto OnPacketReceived(U32 sender, Net::Packet packet) -> void override;
 
 private:
 	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
@@ -47,7 +45,7 @@ private:
 };
 
 MyApp::MyApp(int argc, char** argv)
-	: App(argc, argv)
+	: ClientApp(argc, argv)
 	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
 	, m_Cam(Mem::MakeShared<Gaze::GFX::Camera>())
 {
@@ -270,6 +268,11 @@ auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
 auto MyApp::OnShutdown() -> Status
 {
 	return Status::Success;
+}
+
+auto MyApp::OnPacketReceived(U32 sender, Net::Packet packet) -> void
+{
+	printf("Packet received from %u: %s\n", sender, static_cast<const char*>(packet.Data()));
 }
 
 GAZE_REGISTER_APP(MyApp);

@@ -5,6 +5,7 @@ set(LIBS
 	Events
 	GFX
 	Input
+	Net
 	WM
 )
 

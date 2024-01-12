@@ -20,6 +20,7 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
 	PUBLIC
 		Gaze::Core
+		Gaze::Net
 
 	PRIVATE
 		Gaze::Debug
