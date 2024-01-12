@@ -6,12 +6,14 @@
 
 #include "Net/Core.hpp"
 
-#include <thread>
-#include <chrono>
-#include <stdexcept>
 
 #include "Net/Packet.hpp"
+
+#include <thread>
+#include <chrono>
 #include <cstring>
+#include <iostream>
+#include <stdexcept>
 
 namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/)
@@ -65,8 +67,14 @@ namespace Gaze::Client {
 			throw std::runtime_error("Failed to initialize the window manager.");
 		}
 
-		// Ignore errors. Connection will be retried in Run() if unsuccessful
-		(void)m_Client.Connect("127.0.0.1", 54321);
+		std::jthread([this] {
+			constexpr auto maxRetries = 5;
+			auto currentTry = 0;
+
+			while (!m_Client.Connect("127.0.0.1", 54321) && currentTry++ < maxRetries) {
+				std::cerr << "Server connection failed. Retrying " << currentTry << '/' << maxRetries << '\n';
+			}
+		}).detach();
 	}
 
 	ClientApp::~ClientApp()
