@@ -5,6 +5,7 @@ add_executable(${CLIENT_TARGET} "src/Client.cpp")
 append_common_compiler_options(${CLIENT_TARGET})
 target_link_libraries(${CLIENT_TARGET}
 	PRIVATE
+		Gaze::Physics
 		Gaze::Client
 		Gaze::Input
 		Gaze::GFX

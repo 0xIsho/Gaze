@@ -17,7 +17,13 @@
 #include "GFX/Renderer.hpp"
 #include "GFX/Primitives.hpp"
 
+#include "Physics/World.hpp"
+#include "Physics/Shape.hpp"
+#include "Physics/Rigidbody.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <iostream>
 
 using namespace Gaze;
 
@@ -34,14 +40,17 @@ private:
 	auto OnPacketReceived(U32 sender, Net::Packet packet) -> void override;
 
 private:
-	Gaze::Mem::Shared<Gaze::WM::Window> m_Win;
 	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
-	Gaze::Mem::Shared<Gaze::GFX::Camera> m_Cam;
+	Mem::Shared<Gaze::WM::Window> m_Win;
+	Mem::Shared<Gaze::GFX::Camera> m_Cam;
 
 	glm::vec3 m_CameraDir{};
 
 	double m_Yaw{};
 	double m_Pitch{};
+
+	Physics::World m_PhysicsWorld;
+	Mem::Shared<Physics::Rigidbody> m_RbCube;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -54,6 +63,13 @@ MyApp::MyApp(int argc, char** argv)
 
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->Clear();
+
+	m_PhysicsWorld.AddRigidbody(Mem::MakeShared<Physics::Rigidbody>(Mem::MakeShared<Physics::BoxShape>(10.F, .0002F, 10.F), 0.F));
+	m_RbCube = Mem::MakeShared<Physics::Rigidbody>(Mem::MakeShared<Physics::BoxShape>(1.F, 1.F, 1.F));
+	m_RbCube->SetOrigin(0, 10, 0);
+	m_RbCube->SetRotation({ 1, 1, 1 }, glm::radians(45.F));
+
+	m_PhysicsWorld.AddRigidbody(m_RbCube);
 }
 
 auto MyApp::OnInit() -> Status
@@ -94,6 +110,11 @@ auto MyApp::OnInit() -> Status
 		});
 
 		dispatcher.Dispatch<Events::KeyPressed>([this](auto& event) {
+			if (event.Keycode() == Input::Key::kSpace) {
+				m_RbCube->SetOrigin(0, 10, 0);
+				m_RbCube->SetRotation({ 1, 1, 1 }, glm::radians(45.F));
+			}
+
 			if (event.Keycode() == Input::Key::kW) {
 				m_CameraDir.z += 1;
 			}
@@ -163,32 +184,32 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 	auto cube = GFX::Mesh{
 		{
 			// Back-Front
-			{{  0.5F, 1.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
-			{{ -0.5F, 1.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
-			{{ -0.5F, 0.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
-			{{  0.5F, 0.0F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
-			{{ -0.5F, 1.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
-			{{  0.5F, 1.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
-			{{  0.5F, 0.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
-			{{ -0.5F, 0.0F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{  0.5F,  0.5F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{ -0.5F,  0.5F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{ -0.5F, -0.5F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{  0.5F, -0.5F,  0.5F }, { 0.0F, 0.0F,  1.0F }},
+			{{ -0.5F,  0.5F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{  0.5F,  0.5F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{  0.5F, -0.5F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
+			{{ -0.5F, -0.5F, -0.5F }, { 0.0F, 0.0F, -1.0F }},
 			// Left-Right
-			{{  0.5F, 1.0F,  0.5F }, {  1.0F, 0.0F, 0.0F }},
-			{{ -0.5F, 1.0F,  0.5F }, { -1.0F, 0.0F, 0.0F }},
-			{{ -0.5F, 0.0F,  0.5F }, { -1.0F, 0.0F, 0.0F }},
-			{{  0.5F, 0.0F,  0.5F }, {  1.0F, 0.0F, 0.0F }},
-			{{ -0.5F, 1.0F, -0.5F }, { -1.0F, 0.0F, 0.0F }},
-			{{  0.5F, 1.0F, -0.5F }, {  1.0F, 0.0F, 0.0F }},
-			{{  0.5F, 0.0F, -0.5F }, {  1.0F, 0.0F, 0.0F }},
-			{{ -0.5F, 0.0F, -0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{  0.5F,  0.5F,  0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{ -0.5F,  0.5F,  0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{ -0.5F, -0.5F,  0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{  0.5F, -0.5F,  0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{ -0.5F,  0.5F, -0.5F }, { -1.0F, 0.0F, 0.0F }},
+			{{  0.5F,  0.5F, -0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{  0.5F, -0.5F, -0.5F }, {  1.0F, 0.0F, 0.0F }},
+			{{ -0.5F, -0.5F, -0.5F }, { -1.0F, 0.0F, 0.0F }},
 			// Bottom-Top
-			{{  0.5F, 1.0F,  0.5F }, { 0.0F,  1.0F, 0.0F }},
-			{{ -0.5F, 1.0F,  0.5F }, { 0.0F,  1.0F, 0.0F }},
-			{{ -0.5F, 0.0F,  0.5F }, { 0.0F, -1.0F, 0.0F }},
-			{{  0.5F, 0.0F,  0.5F }, { 0.0F, -1.0F, 0.0F }},
-			{{ -0.5F, 1.0F, -0.5F }, { 0.0F,  1.0F, 0.0F }},
-			{{  0.5F, 1.0F, -0.5F }, { 0.0F,  1.0F, 0.0F }},
-			{{  0.5F, 0.0F, -0.5F }, { 0.0F, -1.0F, 0.0F }},
-			{{ -0.5F, 0.0F, -0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{  0.5F,  0.5F,  0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{ -0.5F,  0.5F,  0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{ -0.5F, -0.5F,  0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{  0.5F, -0.5F,  0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{ -0.5F,  0.5F, -0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{  0.5F,  0.5F, -0.5F }, { 0.0F,  1.0F, 0.0F }},
+			{{  0.5F, -0.5F, -0.5F }, { 0.0F, -1.0F, 0.0F }},
+			{{ -0.5F, -0.5F, -0.5F }, { 0.0F, -1.0F, 0.0F }},
 		},
 		{
 			// Front
@@ -240,15 +261,12 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 		}
 	};
 
+	cube.SetPosition(m_RbCube->Origin());
+	cube.Rotate(m_RbCube->RotationAngle(), m_RbCube->RotationAxis());
 	m_Rdr->DrawMesh(cube, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
 
 	auto plane = GFX::CreateQuad({ 0.0F, 0.0F, 0.0F }, 10, 10);
 	m_Rdr->DrawMesh(plane, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
-
-	for (auto i = -10.F; i <= 10.F; i += .5F) {
-		m_Rdr->DrawMesh(GFX::CreateLine({ i, .0F, -10.F }, { i, .0F, 10.F }), GFX::Renderer::PrimitiveMode::Lines);
-		m_Rdr->DrawMesh(GFX::CreateLine({ -10.F, .0F, i }, { 10.F, .0F, i }), GFX::Renderer::PrimitiveMode::Lines);
-	}
 
 	m_Rdr->DrawMesh(GFX::CreateLine({ -10, 0, 0 }, { 10, 0, 0 }), GFX::Renderer::PrimitiveMode::Lines);
 	m_Rdr->DrawMesh(GFX::CreateLine({ 0, -10, 0 }, { 0, 10, 0 }), GFX::Renderer::PrimitiveMode::Lines);
@@ -259,6 +277,8 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 
 auto MyApp::OnFixedUpdate(F64 deltaTime) -> void
 {
+	m_PhysicsWorld.Update(deltaTime);
+
 	constexpr auto cameraSpeed = 2.0F;
 	m_Cam->Move(m_Cam->Front()  * m_CameraDir.z * cameraSpeed * F32(deltaTime));
 	m_Cam->Move(m_Cam->Up()     * m_CameraDir.y * cameraSpeed * F32(deltaTime));

@@ -6,6 +6,7 @@ set(LIBS
 	GFX
 	Input
 	Net
+	Physics
 	WM
 )
 
