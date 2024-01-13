@@ -37,7 +37,6 @@ private:
 	auto RenderPlayground() -> void;
 	auto RenderPlayers()    -> void;
 	auto RenderScoreboard() -> void;
-	auto HandleCollision()  -> void;
 
 private:
 	Mem::Shared<WM::Window>    m_Win;
