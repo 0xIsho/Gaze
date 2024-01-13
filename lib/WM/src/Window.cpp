@@ -84,10 +84,7 @@ namespace Gaze::WM {
 
 	Window::~Window()
 	{
-		if (m_Handle) {
-			glfwDestroyWindow(m_Handle);
-			m_Handle = nullptr;
-		}
+		Close();
 	}
 
 	Window::Window(Window&& other) noexcept
@@ -130,6 +127,7 @@ namespace Gaze::WM {
 
 		if (m_Handle) {
 			glfwDestroyWindow(m_Handle);
+			m_Handle = nullptr;
 		}
 	}
 }
