@@ -10,6 +10,7 @@ This repository hosts the sources of the *Gaze Interactive Experiences Engine*.
 - [GLFW](https://glfw.org)
 - [GLM](https://github.com/g-truc/glm)
 - [ENet](http://sauerbraten.org/enet)
+- [Bullet](https://github.com/bulletphysics/bullet3)
 
 ## Build
 
