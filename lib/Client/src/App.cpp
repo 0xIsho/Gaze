@@ -46,9 +46,7 @@ namespace Gaze::Client {
 			return Status::Fail;
 		}
 
-		if (const auto ret = Run(); ret != Status::Success) {
-			return ret;
-		}
+		Run();
 
 		return OnShutdown();
 	} catch (...) {
@@ -86,11 +84,11 @@ namespace Gaze::Client {
 		}
 	}
 
-	auto ClientApp::Run() -> Status
+	auto ClientApp::Run() -> void
 	{
 		using namespace std::chrono;
 
-		auto deltaTime = 1.0 / 30.0;
+		auto timestep = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
 
 		constexpr auto fixedTimeStep = 1 / 60.0;
@@ -101,7 +99,7 @@ namespace Gaze::Client {
 		});
 
 		while (m_IsRunning) {
-			OnUpdate(deltaTime);
+			OnUpdate(timestep);
 			Gaze::WM::PollEvents();
 			m_Client.Update();
 
@@ -111,19 +109,17 @@ namespace Gaze::Client {
 			}
 
 			const auto frameEnd = steady_clock::now();
-			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
+			timestep = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
 
 			// Delta too large. Assume that a debugger took over and paused
 			// the engine's execution.
-			if (deltaTime > 5.0) {
-				deltaTime = 1.0F / 30.0F;
+			if (timestep > 5.0) {
+				timestep = 1.0 / 30.0;
 			}
 
-			accumulatedTimestep += deltaTime;
+			accumulatedTimestep += timestep;
 			frameBegin = frameEnd;
 		}
-
-		return Status::Success;
 	}
 
 	auto ClientApp::Send(Net::Packet packet, U8 channel /*= 0*/) -> bool
@@ -140,7 +136,7 @@ namespace Gaze::Client {
 	{
 	}
 
-	auto ServerApp::Run() -> Status
+	auto ServerApp::Run() -> void
 	{
 		using namespace std::chrono;
 
@@ -151,7 +147,7 @@ namespace Gaze::Client {
 			OnClientConnected(clientID);
 		});
 
-		auto deltaTime = 1.0 / 30.0;
+		auto timestep = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();
 
 		constexpr auto fixedTimeStep = 1 / 60.0;
@@ -159,7 +155,7 @@ namespace Gaze::Client {
 
 		while (m_IsRunning) {
 			m_Server.Update();
-			OnUpdate(deltaTime);
+			OnUpdate(timestep);
 
 			while (accumulatedTimestep >= fixedTimeStep) {
 				OnFixedUpdate(fixedTimeStep);
@@ -167,13 +163,11 @@ namespace Gaze::Client {
 			}
 
 			const auto frameEnd = steady_clock::now();
-			deltaTime = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
+			timestep = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
 
-			accumulatedTimestep += deltaTime;
+			accumulatedTimestep += timestep;
 			frameBegin = frameEnd;
 		}
-
-		return Status::Success;
 	}
 
 	auto ServerApp::Send(U32 peerID, Net::Packet packet, U8 channel /*= 0*/) -> bool
