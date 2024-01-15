@@ -37,6 +37,7 @@ namespace Gaze::GFX {
 
 	public:
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);
+		Mesh(std::vector<Vertex> vertices, std::vector<U32> indices);
 		Mesh(std::initializer_list<Primitive> primitives);
 
 		[[nodiscard]] auto Primitives()           const noexcept -> const std::vector<Primitive>&;

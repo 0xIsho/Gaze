@@ -10,6 +10,7 @@ target_link_libraries(${CLIENT_TARGET}
 		Gaze::Input
 		Gaze::GFX
 		Gaze::WM
+		Gaze::IO
 )
 
 add_executable(${SERVER_TARGET} "src/Server.cpp")
