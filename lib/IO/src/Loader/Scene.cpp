@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace Gaze::IO::Loader {
-	static auto ProcessScene(const aiScene* scene, std::vector<Mesh>& outMeshes) -> bool
+	static auto ProcessScene(const aiScene* scene, std::vector<Geometry::Mesh>& outMeshes) -> bool
 	{
 		if (!scene->HasMeshes()) {
 			return false;
@@ -18,9 +18,9 @@ namespace Gaze::IO::Loader {
 		for (auto i = 0U; i < scene->mNumMeshes; ++i) {
 			const auto* mesh = scene->mMeshes[i];
 
-			auto vertices = std::vector<Vertex>();
+			auto vertices = std::vector<Geometry::Vertex>();
 			for (auto j = 0U; j < mesh->mNumVertices; ++j) {
-				auto vertex = Vertex{
+				auto vertex = Geometry::Vertex {
 					.x = mesh->mVertices[j].x,
 					.y = mesh->mVertices[j].y,
 					.z = mesh->mVertices[j].z,
@@ -37,7 +37,7 @@ namespace Gaze::IO::Loader {
 				vertices.push_back(std::move(vertex));
 			}
 
-			auto indices = std::vector<unsigned int>();
+			auto indices = std::vector<Geometry::Index>();
 			for (auto j = 0U; j < mesh->mNumFaces; ++j) {
 				const auto face = mesh->mFaces[j];
 				std::copy(face.mIndices, face.mIndices + face.mNumIndices, std::back_inserter(indices));

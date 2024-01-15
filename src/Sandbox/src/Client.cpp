@@ -53,7 +53,7 @@ private:
 
 	Physics::World m_PhysicsWorld;
 	Mem::Shared<Physics::Rigidbody> m_RbCube;
-	Mem::Unique<GFX::Mesh> m_Suzanne;
+	Mem::Unique<GFX::Object> m_Suzanne;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -173,16 +173,7 @@ auto MyApp::OnInit() -> Status
 
 	auto sceneLoader = IO::Loader::Scene();
 	if (sceneLoader.Load("assets/3d/meshes/suzanne.obj")) {
-		auto vertices = std::vector<GFX::Vertex>();
-
-		for (const auto& vert : sceneLoader.Meshes()[0].vertices) {
-			vertices.emplace_back(GFX::Vertex{
-				{ vert.x, vert.y, vert.z },
-				{ vert.nx, vert.ny, vert.nz },
-			});
-		}
-
-		m_Suzanne = Mem::MakeUnique<GFX::Mesh>(std::move(vertices), sceneLoader.Meshes()[0].indices);
+		m_Suzanne = Mem::MakeUnique<GFX::Object>(sceneLoader.Meshes()[0]);
 
 		const auto whiteMat = GFX::Material{
 			{ 1.F, 1.F, 1.F },
@@ -190,7 +181,7 @@ auto MyApp::OnInit() -> Status
 			32.F
 		};
 
-		m_Suzanne->SetMaterial(whiteMat);
+		m_Suzanne->GetProperties().material = whiteMat;
 
 	} else {
 		std::cerr << "Failed to load scene" << std::endl;
@@ -231,7 +222,7 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 		}
 	};
 
-	m_Rdr->DrawMesh(*m_Suzanne, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
+	m_Rdr->SubmitObject(*m_Suzanne, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
 
 	auto plane = GFX::CreateQuad({ 0.0F, 0.0F, 0.0F }, 10, 10);
 

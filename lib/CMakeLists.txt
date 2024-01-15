@@ -3,6 +3,7 @@ set(LIBS
 	Core
 	Debug
 	Events
+	Geometry
 	GFX
 	Input
 	IO

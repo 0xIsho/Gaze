@@ -86,7 +86,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		I32 size;
 
 		Renderer::PrimitiveMode mode;
-		Mesh::Properties        properties;
+		Object::Properties      properties;
 		Light                   lights[kMaxLights];
 		I32                     nLights;
 	};
@@ -393,9 +393,54 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::DrawMesh(const Mesh& mesh, const Light lights[], I32 nLights, PrimitiveMode mode) -> void
 	{
+		auto primitives = std::vector<Geometry::Primitive>();
+		for (const auto& prim : mesh.Primitives()) {
+			auto vertices = std::vector<Geometry::Vertex>();
+
+			for (const auto& vert : prim.vertices) {
+				vertices.emplace_back(Geometry::Vertex {
+					.x = vert.position.x,
+					.y = vert.position.y,
+					.z = vert.position.z,
+					.nx = vert.normals.x,
+					.ny = vert.normals.y,
+					.nz = vert.normals.z
+				});
+			}
+			primitives.emplace_back(Geometry::Primitive { std::move(vertices), std::move(prim.indices) });
+		}
+
+		SubmitObject(
+			Object(
+				Geometry::Mesh(
+					std::move(primitives)),
+					{ mesh.Transform(), mesh.Material() }
+			),
+			lights,
+			nLights,
+			mode
+		);
+	}
+
+	auto Renderer::SubmitObject(const Object& object, PrimitiveMode mode) -> void
+	{
+		const auto lights = Light {
+			.position           = { 0.F, 0.F, 0.F },
+			.diffuse            = { 0.F, 0.F, 0.F },
+			.ambientCoefficient = 1.F,
+			.attenuation        = 1.F
+		};
+
+		SubmitObject(object, &lights, 1, mode);
+	}
+
+	auto Renderer::SubmitObject(const Object& object, const Light lights[], I32 nLights, PrimitiveMode mode) -> void
+	{
 		GAZE_ASSERT(lights != nullptr, "Missing lights");
 		GAZE_ASSERT(nLights > 0, "Must provide at least 1 light source");
 		GAZE_ASSERT(nLights <= 8, "Each Mesh may have a maximum of 8 light sources influencing it");
+
+		const auto& mesh = object.Mesh();
 
 		{
 			auto offset = 0;
@@ -412,12 +457,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset,
 					I32(prim.vertices.size() * mesh.kVertexSize),
 					mode,
-					{ mesh.Transform(), mesh.Material() },
+					object.GetProperties(),
 					{},
 					nLights
 				};
 				static_assert(std::is_standard_layout_v<Light> && std::is_trivially_copyable_v<Light>);
-				memcpy(sect.lights, lights, nLights * sizeof(Light));
+				memcpy(sect.lights, lights, size_t(nLights) * sizeof(Light));
 
 				*m_pImpl->vertexBufSectsCursor = sect;
 				m_pImpl->vertexBufSectsCursor++;
@@ -445,12 +490,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset,
 					I32(prim.indices.size() * mesh.kIndexSize),
 					mode,
-					{ mesh.Transform(), mesh.Material() },
+					object.GetProperties(),
 					{},
 					nLights
 				};
 				static_assert(std::is_standard_layout_v<Light> && std::is_trivially_copyable_v<Light>);
-				memcpy(sect.lights, lights, nLights * sizeof(Light));
+				memcpy(sect.lights, lights, size_t(nLights) * sizeof(Light));
 
 				*m_pImpl->indexBufSectsCursor = sect;
 				m_pImpl->indexBufSectsCursor++;

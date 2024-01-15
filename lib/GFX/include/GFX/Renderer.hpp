@@ -5,6 +5,7 @@
 #include "GFX/API.hpp"
 #include "GFX/Camera.hpp"
 #include "GFX/Mesh.hpp"
+#include "GFX/Object.hpp"
 
 #include "WM/Window.hpp"
 
@@ -55,9 +56,18 @@ namespace Gaze::GFX {
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height)           noexcept -> void = 0;
 		virtual auto SetProjection(glm::mat4 projection)                        noexcept -> void = 0;
 		virtual auto SetCamera(Mem::Shared<Camera> camera)                      noexcept -> void = 0;
+		[[deprecated("Use SubmitObject()")]]
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)                      -> void = 0;
+		[[deprecated("Use SubmitObject()")]]
 		virtual auto DrawMesh(
 			const Mesh& mesh,
+			const struct Light lights[],
+			I32 nLights,
+			PrimitiveMode mode
+		) -> void = 0;
+		virtual auto SubmitObject(const Object& object, PrimitiveMode mode)              -> void = 0;
+		virtual auto SubmitObject(
+			const Object& object,
 			const struct Light lights[],
 			I32 nLights,
 			PrimitiveMode mode

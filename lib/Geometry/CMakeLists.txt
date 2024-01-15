@@ -1,13 +1,11 @@
-set(TARGET IO)
-
-find_package(assimp REQUIRED)
+set(TARGET Geometry)
 
 set(HEADERS
-	"include/IO/Loader/Scene.hpp"
+	"include/Geometry/Mesh.hpp"
 )
 
 set(SOURCES
-	"src/Loader/Scene.cpp"
+	"src/Mesh.cpp"
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -17,17 +15,11 @@ append_common_compiler_options(${TARGET})
 target_include_directories(${TARGET}
 	PUBLIC
 		"include/"
-
-	PRIVATE
-		${ASSIMP_INCLUDE_DIRS}
 )
 
 target_link_libraries(${TARGET}
 	PUBLIC
-		Gaze::Geometry
-
-	PRIVATE
-		${ASSIMP_LIBRARIES}
+		Gaze::Core
 )
 
 if (GAZE_BUILD_TESTS)
