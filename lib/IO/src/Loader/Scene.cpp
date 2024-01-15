@@ -9,14 +9,14 @@
 #include <iostream>
 
 namespace Gaze::IO::Loader {
-	static auto ProcessScene(const aiScene* scene, std::vector<Geometry::Mesh>& outMeshes) -> bool
+	static auto ProcessNode(const aiNode* node, const aiScene* scene, std::vector<Geometry::Mesh>& outMeshes) -> void
 	{
-		if (!scene->HasMeshes()) {
-			return false;
+		if (node == nullptr) {
+			return;
 		}
 
-		for (auto i = 0U; i < scene->mNumMeshes; ++i) {
-			const auto* mesh = scene->mMeshes[i];
+		for (auto i = 0U; i < node->mNumMeshes; ++i) {
+			const auto* mesh = scene->mMeshes[node->mMeshes[i]];
 
 			auto vertices = std::vector<Geometry::Vertex>();
 			for (auto j = 0U; j < mesh->mNumVertices; ++j) {
@@ -46,6 +46,18 @@ namespace Gaze::IO::Loader {
 			outMeshes.emplace_back(std::move(vertices), std::move(indices));
 		}
 
+		for (auto i = 0U; i < node->mNumChildren; ++i) {
+			ProcessNode(node->mChildren[i], scene, outMeshes);
+		}
+	}
+
+	static auto ProcessScene(const aiScene* scene, std::vector<Geometry::Mesh>& outMeshes) -> bool
+	{
+		if (!scene->HasMeshes()) {
+			return false;
+		}
+
+		ProcessNode(scene->mRootNode, scene, outMeshes);
 		return true;
 	}
 

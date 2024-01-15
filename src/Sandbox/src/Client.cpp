@@ -53,7 +53,7 @@ private:
 
 	Physics::World m_PhysicsWorld;
 	Mem::Shared<Physics::Rigidbody> m_RbCube;
-	Mem::Unique<GFX::Object> m_Suzanne;
+	std::vector<GFX::Object> m_Objects;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -173,15 +173,16 @@ auto MyApp::OnInit() -> Status
 
 	auto sceneLoader = IO::Loader::Scene();
 	if (sceneLoader.Load("assets/3d/meshes/suzanne.obj")) {
-		m_Suzanne = Mem::MakeUnique<GFX::Object>(sceneLoader.Meshes()[0]);
-
 		const auto whiteMat = GFX::Material{
 			{ 1.F, 1.F, 1.F },
 			{ .5F, .5F, .5F },
 			32.F
 		};
 
-		m_Suzanne->GetProperties().material = whiteMat;
+		for (const auto& mesh : sceneLoader.Meshes()) {
+			m_Objects.emplace_back(GFX::Object{ mesh });
+			m_Objects.back().GetProperties().material = whiteMat;
+		}
 
 	} else {
 		std::cerr << "Failed to load scene" << std::endl;
@@ -222,13 +223,9 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 		}
 	};
 
-	m_Rdr->SubmitObject(*m_Suzanne, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
-
-	auto plane = GFX::CreateQuad({ 0.0F, 0.0F, 0.0F }, 10, 10);
-
-	m_Rdr->DrawMesh(GFX::CreateLine({ -10, 0, 0 }, { 10, 0, 0 }), GFX::Renderer::PrimitiveMode::Lines);
-	m_Rdr->DrawMesh(GFX::CreateLine({ 0, -10, 0 }, { 0, 10, 0 }), GFX::Renderer::PrimitiveMode::Lines);
-	m_Rdr->DrawMesh(GFX::CreateLine({ 0, 0, -10 }, { 0, 0, 10 }), GFX::Renderer::PrimitiveMode::Lines);
+	for (const auto& object : m_Objects) {
+		m_Rdr->SubmitObject(object, lights, std::size(lights), GFX::Renderer::PrimitiveMode::Triangles);
+	}
 
 	m_Rdr->Render();
 }
