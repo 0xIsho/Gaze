@@ -59,7 +59,12 @@ private:
 MyApp::MyApp(int argc, char** argv)
 	: ClientApp(argc, argv)
 	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
-	, m_Cam(Mem::MakeShared<Gaze::GFX::Camera>())
+	, m_Cam(Mem::MakeShared<Gaze::GFX::PerspectiveCamera>(
+		glm::radians(75.F),
+		F32(m_Win->Width()) / F32(m_Win->Height()),
+		.1F,
+		100.F
+	))
 {
 	m_Cam->SetPosition({ 1.F, 1.F, 1.F });
 	m_Cam->SetFront({ -1.F, -1.F, -1.F });
@@ -167,7 +172,6 @@ auto MyApp::OnInit() -> Status
 
 	m_Win->Show();
 
-	m_Rdr->SetProjection(glm::perspective(glm::radians(75.F), F32(m_Win->Width()) / F32(m_Win->Height()), .1F, 100.F));
 	m_Rdr->SetCamera(m_Cam);
 	m_Rdr->SetClearColor(.1F, .1F, .1F, 1.F);
 

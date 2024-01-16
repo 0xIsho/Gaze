@@ -131,7 +131,7 @@ auto MyApp::OnInit() -> Status
 
 	m_Win->Show();
 
-	m_Rdr->SetProjection(glm::ortho(.0F, F32(kWinWidth), F32(kWinHeight), .0F, .1F, 10.F));
+	m_Rdr->SetCamera(Mem::MakeShared<GFX::OrthographicCamera>(.0F, F32(kWinWidth), F32(kWinHeight), .0F, .1F, 10.F));
 
 	return Status::Success;
 }

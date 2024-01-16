@@ -102,7 +102,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		std::vector<BufferSection>           indexBufSects;
 		std::vector<BufferSection>::iterator indexBufSectsCursor;
 		Mem::Shared<Camera>                  camera;
-		glm::mat4                            projection;
 		RenderStats                          stats;
 		RenderStats                          statsCurrent;
 	};
@@ -219,8 +218,14 @@ namespace Gaze::GFX::Platform::OpenGL {
 			.vertexBufSectsCursor = {},
 			.indexBufSects        = {},
 			.indexBufSectsCursor  = {},
-			.camera               = { Mem::MakeShared<Camera>() },
-			.projection           = { glm::mat4(1.0F) },
+			.camera               = {
+				Mem::MakeShared<PerspectiveCamera>(
+					glm::radians(75.F),
+					F32(Window().Width()) / F32(Window().Height()),
+					.1F,
+					100.F
+				)
+			},
 			.stats                = {},
 			.statsCurrent         = {},
 		});
@@ -294,8 +299,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		m_pImpl->vertexArray.Bind();
 		m_pImpl->program.Use();
 
-		const auto view = m_pImpl->camera->ComputeViewMatrix();
-		const auto vp = m_pImpl->projection * view;
+		const auto vp = m_pImpl->camera->ComputeProjectionMatrix() * m_pImpl->camera->ComputeViewMatrix();
 
 		m_pImpl->program.UploadUniform3FV("u_ViewPos", &(m_pImpl->camera->Position()[0]));
 		m_pImpl->program.UploadUniformMatrix4FV("u_vp", &(vp[0][0]));
@@ -367,11 +371,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 	auto Renderer::SetViewport(I32 x, I32 y, I32 width, I32 height) noexcept -> void
 	{
 		glViewport(x, y, width, height);
-	}
-
-	auto Renderer::SetProjection(glm::mat4 projection) noexcept -> void
-	{
-		m_pImpl->projection = std::move(projection);
 	}
 
 	auto Renderer::SetCamera(Mem::Shared<Camera> camera) noexcept -> void

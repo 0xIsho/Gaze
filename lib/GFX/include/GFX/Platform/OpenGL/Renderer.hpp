@@ -20,7 +20,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		auto MakeContextCurrent()                             noexcept -> void override;
 		auto Stats()                                          noexcept -> RenderStats override;
 		auto SetViewport(I32 x, I32 y, I32 width, I32 height) noexcept -> void override;
-		auto SetProjection(glm::mat4 projection)              noexcept -> void override;
 		auto SetCamera(Mem::Shared<Camera> camera)            noexcept -> void override;
 		auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)            -> void override;
 		auto DrawMesh(
