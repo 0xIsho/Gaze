@@ -36,7 +36,11 @@ namespace Gaze::GFX {
 		};
 
 	public:
+		[[deprecated("Use GFX::Object or Geometry::Mesh")]]
 		Mesh(std::initializer_list<Vertex> vertices, std::initializer_list<U32> indices);
+		[[deprecated("Use GFX::Object or Geometry::Mesh")]]
+		Mesh(std::vector<Vertex> vertices, std::vector<U32> indices);
+		[[deprecated("Use GFX::Object or Geometry::Mesh")]]
 		Mesh(std::initializer_list<Primitive> primitives);
 
 		[[nodiscard]] auto Primitives()           const noexcept -> const std::vector<Primitive>&;

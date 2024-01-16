@@ -11,6 +11,11 @@ namespace Gaze::GFX {
 	{
 	}
 
+	Mesh::Mesh(std::vector<Vertex> vertices, std::vector<U32> indices)
+		: Mesh({ Primitive{ std::move(vertices), std::move(indices) } })
+	{
+	}
+
 	Mesh::Mesh(std::initializer_list<Primitive> primitives)
 		: m_Primitives(std::move(primitives))
 		, m_Props(glm::mat4{ 1.0F }, { { 1.F, 1.F, 1.F }, { .5F, .5F, .5F }, 32.F })

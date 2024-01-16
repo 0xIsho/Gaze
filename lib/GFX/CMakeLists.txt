@@ -12,6 +12,7 @@ set(HEADERS
 	"include/GFX/Light.hpp"
 	"include/GFX/Material.hpp"
 	"include/GFX/Mesh.hpp"
+	"include/GFX/Object.hpp"
 	"include/GFX/Primitives.hpp"
 	"include/GFX/Renderer.hpp"
 
@@ -28,6 +29,7 @@ set(SOURCES
 	"src/API.cpp"
 	"src/Camera.cpp"
 	"src/Mesh.cpp"
+	"src/Object.cpp"
 	"src/Primitives.cpp"
 	"src/Renderer.cpp"
 
@@ -51,6 +53,7 @@ target_include_directories(${TARGET}
 
 target_link_libraries(${TARGET}
 	PUBLIC
+		Gaze::Geometry
 		Gaze::Debug
 		Gaze::Core
 		Gaze::WM

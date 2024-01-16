@@ -29,6 +29,13 @@ namespace Gaze::GFX::Platform::OpenGL {
 			I32 nLights,
 			PrimitiveMode mode
 		) -> void override;
+		auto SubmitObject(const Object& object, PrimitiveMode mode)    -> void override;
+		auto SubmitObject(
+			const Object& object,
+			const struct Light lights[],
+			I32 nLights,
+			PrimitiveMode mode
+		) -> void override;
 
 	private:
 		Impl* m_pImpl{ nullptr };

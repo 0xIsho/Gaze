@@ -3,8 +3,10 @@ set(LIBS
 	Core
 	Debug
 	Events
+	Geometry
 	GFX
 	Input
+	IO
 	Net
 	Physics
 	WM
