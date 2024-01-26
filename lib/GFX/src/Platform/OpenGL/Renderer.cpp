@@ -101,14 +101,14 @@ namespace Gaze::GFX::Platform::OpenGL {
 		std::vector<BufferSection>::iterator vertexBufSectsCursor;
 		std::vector<BufferSection>           indexBufSects;
 		std::vector<BufferSection>::iterator indexBufSectsCursor;
-		Mem::Shared<Camera>                  camera;
+		Shared<Camera>                  camera;
 		RenderStats                          stats;
 		RenderStats                          statsCurrent;
 	};
 
 	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
 
-	Renderer::Renderer(Mem::Shared<WM::Window> window) noexcept
+	Renderer::Renderer(Shared<WM::Window> window) noexcept
 		: GFX::Renderer(std::move(window))
 		, m_pImpl(nullptr)
 	{
@@ -219,7 +219,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			.indexBufSects        = {},
 			.indexBufSectsCursor  = {},
 			.camera               = {
-				Mem::MakeShared<PerspectiveCamera>(
+				MakeShared<PerspectiveCamera>(
 					glm::radians(75.F),
 					F32(Window().Width()) / F32(Window().Height()),
 					.1F,
@@ -373,7 +373,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glViewport(x, y, width, height);
 	}
 
-	auto Renderer::SetCamera(Mem::Shared<Camera> camera) noexcept -> void
+	auto Renderer::SetCamera(Shared<Camera> camera) noexcept -> void
 	{
 		m_pImpl->camera = std::move(camera);
 	}

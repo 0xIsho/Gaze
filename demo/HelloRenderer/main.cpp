@@ -20,13 +20,13 @@ private:
 	auto OnShutdown() -> Status override;
 
 private:
-	Mem::Shared<WM::Window> m_Win;
-	Mem::Shared<GFX::Renderer> m_Rdr;
+	Shared<WM::Window> m_Win;
+	Shared<GFX::Renderer> m_Rdr;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: ClientApp(argc, argv)
-	, m_Win(Mem::MakeShared<WM::Window>("Hello Renderer", 800, 600))
+	, m_Win(MakeShared<WM::Window>("Hello Renderer", 800, 600))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 {
 }

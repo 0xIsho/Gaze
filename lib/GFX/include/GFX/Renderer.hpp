@@ -44,7 +44,7 @@ namespace Gaze::GFX {
 		};
 
 	public:
-		Renderer(Mem::Shared<WM::Window> window) noexcept;
+		Renderer(Shared<WM::Window> window) noexcept;
 		virtual ~Renderer() = default;
 
 		virtual auto SetClearColor(F32 r, F32 g, F32 b, F32 a)                  noexcept -> void = 0;
@@ -54,7 +54,7 @@ namespace Gaze::GFX {
 		virtual auto MakeContextCurrent()                                       noexcept -> void = 0;
 		virtual auto Stats()                                                    noexcept -> RenderStats = 0;
 		virtual auto SetViewport(I32 x, I32 y, I32 width, I32 height)           noexcept -> void = 0;
-		virtual auto SetCamera(Mem::Shared<Camera> camera)                      noexcept -> void = 0;
+		virtual auto SetCamera(Shared<Camera> camera)                      noexcept -> void = 0;
 		[[deprecated("Use SubmitObject()")]]
 		virtual auto DrawMesh(const Mesh& mesh, PrimitiveMode mode)                      -> void = 0;
 		[[deprecated("Use SubmitObject()")]]
@@ -77,7 +77,7 @@ namespace Gaze::GFX {
 		[[nodiscard]] auto Window()       noexcept -> WM::Window&;
 
 	private:
-		Mem::Shared<WM::Window> m_Window;
+		Shared<WM::Window> m_Window;
 	};
 
 	inline auto Renderer::Window() const noexcept -> const WM::Window&
@@ -90,5 +90,5 @@ namespace Gaze::GFX {
 	}
 
 
-	auto CreateRenderer(Mem::Shared<WM::Window> window) -> Mem::Unique<Renderer>;
+	auto CreateRenderer(Shared<WM::Window> window) -> Unique<Renderer>;
 }

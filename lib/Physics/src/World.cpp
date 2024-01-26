@@ -12,22 +12,22 @@
 namespace Gaze::Physics {
 	struct World::Impl
 	{
-		Mem::Unique<btDefaultCollisionConfiguration>     config;
-		Mem::Unique<btCollisionDispatcher>               dispatcher;
-		Mem::Unique<btDbvtBroadphase>                    broadphase;
-		Mem::Unique<btSequentialImpulseConstraintSolver> solver;
-		Mem::Unique<btDiscreteDynamicsWorld>             world;
-		std::vector<Mem::Shared<Rigidbody>>              rigidbodies;
+		Unique<btDefaultCollisionConfiguration>     config;
+		Unique<btCollisionDispatcher>               dispatcher;
+		Unique<btDbvtBroadphase>                    broadphase;
+		Unique<btSequentialImpulseConstraintSolver> solver;
+		Unique<btDiscreteDynamicsWorld>             world;
+		std::vector<Shared<Rigidbody>>              rigidbodies;
 	};
 
 	World::World()
 		: m_pImpl(new Impl())
 	{
-		m_pImpl->config     = Mem::MakeUnique<btDefaultCollisionConfiguration>();
-		m_pImpl->dispatcher = Mem::MakeUnique<btCollisionDispatcher>(m_pImpl->config.get());
-		m_pImpl->broadphase = Mem::MakeUnique<btDbvtBroadphase>();
-		m_pImpl->solver     = Mem::MakeUnique<btSequentialImpulseConstraintSolver>();
-		m_pImpl->world      = Mem::MakeUnique<btDiscreteDynamicsWorld>(
+		m_pImpl->config     = MakeUnique<btDefaultCollisionConfiguration>();
+		m_pImpl->dispatcher = MakeUnique<btCollisionDispatcher>(m_pImpl->config.get());
+		m_pImpl->broadphase = MakeUnique<btDbvtBroadphase>();
+		m_pImpl->solver     = MakeUnique<btSequentialImpulseConstraintSolver>();
+		m_pImpl->world      = MakeUnique<btDiscreteDynamicsWorld>(
 			m_pImpl->dispatcher.get(),
 			m_pImpl->broadphase.get(),
 			m_pImpl->solver.get(),
@@ -47,7 +47,7 @@ namespace Gaze::Physics {
 		m_pImpl->world->stepSimulation(btScalar(timestep));
 	}
 
-	auto World::AddRigidbody(Mem::Shared<Rigidbody> body) -> void
+	auto World::AddRigidbody(Shared<Rigidbody> body) -> void
 	{
 		m_pImpl->world->addRigidBody(static_cast<btRigidBody*>(body->Handle()));
 		m_pImpl->rigidbodies.emplace_back(std::move(body));

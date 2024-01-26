@@ -96,48 +96,46 @@ namespace Gaze {
 		T m_Value;
 	};
 
-	namespace Mem {
-		/**
-		 * Unique pointer type
-		 */
-		template<typename T>
-		using Unique = std::unique_ptr<T>;
+	/**
+	 * Unique pointer type
+	 */
+	template<typename T>
+	using Unique = std::unique_ptr<T>;
 
-		/**
-		 * Shared pointer type
-		 */
-		template<typename T>
-		using Shared = std::shared_ptr<T>;
+	/**
+	 * Shared pointer type
+	 */
+	template<typename T>
+	using Shared = std::shared_ptr<T>;
 
-		/**
-		 * @brief Create a unique pointer
-		 *
-		 * @tparam T Type of the pointer
-		 * @tparam Args Types of the arguments
-		 * @param args Arguments to forward to the constructor of T
-		 *
-		 * @return Unique pointer to T
-		 */
-		template<typename T, typename... Args>
-		auto MakeUnique(Args&&... args)
-		{
-			return std::make_unique<T>(std::forward<Args>(args)...);
-		}
+	/**
+	 * @brief Create a unique pointer
+	 *
+	 * @tparam T Type of the pointer
+	 * @tparam Args Types of the arguments
+	 * @param args Arguments to forward to the constructor of T
+	 *
+	 * @return Unique pointer to T
+	 */
+	template<typename T, typename... Args>
+	auto MakeUnique(Args&&... args)
+	{
+		return std::make_unique<T>(std::forward<Args>(args)...);
+	}
 
-		/**
-		 * @brief Create a shared pointer
-		 *
-		 * @tparam T Type of the pointer
-		 * @tparam Args Types of the arguments
-		 * @param args Arguments to forward to the constructor of T
-		 *
-		 * @return Shared pointer to T
-		 */
-		template<typename T, typename... Args>
-		auto MakeShared(Args&&... args)
-		{
-			return std::make_shared<T>(std::forward<Args>(args)...);
-		}
+	/**
+	 * @brief Create a shared pointer
+	 *
+	 * @tparam T Type of the pointer
+	 * @tparam Args Types of the arguments
+	 * @param args Arguments to forward to the constructor of T
+	 *
+	 * @return Shared pointer to T
+	 */
+	template<typename T, typename... Args>
+	auto MakeShared(Args&&... args)
+	{
+		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 }
 

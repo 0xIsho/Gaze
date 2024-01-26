@@ -15,7 +15,7 @@ namespace Gaze::Physics {
 
 		auto Update(F64 timestep) -> void;
 
-		auto AddRigidbody(Mem::Shared<Rigidbody> body) -> void;
+		auto AddRigidbody(Shared<Rigidbody> body) -> void;
 
 		[[nodiscard]] auto Handle() const noexcept -> void*;
 

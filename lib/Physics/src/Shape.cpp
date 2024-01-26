@@ -8,7 +8,7 @@
 namespace Gaze::Physics {
 	struct Shape::Impl
 	{
-		Mem::Unique<btCollisionShape> handle;
+		Unique<btCollisionShape> handle;
 	};
 
 	Shape::Shape()
@@ -28,6 +28,6 @@ namespace Gaze::Physics {
 
 	BoxShape::BoxShape(float width, float height, float depth)
 	{
-		m_pImpl->handle = Mem::MakeUnique<btBoxShape>(btVector3(width / 2, height / 2, depth / 2));
+		m_pImpl->handle = MakeUnique<btBoxShape>(btVector3(width / 2, height / 2, depth / 2));
 	}
 }

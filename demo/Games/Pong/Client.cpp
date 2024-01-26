@@ -39,8 +39,8 @@ private:
 	auto RenderScoreboard() -> void;
 
 private:
-	Mem::Shared<WM::Window>    m_Win;
-	Mem::Unique<GFX::Renderer> m_Rdr;
+	Shared<WM::Window>    m_Win;
+	Unique<GFX::Renderer> m_Rdr;
 
 	glm::vec2                  m_P1Pos;
 	glm::vec2                  m_P1Dir;
@@ -63,7 +63,7 @@ private:
 
 MyApp::MyApp(int argc, char** argv)
 	: ClientApp(argc, argv)
-	, m_Win(Mem::MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
+	, m_Win(MakeShared<WM::Window>("Gaze - Pong", kWinWidth, kWinHeight))
 	, m_Rdr(GFX::CreateRenderer(m_Win))
 	, m_PaddleMesh(GFX::CreateQuad({ }, kPaddleSize.x, kPaddleSize.y))
 	, m_BallMesh(GFX::CreateQuad({ }, kBallSize, kBallSize))
@@ -131,7 +131,7 @@ auto MyApp::OnInit() -> Status
 
 	m_Win->Show();
 
-	m_Rdr->SetCamera(Mem::MakeShared<GFX::OrthographicCamera>(.0F, F32(kWinWidth), F32(kWinHeight), .0F, .1F, 10.F));
+	m_Rdr->SetCamera(MakeShared<GFX::OrthographicCamera>(.0F, F32(kWinWidth), F32(kWinHeight), .0F, .1F, 10.F));
 
 	return Status::Success;
 }

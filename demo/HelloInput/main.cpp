@@ -20,12 +20,12 @@ private:
 	auto OnShutdown() -> Status override;
 
 private:
-	Mem::Shared<WM::Window> m_Win;
+	Shared<WM::Window> m_Win;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: ClientApp(argc, argv)
-	, m_Win(Mem::MakeShared<WM::Window>("Hello Input", 800, 600))
+	, m_Win(MakeShared<WM::Window>("Hello Input", 800, 600))
 {
 }
 

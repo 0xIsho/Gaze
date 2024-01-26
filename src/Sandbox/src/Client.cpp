@@ -42,9 +42,9 @@ private:
 	auto OnPacketReceived(U32 sender, Net::Packet packet) -> void override;
 
 private:
-	Gaze::Mem::Unique<Gaze::GFX::Renderer> m_Rdr;
-	Mem::Shared<Gaze::WM::Window> m_Win;
-	Mem::Shared<Gaze::GFX::Camera> m_Cam;
+	Gaze::Unique<Gaze::GFX::Renderer> m_Rdr;
+	Shared<Gaze::WM::Window> m_Win;
+	Shared<Gaze::GFX::Camera> m_Cam;
 
 	glm::vec3 m_CameraDir{};
 
@@ -52,14 +52,14 @@ private:
 	double m_Pitch{};
 
 	Physics::World m_PhysicsWorld;
-	Mem::Shared<Physics::Rigidbody> m_RbCube;
+	Shared<Physics::Rigidbody> m_RbCube;
 	std::vector<GFX::Object> m_Objects;
 };
 
 MyApp::MyApp(int argc, char** argv)
 	: ClientApp(argc, argv)
-	, m_Win(Gaze::Mem::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
-	, m_Cam(Mem::MakeShared<Gaze::GFX::PerspectiveCamera>(
+	, m_Win(Gaze::MakeShared<Gaze::WM::Window>("Sandbox", 1280, 640))
+	, m_Cam(MakeShared<Gaze::GFX::PerspectiveCamera>(
 		glm::radians(75.F),
 		F32(m_Win->Width()) / F32(m_Win->Height()),
 		.1F,
@@ -72,8 +72,8 @@ MyApp::MyApp(int argc, char** argv)
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->Clear();
 
-	m_PhysicsWorld.AddRigidbody(Mem::MakeShared<Physics::Rigidbody>(Mem::MakeShared<Physics::BoxShape>(10.F, .0002F, 10.F), 0.F));
-	m_RbCube = Mem::MakeShared<Physics::Rigidbody>(Mem::MakeShared<Physics::BoxShape>(1.F, 1.F, 1.F));
+	m_PhysicsWorld.AddRigidbody(MakeShared<Physics::Rigidbody>(MakeShared<Physics::BoxShape>(10.F, .0002F, 10.F), 0.F));
+	m_RbCube = MakeShared<Physics::Rigidbody>(MakeShared<Physics::BoxShape>(1.F, 1.F, 1.F));
 	m_RbCube->SetOrigin(0, 10, 0);
 	m_RbCube->SetRotation({ 1, 1, 1 }, glm::radians(45.F));
 
