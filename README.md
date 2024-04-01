@@ -56,7 +56,7 @@ ctest --test-dir <build-path>
 
 | Platform | Support |
 | -------- | ------- |
-| Windows  | ❌      |
+| Windows  | ✔️      |
 | Linux    | ✔️      |
 | macOS    | ❌      |
 | Android  | ❌      |
