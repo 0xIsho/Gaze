@@ -1,7 +1,6 @@
 set(TARGET Net)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(ENet REQUIRED libenet)
+add_subdirectory("vendor/enet")
 
 set(HEADERS
 	"include/Net/Client.hpp"
@@ -25,9 +24,6 @@ append_common_compiler_options(${TARGET})
 target_include_directories(${TARGET}
 	PUBLIC
 		"include/"
-
-	PRIVATE
-		${ENet_INCLUDE_DIRS}
 )
 
 target_link_libraries(${TARGET}
@@ -35,13 +31,11 @@ target_link_libraries(${TARGET}
 		Gaze::Core
 		Gaze::Debug
 
-		${ENet_LIBRARIES}
+		enet
+
+		$<$<PLATFORM_ID:Windows>:wsock32;ws2_32;Winmm>
 )
 
-target_compile_options(${TARGET}
-	PRIVATE
-		${ENet_CFLAGS_OTHER}
-)
 
 if (GAZE_BUILD_TESTS)
 	add_subdirectory("tests/")

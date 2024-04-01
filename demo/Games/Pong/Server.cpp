@@ -11,6 +11,7 @@
 #include <glm/geometric.hpp>
 
 #include <cstring>
+#include <algorithm>
 
 using namespace Gaze;
 

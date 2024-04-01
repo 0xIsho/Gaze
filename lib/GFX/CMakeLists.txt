@@ -47,8 +47,6 @@ append_common_compiler_options(${TARGET})
 target_include_directories(${TARGET}
 	PUBLIC
 		"include/"
-
-		${GLM_INCLUDE_DIRS}
 )
 
 target_link_libraries(${TARGET}
@@ -57,6 +55,8 @@ target_link_libraries(${TARGET}
 		Gaze::Debug
 		Gaze::Core
 		Gaze::WM
+
+		glm::glm
 
 	PRIVATE
 		OpenGL::GL

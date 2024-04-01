@@ -9,6 +9,8 @@
 #		endif
 #	endif
 #	define GAZE_UNREACHABLE() __builtin_unreachable()
+#elif defined(GAZE_COMPILER_MSVC)
+#	define GAZE_UNREACHABLE() __assume(0)
 #endif
 
 #if !defined(GAZE_EXPECT)
