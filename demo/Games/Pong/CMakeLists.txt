@@ -21,8 +21,6 @@ target_link_libraries(${SERVER_TARGET}
 	PRIVATE
 		Gaze::Client
 		Gaze::Net
-)
-target_include_directories(${SERVER_TARGET}
-	PRIVATE
-		${GLM_INCLUDE_DIRS}
+
+		glm::glm
 )

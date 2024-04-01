@@ -22,9 +22,6 @@ append_common_compiler_options(${TARGET})
 target_include_directories(${TARGET}
 	PUBLIC
 		"include/"
-
-		${GLM_INCLUDE_DIRS}
-
 )
 
 target_include_directories(${TARGET}
@@ -34,6 +31,7 @@ target_include_directories(${TARGET}
 
 target_link_libraries(${TARGET}
 	PUBLIC
+		glm::glm
 
 	PUBLIC
 		Gaze::Core
