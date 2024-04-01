@@ -5,15 +5,19 @@ function (append_common_compiler_options TARGET)
     list(APPEND COMMON_COMPILE_OPTIONS
         # Debug configuration
         $<$<CONFIG:Debug>:
-            -Og
-            -ftrapv
+			$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+				-Og
+				-ftrapv
+			>
         >
         # Release configuration
         $<$<CONFIG:Release>:
-            -ftree-vectorize
-            -fstack-protector-strong
-            -fstack-clash-protection
-            -Wdisabled-optimization
+			$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+				-ftree-vectorize
+				-fstack-protector-strong
+				-fstack-clash-protection
+				-Wdisabled-optimization
+			>
         >
     )
 
@@ -88,9 +92,11 @@ function (append_common_compiler_options TARGET)
     # Link options ------------------------------------------------------------
 
     list(APPEND COMMON_LINK_OPTIONS
-        "LINKER:-z,now"
-        "LINKER:-z,relro"
-        "LINKER:-z,noexecstack"
+		$<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:
+			"LINKER:-z,now"
+			"LINKER:-z,relro"
+			"LINKER:-z,noexecstack"
+		>
     )
 
     # -------------------------------------------------------------------------
