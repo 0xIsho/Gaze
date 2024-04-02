@@ -32,6 +32,41 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release"
 			}
+		},
+		{
+			"name": "windows-base",
+			"hidden": true,
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"installDir": "${sourceDir}/out/install/${presetName}",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			},
+			"cacheVariables": {
+				"CMAKE_DEBUG_POSTFIX": "d"
+			},
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			}
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows x64 Debug",
+			"inherits": "windows-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows x64 Release",
+			"inherits": "windows-base",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
 		}
 	]
 }
