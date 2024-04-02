@@ -18,6 +18,8 @@ namespace Gaze::Net {
 
 		[[nodiscard]]
 		auto Connect(std::string_view host, U16 port) -> bool;
+		[[nodiscard]]
+		auto IsConnected() const -> bool;
 		auto Disconnect() -> void;
 
 		auto Update() -> void;

@@ -55,6 +55,16 @@ namespace Gaze::Net {
 		}
 	}
 
+	auto Client::IsConnected() const -> bool
+	{
+		return
+			m_pImpl->host->peers[0].state == ENET_PEER_STATE_CONNECTED ||
+			m_pImpl->host->peers[0].state == ENET_PEER_STATE_CONNECTING ||
+			m_pImpl->host->peers[0].state == ENET_PEER_STATE_ACKNOWLEDGING_CONNECT ||
+			m_pImpl->host->peers[0].state == ENET_PEER_STATE_CONNECTION_PENDING ||
+			m_pImpl->host->peers[0].state == ENET_PEER_STATE_CONNECTION_SUCCEEDED;
+	}
+
 	auto Client::Disconnect() -> void
 	{
 		puts("Disconnecting...");

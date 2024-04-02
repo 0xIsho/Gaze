@@ -68,7 +68,9 @@ namespace Gaze::Client {
 
 	ClientApp::~ClientApp()
 	{
+		if (m_Client.IsConnected()) {
 		m_Client.Disconnect();
+		}
 
 		if (Gaze::WM::IsInitialized()) {
 			Gaze::WM::Terminate();
