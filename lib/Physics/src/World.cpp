@@ -39,6 +39,11 @@ namespace Gaze::Physics {
 
 	World::~World()
 	{
+		for (auto i = m_pImpl->world->getNumCollisionObjects() - 1; i >= 0; i--) {
+			auto* obj = m_pImpl->world->getCollisionObjectArray()[i];
+			m_pImpl->world->removeCollisionObject(obj);
+		}
+
 		delete m_pImpl;
 	}
 
