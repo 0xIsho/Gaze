@@ -29,6 +29,11 @@ target_include_directories(${TARGET}
 		${BULLET_INCLUDE_DIRS}
 )
 
+if (WIN32)
+	# Append "d" to the library names (indicates debug libraries). i.e. Foobar.lib -> Foobard.lib
+	list(TRANSFORM BULLET_LIBRARIES REPLACE "\\." $<$<CONFIG:Debug>:d>.)
+endif()
+
 target_link_libraries(${TARGET}
 	PUBLIC
 		glm::glm
