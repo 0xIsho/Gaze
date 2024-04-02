@@ -382,7 +382,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 	{
 		const auto lights = Light {
 			.position           = { 0.F, 0.F, 0.F },
-			.diffuse            = { 0.F, 0.F, 0.F },
+			.diffuse            = { 1.F, 1.F, 1.F },
 			.ambientCoefficient = 1.F,
 			.attenuation        = 1.F
 		};
