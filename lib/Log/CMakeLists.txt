@@ -1,11 +1,13 @@
-set(TARGET Client)
+set(TARGET Log)
+
+find_package(spdlog REQUIRED)
 
 set(HEADERS
-	"include/Client/App.hpp"
+	"include/Log/Logger.hpp"
 )
 
 set(SOURCES
-	"src/App.cpp"
+	"src/Logger.cpp"
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -18,14 +20,8 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
-	PUBLIC
-		Gaze::Core
-		Gaze::Net
-
 	PRIVATE
-		Gaze::Debug
-		Gaze::Log
-		Gaze::WM
+		spdlog::spdlog
 )
 
 if (GAZE_BUILD_TESTS)

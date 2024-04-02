@@ -11,6 +11,7 @@ This repository hosts the sources of the *Gaze Interactive Experiences Engine*.
 - [GLM](https://github.com/g-truc/glm)
 - [Bullet](https://github.com/bulletphysics/bullet3)
 - [Assimp](https://www.assimp.org)
+- [spdlog](https://github.com/gabime/spdlog)
 
 ## Build
 

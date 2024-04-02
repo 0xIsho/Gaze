@@ -7,6 +7,7 @@ set(LIBS
 	GFX
 	Input
 	IO
+	Log
 	Net
 	Physics
 	WM

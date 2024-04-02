@@ -5,9 +5,9 @@
 #include "WM/Core.hpp"
 
 #include "Net/Core.hpp"
-
-
 #include "Net/Packet.hpp"
+
+#include "Log/Logger.hpp"
 
 #include <thread>
 #include <chrono>
@@ -19,6 +19,8 @@ namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/)
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
+
+		Log::Logger::LogsDirectoryPath("logs/");
 
 		if (!Gaze::Net::Init()) {
 			throw std::runtime_error("Failed to initialize the Network sub-system.");
