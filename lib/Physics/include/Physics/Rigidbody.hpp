@@ -14,7 +14,7 @@ namespace Gaze::Physics {
 		static constexpr auto kDefaultMass = 1.0F;
 
 	public:
-		Rigidbody(Shared<Shape> collisionShape, float mass = kDefaultMass);
+		Rigidbody(Unique<Shape> collisionShape, float mass = kDefaultMass);
 		~Rigidbody();
 
 		[[nodiscard]] auto Handle() const noexcept -> void*;

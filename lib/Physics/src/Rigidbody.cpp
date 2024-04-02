@@ -16,10 +16,10 @@ namespace Gaze::Physics {
 	{
 		Unique<btRigidBody> handle;
 		Unique<btMotionState> motionState;
-		Shared<Shape> collisionShape;
+		Unique<Shape> collisionShape;
 	};
 
-	Rigidbody::Rigidbody(Shared<Shape> collisionShape, float mass)
+	Rigidbody::Rigidbody(Unique<Shape> collisionShape, float mass)
 		: m_pImpl(new Impl())
 	{
 		auto* shape = static_cast<btBoxShape*>(collisionShape->Handle());
@@ -39,7 +39,7 @@ namespace Gaze::Physics {
 			inertia
 		);
 		m_pImpl->handle = MakeUnique<btRigidBody>(std::move(info));
-		m_pImpl->collisionShape = collisionShape;
+		m_pImpl->collisionShape = std::move(collisionShape);
 	}
 
 	Rigidbody::~Rigidbody()

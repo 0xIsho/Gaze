@@ -72,8 +72,8 @@ MyApp::MyApp(int argc, char** argv)
 	m_Rdr = Gaze::GFX::CreateRenderer(m_Win);
 	m_Rdr->Clear();
 
-	m_PhysicsWorld.AddRigidbody(MakeShared<Physics::Rigidbody>(MakeShared<Physics::BoxShape>(10.F, .0002F, 10.F), 0.F));
-	m_RbCube = MakeShared<Physics::Rigidbody>(MakeShared<Physics::BoxShape>(1.F, 1.F, 1.F));
+	m_PhysicsWorld.AddRigidbody(MakeShared<Physics::Rigidbody>(MakeUnique<Physics::BoxShape>(10.F, .0002F, 10.F), 0.F));
+	m_RbCube = MakeShared<Physics::Rigidbody>(MakeUnique<Physics::BoxShape>(1.F, 1.F, 1.F));
 	m_RbCube->SetOrigin(0, 10, 0);
 	m_RbCube->SetRotation({ 1, 1, 1 }, glm::radians(45.F));
 
