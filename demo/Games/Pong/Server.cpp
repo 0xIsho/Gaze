@@ -11,6 +11,7 @@
 #include <glm/geometric.hpp>
 
 #include <cstring>
+#include <chrono>
 #include <algorithm>
 
 using namespace Gaze;
@@ -44,6 +45,11 @@ private:
 
 	glm::vec2 m_BallPos;
 	glm::vec2 m_BallDir;
+
+	bool m_ArePlayersReady = false; /**< True when both players are connected */
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds> m_PlayersReadyTimestamp;
+	bool m_HasGameStarted = false; /**< Starts after "m_StartDelay" after both players connect */
+	std::chrono::duration<long long> m_StartDelay = std::chrono::seconds(3);
 };
 
 PongServer::PongServer(int argc, char** argv)
@@ -60,11 +66,17 @@ auto PongServer::OnInit() -> Status
 
 auto PongServer::OnUpdate(F64 /*deltaTime*/) -> void
 {
-
+	if (m_ArePlayersReady && std::chrono::steady_clock::now() - m_PlayersReadyTimestamp >= m_StartDelay) {
+		m_HasGameStarted = true;
+	}
 }
 
 auto PongServer::OnFixedUpdate(F64 deltaTime) -> void
 {
+	if (!m_HasGameStarted) {
+		return;
+	}
+
 	m_P1Pos.y += m_P1Dir.y * kPaddleSpeed * F32(deltaTime);
 	m_P2Pos.y += m_P2Dir.y * kPaddleSpeed * F32(deltaTime);
 	m_BallPos.x += m_BallDir.x * kBallSpeed * F32(deltaTime);
@@ -123,6 +135,8 @@ auto PongServer::OnClientConnected(U32 clientID) -> void
 	} else if (m_P2ID == U32(-1)) {
 		printf("Setting P2ID to %u\n", clientID);
 		m_P2ID = clientID;
+		m_ArePlayersReady = true;
+		m_PlayersReadyTimestamp = std::chrono::steady_clock::now();
 	}
 }
 
