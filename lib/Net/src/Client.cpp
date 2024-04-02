@@ -7,7 +7,7 @@
 namespace Gaze::Net {
 	struct Client::Impl
 	{
-		ENetHost* host;
+		ENetHost* host = nullptr;
 
 		PacketReceivedCallback cbPacketReceived = [](auto, auto) {};
 	};
@@ -44,7 +44,7 @@ namespace Gaze::Net {
 
 		if (
 			auto event = ENetEvent();
-			enet_host_service(m_pImpl->host, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT
+			enet_host_service(m_pImpl->host, &event, 3000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT
 		) {
 			puts("Connection successful.");
 			return true;
