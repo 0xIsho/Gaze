@@ -89,7 +89,7 @@ namespace Gaze::Client {
 			constexpr auto maxRetries = 5;
 			auto currentTry = 0;
 
-			while (!m_Client.Connect("127.0.0.1", 54321) && currentTry++ < maxRetries) {
+			while (m_IsRunning && !m_Client.Connect("127.0.0.1", 54321) && currentTry++ < maxRetries) {
 				std::cerr << "Server connection failed. Retrying " << currentTry << '/' << maxRetries << '\n';
 			}
 		});
