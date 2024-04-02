@@ -64,16 +64,7 @@ namespace Gaze::Client {
 		if (!Gaze::WM::Init()) {
 			throw std::runtime_error("Failed to initialize the window manager.");
 		}
-
-		std::jthread([this] {
-			constexpr auto maxRetries = 5;
-			auto currentTry = 0;
-
-			while (!m_Client.Connect("127.0.0.1", 54321) && currentTry++ < maxRetries) {
-				std::cerr << "Server connection failed. Retrying " << currentTry << '/' << maxRetries << '\n';
 			}
-		}).detach();
-	}
 
 	ClientApp::~ClientApp()
 	{
@@ -93,6 +84,15 @@ namespace Gaze::Client {
 
 		constexpr auto fixedTimeStep = 1 / 60.0;
 		auto accumulatedTimestep = 0.0;
+
+		auto connThread = std::jthread([this] {
+			constexpr auto maxRetries = 5;
+			auto currentTry = 0;
+
+			while (!m_Client.Connect("127.0.0.1", 54321) && currentTry++ < maxRetries) {
+				std::cerr << "Server connection failed. Retrying " << currentTry << '/' << maxRetries << '\n';
+			}
+		});
 
 		m_Client.OnPacketReceived([this](auto senderID, auto packet) {
 			OnPacketReceived(senderID, std::move(packet));
