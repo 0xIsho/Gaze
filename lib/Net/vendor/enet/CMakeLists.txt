@@ -92,6 +92,8 @@ target_include_directories(enet
 		"include/"
 )
 
+target_compile_definitions(enet PRIVATE $<$<CONFIG:Debug>:ENET_DEBUG>)
+
 if (MINGW)
     target_link_libraries(enet winmm ws2_32)
 endif()
