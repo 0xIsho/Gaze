@@ -17,7 +17,7 @@ namespace Gaze::Net {
 		~Client();
 
 		[[nodiscard]]
-		auto Connect(std::string_view host, U16 port) -> bool;
+		auto Connect(std::string_view host, U16 port, U32 timeoutMillis = 3000) -> bool;
 		[[nodiscard]]
 		auto IsConnected() const -> bool;
 		auto Disconnect() -> void;

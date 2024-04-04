@@ -1,11 +1,13 @@
-set(TARGET Client)
+set(TARGET Config)
 
 set(HEADERS
-	"include/Client/App.hpp"
+	"include/Config/Configuration.hpp"
+	"include/Config/Parser.hpp"
 )
 
 set(SOURCES
-	"src/App.cpp"
+	"src/Configuration.cpp"
+	"src/Parser.cpp"
 )
 
 add_library(${TARGET} ${HEADERS} ${SOURCES})
@@ -18,15 +20,8 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
-	PUBLIC
-		Gaze::Config
-		Gaze::Core
-		Gaze::Net
-
 	PRIVATE
 		Gaze::Debug
-		Gaze::Log
-		Gaze::WM
 )
 
 if (GAZE_BUILD_TESTS)

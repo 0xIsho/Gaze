@@ -9,18 +9,40 @@
 
 #include "Log/Logger.hpp"
 
+#include "Config/Parser.hpp"
+
 #include <thread>
 #include <chrono>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <filesystem>
 
 namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/)
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
 
-		Log::Logger::LogsDirectoryPath("logs/");
+		Log::Logger::LogsDirectoryPath("Engine/Logs/");
+
+		static const auto configDirPath = [] { return std::filesystem::path("Engine/Config/").make_preferred(); }();
+		if (std::filesystem::exists(configDirPath)) {
+			Config::Parser::ConfigDirectoryPath(configDirPath);
+
+			using DirIt = std::filesystem::recursive_directory_iterator;
+			auto parser = Config::Parser(&m_Config);
+
+			for (const auto& entry : DirIt(configDirPath)) {
+				if (!(entry.is_regular_file() && entry.path().extension() == ".conf")) {
+					continue;
+				}
+
+				const auto relativeToConfigDir = std::filesystem::relative(entry.path(), configDirPath);
+				if (!parser.Load(relativeToConfigDir)) {
+					std::cerr << "Error loading config file: " << configDirPath / relativeToConfigDir << '\n';
+				}
+			}
+		}
 
 		if (!Gaze::Net::Init()) {
 			throw std::runtime_error("Failed to initialize the Network sub-system.");
@@ -93,7 +115,22 @@ namespace Gaze::Client {
 			constexpr auto maxRetries = 5;
 			auto currentTry = 0;
 
-			while (m_IsRunning && !m_Client.Connect("127.0.0.1", 54321) && currentTry++ < maxRetries) {
+			auto timeout = 3000;
+			if (!m_Config.Get<int>("/Engine/Net/Client", "ConnectionAttemptTimeout", timeout)) {
+				std::cerr << "Error loading '/Engine/Net/Client.ConnectionAttemptTimeout'"
+					"configuration option. Using default value: " << timeout << '\n';
+			}
+			else {
+				std::cout << "/Engine/Net/Client.ConnectionAttemptTimeout: " << timeout << '\n';
+			}
+
+			auto address = std::string("127.0.0.1");
+			if (!m_Config.Get<std::string>("/Engine/Net/Client", "ServerAddress", address)) {
+				std::cerr << "Error loading '/Engine/Net/Client.ServerAddress'"
+					"configuration option. Using default value: " << address << '\n';
+			}
+
+			while (m_IsRunning && !m_Client.Connect(address, 54321, U32(timeout)) && currentTry++ < maxRetries) {
 				std::cerr << "Server connection failed. Retrying " << currentTry << '/' << maxRetries << '\n';
 			}
 		});

@@ -1,5 +1,6 @@
 set(LIBS
 	Client
+	Config
 	Core
 	Debug
 	Events

@@ -27,7 +27,7 @@ namespace Gaze::Net {
 		delete m_pImpl;
 	}
 
-	auto Client::Connect(std::string_view host, U16 port) -> bool
+	auto Client::Connect(std::string_view host, U16 port, U32 timeoutMillis /*= 3000*/) -> bool
 	{
 		auto addr = ENetAddress();
 		if (enet_address_set_host(&addr, host.data()) < 0) {
@@ -44,7 +44,7 @@ namespace Gaze::Net {
 
 		if (
 			auto event = ENetEvent();
-			enet_host_service(m_pImpl->host, &event, 3000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT
+			enet_host_service(m_pImpl->host, &event, timeoutMillis) > 0 && event.type == ENET_EVENT_TYPE_CONNECT
 		) {
 			puts("Connection successful.");
 			return true;

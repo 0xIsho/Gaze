@@ -6,6 +6,8 @@
 #include "Net/Client.hpp"
 #include "Net/Packet.hpp"
 
+#include "Config/Configuration.hpp"
+
 namespace Gaze::Client {
 	/**
 	 * @brief The main application
@@ -123,6 +125,8 @@ namespace Gaze::Client {
 		virtual auto OnPacketReceived(U32, Net::Packet) -> void { };
 
 	protected:
+		Config::Configuration m_Config;
+
 		bool m_IsRunning = false;
 	};
 
