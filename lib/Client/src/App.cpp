@@ -150,7 +150,7 @@ namespace Gaze::Client {
 			}
 
 			const auto frameEnd = steady_clock::now();
-			timestep = F64((frameEnd - frameBegin).count()) / 1'000'000'000;
+			timestep = std::chrono::duration<double>(frameEnd - frameBegin) / 1s;
 
 			// Delta too large. Assume that a debugger took over and paused
 			// the engine's execution.
