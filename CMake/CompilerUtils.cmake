@@ -18,6 +18,9 @@ function (append_common_compiler_options TARGET)
 				-fstack-clash-protection
 				-Wdisabled-optimization
 			>
+			$<$<CXX_COMPILER_ID:MSVC>:
+				/sdl # https://learn.microsoft.com/en-us/cpp/build/reference/sdl-enable-additional-security-checks
+			>
 		>
 	)
 
