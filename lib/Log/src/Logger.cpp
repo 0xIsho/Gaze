@@ -26,7 +26,9 @@ namespace Gaze::Log {
 
 		sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 		if (!Impl::s_LogsDirPath.empty()) {
-			sinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>((Impl::s_LogsDirPath / name).string() + ".log"));
+			auto filename = name;
+			filename.erase(std::remove_if(filename.begin(), filename.end(), std::not_fn(isalnum)), filename.end());
+			sinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>((Impl::s_LogsDirPath / filename).string() + ".log"));
 		}
 
 		m_pImpl->handle = std::make_unique<spdlog::logger>(spdlog::logger(name, sinks.begin(), sinks.end()));
