@@ -2,6 +2,8 @@
 
 #include "Core/Type.hpp"
 
+#include "Log/Logger.hpp"
+
 #include "Net/Server.hpp"
 #include "Net/Client.hpp"
 #include "Net/Packet.hpp"
@@ -70,6 +72,12 @@ namespace Gaze::Client {
 
 	protected:
 		/**
+		 * @brief Retrieves the logger object associated with the client application
+		 *
+		 * Client-side logging should be done through this function
+		 */
+		[[nodiscard]] auto Logger() -> Log::Logger&;
+		/**
 		 * @brief Initialisation function
 		 *
 		 * This function is called after the engine's subsystems have been
@@ -128,6 +136,10 @@ namespace Gaze::Client {
 		Config::Configuration m_Config;
 
 		bool m_IsRunning = false;
+
+	private:
+		Log::Logger m_Logger;
+		Log::Logger m_ClientLogger;
 	};
 
 	/**
@@ -169,6 +181,7 @@ namespace Gaze::Client {
 
 	private:
 		Net::Client m_Client;
+		Log::Logger m_Logger;
 	};
 
 	/**
@@ -225,6 +238,7 @@ namespace Gaze::Client {
 		virtual auto OnClientConnected(U32 /*clientID*/) -> void { }
 
 	private:
+		Log::Logger m_Logger;
 		Net::Server m_Server;
 	};
 

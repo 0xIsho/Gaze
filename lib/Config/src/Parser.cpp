@@ -4,6 +4,8 @@
 
 #include "Debug/Assert.hpp"
 
+#include "Log/Logger.hpp"
+
 #include <string>
 #include <fstream>
 
@@ -32,23 +34,40 @@ namespace Gaze::Config {
 		str.erase(str.begin() + commentBegin, str.end());
 	}
 
-	Parser::Path Parser::s_ConfigDirPath = ".";
+	struct Parser::Impl
+	{
+		Configuration* outConfig = nullptr;
+		Log::Logger logger = Log::Logger("Parser");
+
+		static Path s_ConfigDirPath;
+	};
+
+	Parser::Path Parser::Impl::s_ConfigDirPath = ".";
 
 	auto Parser::ConfigDirectoryPath(const Path& path) -> void
 	{
-		s_ConfigDirPath = path;
+		Impl::s_ConfigDirPath = path;
 	}
 
 	Parser::Parser(Configuration* outConfig)
-		: m_pOutConfig(outConfig)
+		: m_pImpl(new Impl({ .outConfig = outConfig }))
 	{
 		GAZE_ASSERT(outConfig != nullptr, "Output parameter was nullptr");
 	}
 
+	Parser::~Parser()
+	{
+		delete m_pImpl;
+	}
+
 	auto Parser::Load(const Path& path) -> bool
 	{
-		const auto configFilePath = s_ConfigDirPath / path;
+		const auto configFilePath = Impl::s_ConfigDirPath / path;
+
+		m_pImpl->logger.Trace("Parsing configuration file: {}", configFilePath.string());
+
 		if (!(std::filesystem::exists(configFilePath) && std::filesystem::is_regular_file(configFilePath))) {
+			m_pImpl->logger.Error("Configuration file '{}' does not exist or is not a regular file.", configFilePath.string());
 			return false;
 		}
 
@@ -68,7 +87,7 @@ namespace Gaze::Config {
 			
 			if (line[0] == '[') {
 				if (sectionDirty) {
-					m_pOutConfig->Add(currentSectionPath, std::move(currentSection));
+					m_pImpl->outConfig->Add(currentSectionPath, std::move(currentSection));
 					sectionDirty = false;
 				}
 
@@ -87,7 +106,7 @@ namespace Gaze::Config {
 		}
 
 		if (sectionDirty) {
-			m_pOutConfig->Add(currentSectionPath, std::move(currentSection));
+			m_pImpl->outConfig->Add(currentSectionPath, std::move(currentSection));
 ;		}
 
 		return true;
@@ -97,7 +116,8 @@ namespace Gaze::Config {
 	{
 		// TODO: Error handling (e.g. non-matching "[", "]")
 		outSectionPath = sectionStr.substr(1, sectionStr.find_first_of(']') - 1);
-		
+		m_pImpl->logger.Trace("Parsed section: {}", outSectionPath);
+
 		return true;
 	}
 
@@ -116,6 +136,7 @@ namespace Gaze::Config {
 			Trim(value, "\"");
 		}
 
+		m_pImpl->logger.Trace("Parsed variable: {} = {}", name, value);
 		outSection.Add(std::move(name), std::move(value));
 
 		return true;

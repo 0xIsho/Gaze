@@ -5,6 +5,8 @@
 #include "Net/Type.hpp"
 #include "Net/Packet.hpp"
 
+#include <string_view>
+
 namespace Gaze::Net {
 	class Server
 	{
@@ -14,7 +16,7 @@ namespace Gaze::Net {
 		using ClientConnectedCallback = std::function<void(U32)>;
 
 	public:
-		Server(U32 host = 0, U16 port = 54321);
+		Server(std::string_view host = "0.0.0.0", U16 port = 54321);
 		~Server();
 
 		auto Update() -> void;

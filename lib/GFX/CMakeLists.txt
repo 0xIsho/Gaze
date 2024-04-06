@@ -52,15 +52,17 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
 	PUBLIC
 		Gaze::Geometry
-		Gaze::Debug
 		Gaze::Core
 		Gaze::WM
 
 		glm::glm
 
 	PRIVATE
-		OpenGL::GL
+		Gaze::Debug
 		Gaze::GLAD
+		Gaze::Log
+
+		OpenGL::GL
 		glfw
 )
 

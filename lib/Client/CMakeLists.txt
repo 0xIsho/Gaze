@@ -22,10 +22,10 @@ target_link_libraries(${TARGET}
 		Gaze::Config
 		Gaze::Core
 		Gaze::Net
+		Gaze::Log
 
 	PRIVATE
 		Gaze::Debug
-		Gaze::Log
 		Gaze::WM
 )
 

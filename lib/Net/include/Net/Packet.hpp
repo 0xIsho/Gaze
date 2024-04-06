@@ -22,6 +22,6 @@ namespace Gaze::Net {
 		auto Data() const -> void*;
 
 	private:
-		Impl* m_pImpl;
+		Impl* m_pImpl = nullptr;
 	};
 }

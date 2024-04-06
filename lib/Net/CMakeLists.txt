@@ -29,10 +29,12 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
 	PUBLIC
 		Gaze::Core
+
+	PRIVATE
 		Gaze::Debug
+		Gaze::Log
 
 		enet
-
 		$<$<PLATFORM_ID:Windows>:wsock32;ws2_32;Winmm>
 )
 

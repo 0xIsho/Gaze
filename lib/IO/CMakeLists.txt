@@ -27,6 +27,8 @@ target_link_libraries(${TARGET}
 		Gaze::Geometry
 
 	PRIVATE
+		Gaze::Log
+
 		${ASSIMP_LIBRARIES}
 )
 

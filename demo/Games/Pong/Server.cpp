@@ -128,12 +128,9 @@ auto PongServer::OnPacketReceived(U32 sender, Net::Packet packet) -> void
 
 auto PongServer::OnClientConnected(U32 clientID) -> void
 {
-	printf("New Client Connection: %u\n", clientID);
 	if (m_P1ID == U32(-1)) {
-		printf("Setting P1ID to %u\n", clientID);
 		m_P1ID = clientID;
 	} else if (m_P2ID == U32(-1)) {
-		printf("Setting P2ID to %u\n", clientID);
 		m_P2ID = clientID;
 		m_ArePlayersReady = true;
 		m_PlayersReadyTimestamp = std::chrono::steady_clock::now();

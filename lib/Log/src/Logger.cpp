@@ -4,8 +4,10 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
+#include <cctype>
 #include <memory>
 #include <vector>
+#include <functional>
 
 namespace Gaze::Log {
 	struct Logger::Impl
@@ -24,7 +26,9 @@ namespace Gaze::Log {
 
 		auto sinks = std::vector<spdlog::sink_ptr>();
 
-		sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+		auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		consoleSink->set_level(spdlog::level::info);
+		sinks.emplace_back(std::move(consoleSink));
 		if (!Impl::s_LogsDirPath.empty()) {
 			auto filename = name;
 			filename.erase(std::remove_if(filename.begin(), filename.end(), std::not_fn(isalnum)), filename.end());

@@ -22,6 +22,7 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
 	PRIVATE
 		Gaze::Debug
+		Gaze::Log
 )
 
 if (GAZE_BUILD_TESTS)

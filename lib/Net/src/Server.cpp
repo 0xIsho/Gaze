@@ -13,11 +13,15 @@ namespace Gaze::Net {
 		ClientConnectedCallback cbClientConnected = [](auto) {};
 	};
 
-	Server::Server(U32 host /*= 0*/, U16 port /*= 54321*/)
+	Server::Server(std::string_view host /*= "0.0.0.0"*/, U16 port /*= 54321*/)
 		: m_pImpl(new Impl())
 	{
 		auto addr = ENetAddress();
-		addr.host = host;
+		if (enet_address_set_host(&addr, host.data()) < 0) {
+			// TODO: Log error
+			addr.host = ENET_HOST_ANY;
+		}
+
 		addr.port = port;
 
 		m_pImpl->host = enet_host_create(&addr, 32, 2, 0, 0);

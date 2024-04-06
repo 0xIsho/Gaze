@@ -20,10 +20,13 @@
 
 namespace Gaze::Client {
 	App::App(int /*argc*/, char** /*argv*/)
+		: m_Logger([] { Log::Logger::LogsDirectoryPath("Engine/Logs/"); return Log::Logger("App"); }())
+		, m_ClientLogger("Game")
 	{
 		GAZE_ASSERT(m_IsRunning == false, "The application should not be running yet.");
 
-		Log::Logger::LogsDirectoryPath("Engine/Logs/");
+		// TODO: Add version info
+		m_Logger.Info("Gaze Engine starting...");
 
 		static const auto configDirPath = [] { return std::filesystem::path("Engine/Config/").make_preferred(); }();
 		if (std::filesystem::exists(configDirPath)) {
@@ -38,24 +41,36 @@ namespace Gaze::Client {
 				}
 
 				const auto relativeToConfigDir = std::filesystem::relative(entry.path(), configDirPath);
+				m_Logger.Trace("Loading configuration file: {}", (configDirPath / relativeToConfigDir).string());
 				if (!parser.Load(relativeToConfigDir)) {
-					std::cerr << "Error loading config file: " << configDirPath / relativeToConfigDir << '\n';
+					m_Logger.Error("Error loading configuration file: {}", (configDirPath / relativeToConfigDir).string());
 				}
+
 			}
 		}
+		else {
+			m_Logger.Warn("Configuration directory '{}' does not exist.", configDirPath.string());
+		}
 
+		m_Logger.Info("Initialising the Networking sub-system...");
 		if (!Gaze::Net::Init()) {
-			throw std::runtime_error("Failed to initialize the Network sub-system.");
+			m_Logger.Error("Error initialsing the Network sub-system.");
 		}
 	}
 
 	App::~App()
 	{
 		if (Net::IsInitialized()) {
+			m_Logger.Info("Terminating the Networking sub-system");
 			Net::Terminate();
 		}
 
 		m_IsRunning = false;
+	}
+
+	auto App::Logger() -> Log::Logger&
+	{
+		return m_ClientLogger;
 	}
 
 	auto App::Start() noexcept -> Status
@@ -67,36 +82,51 @@ namespace Gaze::Client {
 		if (OnInit() == Status::Success) {
 			m_IsRunning = true;
 		} else {
+			m_Logger.Critical("Engine initialisation failed.");
+			m_Logger.Info("Shutting down...");
 			return Status::Fail;
 		}
 
+		m_Logger.Info("Running...");
 		Run();
 
+		m_Logger.Info("Shutting down...");
 		return OnShutdown();
-	} catch (...) {
+	}
+	catch (const std::exception& ex) {
+		m_Logger.Critical("Unhandled exception: {}", ex.what());
+		return Status::Fail;
+	}
+	catch (...) {
+		m_Logger.Critical("Unknown unhandled exception.");
 		return Status::Fail;
 	}
 
 	auto App::Quit() noexcept -> void
 	{
+		m_Logger.Info("Quit requested.");
 		m_IsRunning = false;
 	}
 
 	ClientApp::ClientApp(int argc, char** argv)
 		: App(argc, argv)
+		, m_Logger("AppClient")
 	{
+		m_Logger.Info("Initialising the Window Manager...");
 		if (!Gaze::WM::Init()) {
-			throw std::runtime_error("Failed to initialize the window manager.");
+			m_Logger.Error("Error initialising the Window Manager");
 		}
-			}
+	}
 
 	ClientApp::~ClientApp()
 	{
 		if (m_Client.IsConnected()) {
-		m_Client.Disconnect();
+			m_Logger.Info("Disconnecting remote peer...");
+			m_Client.Disconnect();
 		}
 
 		if (Gaze::WM::IsInitialized()) {
+			m_Logger.Info("Terminating the Window Manager");
 			Gaze::WM::Terminate();
 		}
 	}
@@ -116,22 +146,23 @@ namespace Gaze::Client {
 			auto currentTry = 0;
 
 			auto timeout = 3000;
-			if (!m_Config.Get<int>("/Engine/Net/Client", "ConnectionAttemptTimeout", timeout)) {
-				std::cerr << "Error loading '/Engine/Net/Client.ConnectionAttemptTimeout'"
-					"configuration option. Using default value: " << timeout << '\n';
+			if (m_Config.Get<int>("/Engine/Net/Client", "ConnectionAttemptTimeout", timeout)) {
+				m_Logger.Info("/Engine/Net/Client.ConnectionAttemptTimeout: {}", timeout);
 			}
 			else {
-				std::cout << "/Engine/Net/Client.ConnectionAttemptTimeout: " << timeout << '\n';
+				m_Logger.Error("Error retrieving '/Engine/Net/Client.ConnectionAttemptTimeout'. Using default: {}", timeout);
 			}
 
 			auto address = std::string("127.0.0.1");
-			if (!m_Config.Get<std::string>("/Engine/Net/Client", "ServerAddress", address)) {
-				std::cerr << "Error loading '/Engine/Net/Client.ServerAddress'"
-					"configuration option. Using default value: " << address << '\n';
+			if (m_Config.Get<std::string>("/Engine/Net/Client", "ServerAddress", address)) {
+				m_Logger.Info("/Engine/Net/Client.ServerAddress: {}", address);
+			}
+			else {
+				m_Logger.Error("Error retrieving '/Engine/Net/Client.ServerAddress'. Using default: {}", address);
 			}
 
 			while (m_IsRunning && !m_Client.Connect(address, 54321, U32(timeout)) && currentTry++ < maxRetries) {
-				std::cerr << "Server connection failed. Retrying " << currentTry << '/' << maxRetries << '\n';
+				m_Logger.Error("Server connection failed. Retrying {}/{}", currentTry, maxRetries);
 			}
 		});
 
@@ -156,6 +187,7 @@ namespace Gaze::Client {
 			// Delta too large. Assume that a debugger took over and paused
 			// the engine's execution.
 			if (timestep > 5.0) {
+				m_Logger.Warn("TimestepCap reached!");
 				timestep = 1.0 / 30.0;
 			}
 
@@ -171,6 +203,19 @@ namespace Gaze::Client {
 
 	ServerApp::ServerApp(int argc, char** argv)
 		: App(argc, argv)
+		, m_Logger("AppServer")
+		, m_Server(
+			[this] {
+				auto addr = std::string("0.0.0.0");
+				if (m_Config.Get<std::string>("/Engine/Net/Server", "ListenAddress", addr)) {
+					m_Logger.Trace("/Engine/Net/Server.ListenAddress: {}", addr);
+				}
+				else {
+					m_Logger.Error("Error retrieving '/Engine/Net/Server.ListenAddress'. Using default: {}", addr);
+				}
+
+				return addr;
+			}())
 	{
 	}
 
@@ -186,6 +231,7 @@ namespace Gaze::Client {
 			OnPacketReceived(senderID, std::move(packet));
 		});
 		m_Server.OnClientConnected([this](auto clientID) {
+			m_Logger.Info("New client connected. ID: {}", clientID);
 			OnClientConnected(clientID);
 		});
 

@@ -1,5 +1,7 @@
 #include "IO/Loader/Scene.hpp"
 
+#include "Log/Logger.hpp"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -64,6 +66,14 @@ namespace Gaze::IO::Loader {
 	auto Scene::Load(const std::filesystem::path& path) -> bool
 	{
 		auto importer = Assimp::Importer();
+		auto logger = Log::Logger("Loader");
+
+		if (!std::filesystem::exists(path)) {
+			logger.Error("Scene file '{}' does not exist.", path.string());
+			return false;
+		}
+
+		logger.Info("Loading scene from: {}", path.string());
 
 		const auto* scene = importer.ReadFile(
 			path.string(),
@@ -76,7 +86,7 @@ namespace Gaze::IO::Loader {
 		);
 
 		if (scene == nullptr) {
-			std::cerr << importer.GetErrorString() << std::endl;
+			logger.Error("Error loading scene: {}", importer.GetErrorString());
 			return false;
 		}
 

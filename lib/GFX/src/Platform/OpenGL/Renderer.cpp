@@ -8,11 +8,12 @@
 
 #include "GFX/Light.hpp"
 
+#include "Log/Logger.hpp"
+
 #include "glad/gl.h"
 
 #include <GLFW/glfw3.h>
 
-#include <cstdio>
 #include <format>
 #include <type_traits>
 #include <unordered_map>
@@ -46,12 +47,12 @@ namespace Gaze::GFX::Platform::OpenGL {
 			{ GL_DEBUG_TYPE_POP_GROUP           , "Pop Group"           },
 			{ GL_DEBUG_TYPE_OTHER               , "Other"               },
 		};
-		static const auto severities = std::unordered_map<GLenum, const char*> {
+		/*static const auto severities = std::unordered_map<GLenum, const char*> {
 			{ GL_DEBUG_SEVERITY_HIGH            , "High"                },
 			{ GL_DEBUG_SEVERITY_MEDIUM          , "Medium"              },
 			{ GL_DEBUG_SEVERITY_LOW             , "Low"                 },
 			{ GL_DEBUG_SEVERITY_NOTIFICATION    , "Notification"        },
-		};
+		};*/
 		// clang-format on
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -67,12 +68,24 @@ namespace Gaze::GFX::Platform::OpenGL {
 				const GLchar* message,
 				const void* /* userParam */
 			) {
-				fprintf(stderr,
-					"OpenGL Message {\n  Source: %s\n  Type: %s\n  Severity: %s\n  Message: %s\n}\n",
-					sources.at(source),
-					types.at(type),
-					severities.at(severity),
-					message);
+				auto logger = Log::Logger("Renderer");
+
+				constexpr char fmt[] = "OpenGL Message:\n  - Source: {}\n  - Type: {}\n  - Message: {}";
+
+				switch (severity) {
+				case GL_DEBUG_SEVERITY_NOTIFICATION:
+					logger.Trace(fmt, sources.at(source), types.at(type), message);
+					break;
+				case GL_DEBUG_SEVERITY_LOW:
+					logger.Warn(fmt, sources.at(source), types.at(type), message);
+					break;
+				case GL_DEBUG_SEVERITY_MEDIUM:
+					logger.Error(fmt, sources.at(source), types.at(type), message);
+					break;
+				case GL_DEBUG_SEVERITY_HIGH:
+					logger.Critical(fmt, sources.at(source), types.at(type), message);
+					break;
+				}
 			},
 			nullptr
 		);
@@ -101,9 +114,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 		std::vector<BufferSection>::iterator vertexBufSectsCursor;
 		std::vector<BufferSection>           indexBufSects;
 		std::vector<BufferSection>::iterator indexBufSectsCursor;
-		Shared<Camera>                  camera;
+		Shared<Camera>                       camera;
 		RenderStats                          stats;
 		RenderStats                          statsCurrent;
+		Log::Logger                          logger;
 	};
 
 	static constexpr auto kStaticBufferSize = 8 * 1024 * 1024; // 8 MiB
@@ -228,6 +242,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			},
 			.stats                = {},
 			.statsCurrent         = {},
+			.logger               = Log::Logger("Renderer")
 		});
 
 		GAZE_ASSERT(m_pImpl->program.Link(), "Failed to link shader program");
@@ -261,6 +276,23 @@ namespace Gaze::GFX::Platform::OpenGL {
 			Objects::VertexArray::Offset(0),
 			Objects::VertexArray::Stride(sizeof(Vertex))
 		);
+
+		{
+			const GLubyte* info[] = {
+				glGetString(GL_VENDOR),
+				glGetString(GL_RENDERER),
+				glGetString(GL_VERSION),
+				glGetString(GL_SHADING_LANGUAGE_VERSION),
+			};
+
+			m_pImpl->logger.Info(
+				"OpenGL Info:\n  - Vendor: {}\n  - Renderer: {}\n  - Version: {}\n  - GLSL Version: {}",
+				info[0] ? reinterpret_cast<const char*>(info[0]) : "Unknown",
+				info[1] ? reinterpret_cast<const char*>(info[1]) : "Unknown",
+				info[2] ? reinterpret_cast<const char*>(info[2]) : "Unknown",
+				info[3] ? reinterpret_cast<const char*>(info[3]) : "Unknown"
+			);
+		}
 
 		if (oldCurrentContext) {
 			glfwMakeContextCurrent(oldCurrentContext);
@@ -406,7 +438,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 					.nz = vert.normals.z
 				});
 			}
-			primitives.emplace_back(Geometry::Primitive { std::move(vertices), std::move(prim.indices) });
+			primitives.emplace_back(Geometry::Primitive { std::move(vertices), prim.indices });
 		}
 
 		SubmitObject(
