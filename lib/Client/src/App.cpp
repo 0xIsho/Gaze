@@ -140,14 +140,15 @@ namespace Gaze::Client {
 		});
 
 		while (m_IsRunning) {
-			OnUpdate(timestep);
-			Gaze::WM::PollEvents();
 			m_Client.Update();
+			OnUpdate(timestep);
 
 			while (accumulatedTimestep >= fixedTimeStep) {
 				OnFixedUpdate(fixedTimeStep);
 				accumulatedTimestep -= fixedTimeStep;
 			}
+
+			Gaze::WM::PollEvents();
 
 			const auto frameEnd = steady_clock::now();
 			timestep = std::chrono::duration<double>(frameEnd - frameBegin) / 1s;
