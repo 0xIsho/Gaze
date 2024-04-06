@@ -17,7 +17,7 @@ namespace Gaze::Log {
 		~Logger();
 
 		auto operator=(const Logger&) = delete;
-		auto operator=(Logger& other) noexcept -> Logger&;
+		auto operator=(Logger&& other) noexcept -> Logger&;
 		
 		auto Trace(std::string_view msg) -> void;
 		auto Debug(std::string_view msg) -> void;

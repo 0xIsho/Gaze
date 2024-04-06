@@ -48,7 +48,7 @@ namespace Gaze::Log {
 		delete m_pImpl;
 	}
 
-	auto Logger::operator=(Logger& other) noexcept -> Logger&
+	auto Logger::operator=(Logger&& other) noexcept -> Logger&
 	{
 		if (this != &other) {
 			m_pImpl = std::exchange(other.m_pImpl, nullptr);
