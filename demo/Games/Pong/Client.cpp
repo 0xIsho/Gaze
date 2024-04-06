@@ -36,7 +36,6 @@ private:
 
 	auto RenderPlayground() -> void;
 	auto RenderPlayers()    -> void;
-	auto RenderScoreboard() -> void;
 
 private:
 	Shared<WM::Window>    m_Win;
@@ -55,7 +54,6 @@ private:
 
 	GFX::Mesh                  m_PaddleMesh;
 	GFX::Mesh                  m_BallMesh;
-	GFX::Mesh                  m_ScoreMarkerMesh;
 	GFX::Mesh                  m_MidlineMesh;
 
 	ClientPacket               m_Packet = {};
@@ -71,7 +69,6 @@ MyApp::MyApp(int argc, char** argv)
 	, m_BallPos(kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2)
 	, m_PaddleMesh(GFX::CreateQuad({ }, kPaddleSize.x, kPaddleSize.y))
 	, m_BallMesh(GFX::CreateQuad({ }, kBallSize, kBallSize))
-	, m_ScoreMarkerMesh(GFX::CreateLine({ .0F, .0F, .0F }, { .0F, 10.F, .0F }))
 	, m_MidlineMesh(GFX::CreateLine({ kWinWidth / 2, .0F, .0F }, { kWinWidth / 2, kWinHeight, .0F }))
 {
 	m_PaddleMesh.Rotate(glm::radians(-90.0F), { 1.0F, .0F, .0F });
@@ -150,7 +147,6 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 
 	RenderPlayground();
 	RenderPlayers();
-	RenderScoreboard();
 
 	if (m_IsPacketDirty) {
 		Send(Net::Packet(reinterpret_cast<const void*>(&m_Packet), sizeof(ClientPacket)));
@@ -184,23 +180,6 @@ auto MyApp::RenderPlayers() -> void
 
 	m_BallMesh.SetPosition({ m_BallPos + kBallSize / 2, 0.F });
 	m_Rdr->DrawMesh(m_BallMesh, GFX::Renderer::PrimitiveMode::Triangles);
-}
-
-auto MyApp::RenderScoreboard() -> void
-{
-	auto p1ScoreboardPos = glm::vec3{ kWinWidth / 4 - (m_P1Score + 10)            , 10, .0F };
-	auto p2ScoreboardPos = glm::vec3{ kWinWidth - kWinWidth / 4 - (m_P2Score + 10), 10, .0F };
-
-	for (auto i = 0; i < m_P1Score; i++) {
-		m_ScoreMarkerMesh.SetPosition(p1ScoreboardPos);
-		m_Rdr->DrawMesh(m_ScoreMarkerMesh, GFX::Renderer::PrimitiveMode::Lines);
-		p1ScoreboardPos.x += 5;
-	}
-	for (auto i = 0; i < m_P2Score; i++) {
-		m_ScoreMarkerMesh.SetPosition(p2ScoreboardPos);
-		m_Rdr->DrawMesh(m_ScoreMarkerMesh, GFX::Renderer::PrimitiveMode::Lines);
-		p2ScoreboardPos.x += 5;
-	}
 }
 
 auto MyApp::OnPacketReceived(U32 /*sender*/, Net::Packet packet) -> void
