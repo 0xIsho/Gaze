@@ -191,7 +191,7 @@ auto PongServer::Reset() -> void
 	m_P2Dir   = { 0, 0 };
 	m_BallPos = { kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2 };
 
-	m_BallDir = glm::normalize(glm::vec2{ rand() - RAND_MAX / 2, rand() - RAND_MAX / 2 });
+	m_BallDir = glm::normalize(glm::vec2{ rand() - RAND_MAX, 0 });
 }
 
 GAZE_REGISTER_APP(PongServer);
