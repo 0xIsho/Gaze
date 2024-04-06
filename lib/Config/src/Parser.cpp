@@ -77,7 +77,10 @@ namespace Gaze::Config {
 
 		auto stream = std::ifstream(configFilePath);
 		auto line = std::string();
+		auto currentLine = 0; // For logging purposes
 		while (std::getline(stream, line)) {
+			currentLine++;
+
 			RemoveComments(line);
 			Trim(line);
 
@@ -92,15 +95,19 @@ namespace Gaze::Config {
 				}
 
 				if (!ParseSection(line, currentSectionPath)) {
-					// TODO: Error handling
+					m_pImpl->logger.Error("Error parsing section (Line {}): {}", currentLine, line);
 				}
 			}
 			else {
+				if (currentSectionPath == "/") {
+					continue;
+				}
+
 				if (ParseParameter(line, currentSection)) {
 					sectionDirty = true;
 				}
 				else {
-					// TODO: Error handling
+					m_pImpl->logger.Error("Error parsing parameter (Line {}): {}", currentLine, line);
 				}
 			}
 		}
@@ -112,10 +119,16 @@ namespace Gaze::Config {
 		return true;
 	}
 
-	auto Parser::ParseSection(const std::string & sectionStr, std::string& outSectionPath) -> bool
+	auto Parser::ParseSection(const std::string& sectionStr, std::string& outSectionPath) -> bool
 	{
-		// TODO: Error handling (e.g. non-matching "[", "]")
-		outSectionPath = sectionStr.substr(1, sectionStr.find_first_of(']') - 1);
+		const auto closingBracket = sectionStr.find_first_of(']');
+
+		if (sectionStr.size() <= 2 || closingBracket == std::string::npos || closingBracket != sectionStr.size() - 1) {
+			m_pImpl->logger.Error("Invalid section path: {}", sectionStr);
+			return false;
+		}
+
+		outSectionPath = sectionStr.substr(1, closingBracket - 1);
 		m_pImpl->logger.Trace("Parsed section: {}", outSectionPath);
 
 		return true;
@@ -123,10 +136,14 @@ namespace Gaze::Config {
 
 	auto Parser::ParseParameter(const std::string& param, Section& outSection) -> bool
 	{
-		// TODO: Error handling
-
 		const auto eqIdx = param.find_first_of('=');
-		auto name = param.substr(0, eqIdx - 1);
+
+		if (eqIdx == std::string::npos || eqIdx == 0) {
+			m_pImpl->logger.Error("Invalid parameter definition: {}", param);
+			return false;
+		}
+
+		auto name = param.substr(0, eqIdx);
 		auto value = param.substr(eqIdx + 1, param.size() - eqIdx);
 
 		Trim(name);
@@ -136,7 +153,7 @@ namespace Gaze::Config {
 			Trim(value, "\"");
 		}
 
-		m_pImpl->logger.Trace("Parsed variable: {} = {}", name, value);
+		m_pImpl->logger.Trace("Parsed variable: {} = {}", name, value.empty() ? "<NULL>" : value);
 		outSection.Add(std::move(name), std::move(value));
 
 		return true;
