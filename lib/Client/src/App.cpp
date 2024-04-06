@@ -234,6 +234,10 @@ namespace Gaze::Client {
 			m_Logger.Info("New client connected. ID: {}", clientID);
 			OnClientConnected(clientID);
 		});
+		m_Server.OnClientDisconnected([this](auto clientID) {
+			m_Logger.Info("Client disconnected. ID: {}", clientID);
+			OnClientDisconnected(clientID);
+		});
 
 		auto timestep = 1.0 / 30.0;
 		auto frameBegin = steady_clock::now();

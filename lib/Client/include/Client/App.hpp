@@ -237,6 +237,13 @@ namespace Gaze::Client {
 		 */
 		virtual auto OnClientConnected(U32 /*clientID*/) -> void { }
 
+		/**
+		 * @brief Called when a client disconnects from the server
+		 *
+		 * @param clientID The ID of the client
+		 */
+		virtual auto OnClientDisconnected(U32 /*clientID*/) -> void { }
+
 	private:
 		Log::Logger m_Logger;
 		Net::Server m_Server;

@@ -28,6 +28,7 @@ private:
 	auto OnShutdown() -> Status override;
 	auto OnPacketReceived(U32 /*sender*/, Net::Packet /*packet*/) -> void override;
 	auto OnClientConnected(U32 clientID) -> void override;
+	auto OnClientDisconnected(U32 clientID) -> void override;
 
 	auto HandleCollision() -> void;
 	auto Reset() -> void;
@@ -35,6 +36,7 @@ private:
 private:
 	U32 m_P1ID = U32(-1);
 	U32 m_P2ID = U32(-1);
+	static constexpr auto kInvalidID = U32(-1);
 
 	glm::vec2 m_P1Pos;
 	glm::vec2 m_P1Dir;
@@ -128,12 +130,30 @@ auto PongServer::OnPacketReceived(U32 sender, Net::Packet packet) -> void
 
 auto PongServer::OnClientConnected(U32 clientID) -> void
 {
-	if (m_P1ID == U32(-1)) {
+	if (m_P1ID == kInvalidID) {
 		m_P1ID = clientID;
-	} else if (m_P2ID == U32(-1)) {
+	} else if (m_P2ID == kInvalidID) {
 		m_P2ID = clientID;
+	}
+
+	if (m_P1ID != kInvalidID && m_P2ID != kInvalidID) {
 		m_ArePlayersReady = true;
 		m_PlayersReadyTimestamp = std::chrono::steady_clock::now();
+	}
+}
+
+auto PongServer::OnClientDisconnected(U32 clientID) -> void
+{
+	if (clientID == m_P1ID) {
+		m_P1ID = kInvalidID;
+	}
+	if (clientID == m_P2ID) {
+		m_P2ID == kInvalidID;
+	}
+
+	if (m_P1ID == kInvalidID || m_P2ID == kInvalidID) {
+		Reset();
+		m_ArePlayersReady = false;
 	}
 }
 
@@ -189,6 +209,7 @@ auto PongServer::Reset() -> void
 	m_BallPos = { kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2 };
 
 	m_BallDir = glm::normalize(glm::vec2{ rand() - RAND_MAX, 0 });
+	m_HasGameStarted = false;
 }
 
 GAZE_REGISTER_APP(PongServer);

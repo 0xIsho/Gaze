@@ -11,6 +11,7 @@ namespace Gaze::Net {
 
 		PacketReceivedCallback cbPacketReceived = [](auto, auto) {};
 		ClientConnectedCallback cbClientConnected = [](auto) {};
+		ClientDisconnectedCallback cbClientDisconnected = [](auto) {};
 	};
 
 	Server::Server(std::string_view host /*= "0.0.0.0"*/, U16 port /*= 54321*/)
@@ -56,6 +57,8 @@ namespace Gaze::Net {
 					event.peer->address.port
 					);
 				event.peer->data = nullptr;
+				GAZE_ASSERT(m_pImpl->cbClientDisconnected, "NULL callback");
+				m_pImpl->cbClientDisconnected(event.peer->incomingPeerID);
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
 				GAZE_ASSERT(m_pImpl->cbPacketReceived, "NULL callback");
@@ -91,5 +94,9 @@ namespace Gaze::Net {
 	auto Server::OnClientConnected(ClientConnectedCallback callback) -> void
 	{
 		m_pImpl->cbClientConnected = std::move(callback);
+	}
+	auto Server::OnClientDisconnected(ClientDisconnectedCallback callback) -> void
+	{
+		m_pImpl->cbClientDisconnected = std::move(callback);
 	}
 }

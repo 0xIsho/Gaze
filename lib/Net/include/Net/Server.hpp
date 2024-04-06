@@ -14,6 +14,7 @@ namespace Gaze::Net {
 
 	public:
 		using ClientConnectedCallback = std::function<void(U32)>;
+		using ClientDisconnectedCallback = std::function<void(U32)>;
 
 	public:
 		Server(std::string_view host = "0.0.0.0", U16 port = 54321);
@@ -26,6 +27,8 @@ namespace Gaze::Net {
 
 		auto OnPacketReceived(PacketReceivedCallback callback) -> void;
 		auto OnClientConnected(ClientConnectedCallback callback) -> void;
+		auto OnClientDisconnected(ClientDisconnectedCallback callback) -> void;
+
 	private:
 		Impl* m_pImpl;
 	};
