@@ -176,7 +176,7 @@ auto MyApp::OnInit() -> Status
 	m_Rdr->SetClearColor(.1F, .1F, .1F, 1.F);
 
 	auto sceneLoader = IO::Loader::Scene();
-	if (sceneLoader.Load("assets/3d/scenes/default.obj")) {
+	if (sceneLoader.Load("Engine/Assets/3D/Scenes/Default.obj")) {
 		const auto whiteMat = GFX::Material{
 			{ 1.F, 1.F, 1.F },
 			{ .5F, .5F, .5F },
