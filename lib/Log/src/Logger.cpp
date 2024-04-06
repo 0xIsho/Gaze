@@ -43,6 +43,10 @@ namespace Gaze::Log {
 
 	Logger::~Logger()
 	{
+		if (m_pImpl == nullptr) {
+			return;
+		}
+
 		Flush();
 
 		delete m_pImpl;
