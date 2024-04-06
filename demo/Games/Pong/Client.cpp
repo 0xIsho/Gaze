@@ -59,6 +59,7 @@ private:
 	GFX::Mesh                  m_MidlineMesh;
 
 	ClientPacket               m_Packet = {};
+	bool                       m_IsPacketDirty = true;
 };
 
 MyApp::MyApp(int argc, char** argv)
@@ -103,6 +104,8 @@ auto MyApp::OnInit() -> Status
 			default:
 				break;
 			}
+
+			m_IsPacketDirty = true;
 		});
 
 		dispatcher.Dispatch<Events::KeyReleased>([this](auto& event) {
@@ -128,6 +131,8 @@ auto MyApp::OnInit() -> Status
 				default:
 					break;
 				}
+
+				m_IsPacketDirty = true;
 			}
 		});
 	});
@@ -147,7 +152,10 @@ auto MyApp::OnUpdate(F64 /*deltaTime*/) -> void
 	RenderPlayers();
 	RenderScoreboard();
 
-	Send(Net::Packet(reinterpret_cast<const void*>(&m_Packet), sizeof(ClientPacket)));
+	if (m_IsPacketDirty) {
+		Send(Net::Packet(reinterpret_cast<const void*>(&m_Packet), sizeof(ClientPacket)));
+		m_IsPacketDirty = false;
+	}
 
 	m_Rdr->Render();
 }
