@@ -7,7 +7,7 @@
 namespace Gaze::Net {
 	struct Server::Impl
 	{
-		ENetHost* host;
+		ENetHost* host = nullptr;
 
 		PacketReceivedCallback cbPacketReceived = [](auto, auto) {};
 		ClientConnectedCallback cbClientConnected = [](auto) {};
