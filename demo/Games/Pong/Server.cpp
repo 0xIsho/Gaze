@@ -148,7 +148,7 @@ auto PongServer::OnClientDisconnected(U32 clientID) -> void
 		m_P1ID = kInvalidID;
 	}
 	if (clientID == m_P2ID) {
-		m_P2ID == kInvalidID;
+		m_P2ID = kInvalidID;
 	}
 
 	if (m_P1ID == kInvalidID || m_P2ID == kInvalidID) {
