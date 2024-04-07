@@ -17,6 +17,7 @@
 #include "Type.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <cstring>
 
@@ -52,9 +53,9 @@ private:
 	glm::vec2                  m_BallPos;
 	glm::vec2                  m_BallDir;
 
-	GFX::Mesh                  m_PaddleMesh;
-	GFX::Mesh                  m_BallMesh;
-	GFX::Mesh                  m_MidlineMesh;
+	GFX::Object                m_Paddle;
+	GFX::Object                m_Ball;
+	GFX::Object                m_Midline;
 
 	ClientPacket               m_Packet = {};
 	bool                       m_IsPacketDirty = true;
@@ -67,12 +68,12 @@ MyApp::MyApp(int argc, char** argv)
 	, m_P1Pos(kDefaultPaddleOffsetX, kWinHeight / 2 - kPaddleSize.y / 2)
 	, m_P2Pos(kWinWidth - kPaddleSize.x - kDefaultPaddleOffsetX, kWinHeight / 2 - kPaddleSize.y / 2)
 	, m_BallPos(kWinWidth / 2 - kBallSize / 2, kWinHeight / 2 - kBallSize / 2)
-	, m_PaddleMesh(GFX::CreateQuad({ }, kPaddleSize.x, kPaddleSize.y))
-	, m_BallMesh(GFX::CreateQuad({ }, kBallSize, kBallSize))
-	, m_MidlineMesh(GFX::CreateLine({ kWinWidth / 2, .0F, .0F }, { kWinWidth / 2, kWinHeight, .0F }))
+	, m_Paddle(GFX::Primitives::CreateQuad({}, kPaddleSize.x, kPaddleSize.y))
+	, m_Ball(GFX::Primitives::CreateQuad({}, kBallSize, kBallSize))
+	, m_Midline(GFX::Primitives::CreateLine({ kWinWidth / 2, .0F, .0F }, { kWinWidth / 2, kWinHeight, .0F }))
 {
-	m_PaddleMesh.Rotate(glm::radians(-90.0F), { 1.0F, .0F, .0F });
-	m_BallMesh.Rotate(glm::radians(-90.0F), { 1.0F, .0F, .0F });
+	m_Paddle.Rotate(glm::radians(-90.0F), glm::vec3{ 1.0F, .0F, .0F });
+	m_Ball.Rotate(glm::radians(-90.0F), glm::vec3{ 1.0F, .0F, .0F });
 }
 
 auto MyApp::OnInit() -> Status
@@ -167,19 +168,19 @@ auto MyApp::OnShutdown() -> Status
 
 auto MyApp::RenderPlayground() -> void
 {
-	m_Rdr->DrawMesh(m_MidlineMesh, GFX::Renderer::PrimitiveMode::Lines);
+	m_Rdr->SubmitObject(m_Midline, GFX::Renderer::PrimitiveMode::Lines);
 }
 
 auto MyApp::RenderPlayers() -> void
 {
-	m_PaddleMesh.SetPosition({ m_P1Pos + kPaddleSize * .5F, 0.F });
-	m_Rdr->DrawMesh(m_PaddleMesh, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Paddle.SetPosition({ m_P1Pos + kPaddleSize * .5F, 0.0F });
+	m_Rdr->SubmitObject(m_Paddle, GFX::Renderer::PrimitiveMode::Triangles);
 
-	m_PaddleMesh.SetPosition({ m_P2Pos + kPaddleSize * .5F, 0.F });
-	m_Rdr->DrawMesh(m_PaddleMesh, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Paddle.SetPosition({ m_P2Pos + kPaddleSize * .5F, 0.0F });
+	m_Rdr->SubmitObject(m_Paddle, GFX::Renderer::PrimitiveMode::Triangles);
 
-	m_BallMesh.SetPosition({ m_BallPos + kBallSize / 2, 0.F });
-	m_Rdr->DrawMesh(m_BallMesh, GFX::Renderer::PrimitiveMode::Triangles);
+	m_Ball.SetPosition({ m_BallPos + kBallSize * .5F, 0.0F });
+	m_Rdr->SubmitObject(m_Ball, GFX::Renderer::PrimitiveMode::Triangles);
 }
 
 auto MyApp::OnPacketReceived(U32 /*sender*/, Net::Packet packet) -> void

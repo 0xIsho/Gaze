@@ -4,6 +4,7 @@
 
 #include "Geometry/Mesh.hpp"
 
+#include <glm/vec3.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
 
 namespace Gaze::GFX {
@@ -21,6 +22,10 @@ namespace Gaze::GFX {
 		Object(Geometry::Mesh mesh, Properties props);
 
 		[[nodiscard]] auto Mesh()          const noexcept -> const Geometry::Mesh&;
+
+		auto SetPosition(const glm::vec3& pos) -> void;
+		auto Rotate(float angleRadians, const glm::vec3& axis) -> void;
+
 		[[nodiscard]] auto GetProperties() const noexcept -> const Properties&;
 		[[nodiscard]] auto GetProperties()       noexcept -> Properties&;
 
