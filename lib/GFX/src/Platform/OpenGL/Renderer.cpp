@@ -70,7 +70,7 @@ namespace Gaze::GFX::Platform::OpenGL {
 			) {
 				auto logger = Log::Logger("Renderer");
 
-				constexpr char fmt[] = "OpenGL Message:\n  - Source: {}\n  - Type: {}\n  - Message: {}";
+				static constexpr char fmt[] = "OpenGL Message:\n  - Source: {}\n  - Type: {}\n  - Message: {}";
 
 				switch (severity) {
 				case GL_DEBUG_SEVERITY_NOTIFICATION:
