@@ -3,12 +3,10 @@
 
 #if defined(_WIN32)
 	#define GAZE_PLATFORM_WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#define _AMD64_
 	#if defined(_WIN64)
 		#define GAZE_PLATFORM_WIN64
 	#else
-		#error "x86 build are not supported!"
+		#error "x86 builds are not supported!"
 	#endif
 #elif defined(__APPLE__) || defined(__MACH__)
 	#define GAZE_PLATFORM_APPLE
