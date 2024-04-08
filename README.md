@@ -17,8 +17,9 @@ This repository hosts the sources of the *Gaze Interactive Experiences Engine*.
 
 Clone the repository:
 ```sh
-git clone https://gitlab.com/0xIsho/Gaze.git && cd Gaze
+git clone --recursive https://gitlab.com/0xIsho/Gaze.git && cd Gaze
 ```
+> If you've already cloned the repository without the `--recursive` flag. Run `git submodule init` then `git submodule update`
 
 Configure:
 ```sh

@@ -1,0 +1,3 @@
+[submodule "lib/Net/vendor/enet"]
+	path = lib/Net/vendor/enet
+	url = https://github.com/0xIsho/enet.git
