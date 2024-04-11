@@ -19,6 +19,6 @@ namespace Gaze::GFX {
 
 	auto Object::Rotate(float angleRadians, const glm::vec3& axis) -> void
 	{
-		m_Properties.transform *= glm::mat4_cast(glm::angleAxis(glm::radians(angleRadians), axis));
+		m_Properties.transform *= glm::mat4_cast(glm::angleAxis(angleRadians, axis));
 	}
 }
