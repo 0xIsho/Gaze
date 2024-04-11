@@ -1,10 +1,15 @@
 #include "Client/App.hpp"
 
+#include "Common.hpp"
+
 #include "WM/Window.hpp"
+
+#include "Input/KeyCode.hpp"
 
 #include "Events/Dispatcher.hpp"
 #include "Events/Event.hpp"
 #include "Events/WindowEvent.hpp"
+#include "Events/KeyEvent.hpp"
 
 #include "GFX/Renderer.hpp"
 #include "GFX/Object.hpp"
@@ -13,13 +18,9 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-using namespace Gaze;
+#include <cstring>
 
-static constexpr auto kWindowWidth        = 1200;
-static constexpr auto kWindowHeight       = 1024;
-static constexpr auto kPaddleWidth        = 100;
-static constexpr auto kPaddleHeight       = 10;
-static constexpr auto kPaddleBottomOffset = 50;
+using namespace Gaze;
 
 class BrickPopperClient : public Client::ClientApp
 {
@@ -41,12 +42,17 @@ private:
 
 	GFX::Object m_Paddle;
 	glm::vec2 m_PlayerPos;
+	glm::vec2 m_PlayerDir;
+
+	ClientPacket m_Packet;
+	bool m_bIsPacketDirty = false;
 };
 
 BrickPopperClient::BrickPopperClient(int argc, char** argv)
 	: ClientApp(argc, argv)
 	, m_Paddle(GFX::Primitives::CreateQuad({}, kPaddleWidth, kPaddleHeight))
 	, m_PlayerPos({ kWindowWidth / 2, kPaddleBottomOffset })
+	, m_Packet({})
 {
 	m_Paddle.Rotate(glm::radians(-90.0F), glm::vec3{ 1.0F, .0F, .0F });
 }
@@ -69,6 +75,39 @@ auto BrickPopperClient::OnInit() -> Status
 		dispatcher.Dispatch<Events::WindowClose>([this](auto& event) {
 			Quit();
 		});
+
+		dispatcher.Dispatch<Events::KeyPressed>([this](auto& event) {
+			switch (event.Keycode()) {
+			case Input::Key::kA:
+			case Input::Key::kLeft:
+				m_Packet.left = 1;
+				m_bIsPacketDirty = true;
+				break;
+			case Input::Key::kD:
+			case Input::Key::kRight:
+				m_Packet.right = 1;
+				m_bIsPacketDirty = true;
+				break;
+			default:
+				break;
+			}
+		});
+		dispatcher.Dispatch<Events::KeyReleased>([this](auto& event) {
+			switch (event.Keycode()) {
+			case Input::Key::kA:
+			case Input::Key::kLeft:
+				m_Packet.left = 0;
+				m_bIsPacketDirty = true;
+				break;
+			case Input::Key::kD:
+			case Input::Key::kRight:
+				m_Packet.right = 0;
+				m_bIsPacketDirty = true;
+				break;
+			default:
+				break;
+			}
+			});
 	});
 
 	m_Window->Show();
@@ -83,6 +122,11 @@ auto BrickPopperClient::OnUpdate(F64 deltaTime) -> void
 	RenderPlayers();
 
 	m_Renderer->Render();
+
+	if (m_bIsPacketDirty) {
+		Send(Net::Packet(reinterpret_cast<void*>(&m_Packet), sizeof(ClientPacket)));
+		m_bIsPacketDirty = false;
+	}
 }
 
 auto BrickPopperClient::RenderPlayers() -> void
@@ -103,7 +147,11 @@ auto BrickPopperClient::OnShutdown() -> Status
 
 auto BrickPopperClient::OnPacketReceived(U32 sender, Net::Packet packet) -> void
 {
+	auto serverPacket = ServerPacket();
+	std::memcpy(&serverPacket, packet.Data(), sizeof(ServerPacket));
 
+	m_PlayerPos = { serverPacket.playerPos[0], serverPacket.playerPos[1] };
+	m_PlayerDir = { serverPacket.playerDir[0], serverPacket.playerDir[1] };
 }
 
 GAZE_REGISTER_APP(BrickPopperClient);
