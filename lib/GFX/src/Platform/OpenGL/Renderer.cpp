@@ -1,5 +1,6 @@
 #include "GFX/Platform/OpenGL/Renderer.hpp"
 
+#include "GFX/Platform/OpenGL/Objects/Framebuffer.hpp"
 #include "GFX/Platform/OpenGL/Objects/IndexBuffer.hpp"
 #include "GFX/Platform/OpenGL/Objects/Object.hpp"
 #include "GFX/Platform/OpenGL/Objects/Shader.hpp"
@@ -104,12 +105,23 @@ namespace Gaze::GFX::Platform::OpenGL {
 		I32                     nLights;
 	};
 
+	struct ScreenQuadVertex
+	{
+		float x, y, z;
+		float u, v;
+	};
+
 	struct Renderer::Impl
 	{
 		Objects::VertexArray                 vertexArray;
+		Objects::VertexArray                 screenVA;
+		Objects::VertexBuffer                screenVB;
+		Objects::IndexBuffer                 screenIB;
 		Objects::ShaderProgram               program;
+		Objects::ShaderProgram               screenProgram;
 		Objects::VertexBuffer                vertexBuf;
 		Objects::IndexBuffer                 indexBuf;
+		Objects::Framebuffer                 framebuffer;
 		std::vector<BufferSection>           vertexBufSects;
 		std::vector<BufferSection>::iterator vertexBufSectsCursor;
 		std::vector<BufferSection>           indexBufSects;
@@ -130,8 +142,6 @@ namespace Gaze::GFX::Platform::OpenGL {
 		glfwMakeContextCurrent(static_cast<GLFWwindow*>(Window().Handle()));
 
 		gladLoadGL(static_cast<GLADloadfunc>(glfwGetProcAddress));
-
-		glEnable(GL_DEPTH_TEST);
 
 #ifndef NDEBUG
 		EnableDebugOutput();
@@ -218,16 +228,66 @@ namespace Gaze::GFX::Platform::OpenGL {
 			}
 		)";
 
+		const auto* screenQuadVertexSource = R"(
+			#version 330 core
+
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TextureCoords;
+
+			out vec2 TextureCoords;
+
+			void main()
+			{
+				gl_Position = vec4(a_Position.x, a_Position.y, 0.0, 1.0);
+				TextureCoords = a_TextureCoords;
+			}
+		)";
+
+		const auto* screenQuadFragmentSource = R"(
+			#version 330 core
+
+			out vec4 FragColor;
+
+			in vec2 TextureCoords;
+
+			uniform sampler2D screenTexture;
+
+			void main()
+			{
+				FragColor = texture(screenTexture, TextureCoords);
+			}
+		)";
+
 		auto vShader = Objects::Shader(Objects::Shader::Type::Vertex, vertexSource);
 		GAZE_ASSERT(vShader.Compile(), "Failed to compile Vertex shader");
 		auto fShader = Objects::Shader(Objects::Shader::Type::Fragment, fragmentSource);
 		GAZE_ASSERT(fShader.Compile(), "Failed to compile Fragment shader");
 
-		m_pImpl= new Impl({
+		auto screenVShader = Objects::Shader(Objects::Shader::Type::Vertex, screenQuadVertexSource);
+		GAZE_ASSERT(screenVShader.Compile(), "Failed to compile Screen Vertex shader");
+		auto screenFShader = Objects::Shader(Objects::Shader::Type::Fragment, screenQuadFragmentSource);
+		GAZE_ASSERT(screenFShader.Compile(), "Failed to compile Screen Fragment shader");
+
+		const ScreenQuadVertex screenQuadVertices[4] = {
+			{ -1.0F, -1.0F, 0.0F, 0.0F, 0.0F },
+			{  1.0F, -1.0F, 0.0F, 1.0F, 0.0F },
+			{ -1.0F,  1.0F, 0.0F, 0.0F, 1.0F },
+			{  1.0F,  1.0F, 0.0F, 1.0F, 1.0F },
+		};
+		const U32 screenQuadIndices[6] = {
+			0, 1, 2, 3
+		};
+
+		m_pImpl = new Impl({
 			.vertexArray          = {},
+			.screenVA             = {},
+			.screenVB             = Objects::VertexBuffer(screenQuadVertices, sizeof(screenQuadVertices), Objects::BufferUsage::StaticDraw),
+			.screenIB             = Objects::IndexBuffer(screenQuadIndices, sizeof(screenQuadIndices), Objects::BufferUsage::StaticDraw),
 			.program              = { &vShader, &fShader },
+			.screenProgram        = { &screenVShader, &screenFShader },
 			.vertexBuf            = Objects::VertexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
 			.indexBuf             = Objects::IndexBuffer(nullptr, kStaticBufferSize, Objects::BufferUsage::DynamicDraw),
+			.framebuffer          = { Window().Width(), Window().Height() },
 			.vertexBufSects       = {},
 			.vertexBufSectsCursor = {},
 			.indexBufSects        = {},
@@ -246,6 +306,9 @@ namespace Gaze::GFX::Platform::OpenGL {
 		});
 
 		GAZE_ASSERT(m_pImpl->program.Link(), "Failed to link shader program");
+		GAZE_ASSERT(m_pImpl->screenProgram.Link(), "Failed to link screen shader program");
+		m_pImpl->screenProgram.Use();
+		m_pImpl->screenProgram.UploadUniform1I("screenTexture", 0);
 
 		m_pImpl->vertexBufSects.resize(kStaticBufferSize / sizeof(BufferSection));
 		m_pImpl->vertexBufSectsCursor = m_pImpl->vertexBufSects.begin();
@@ -275,6 +338,31 @@ namespace Gaze::GFX::Platform::OpenGL {
 			Objects::VertexArray::Layout::BufferBinding(0),
 			Objects::VertexArray::Offset(0),
 			Objects::VertexArray::Stride(sizeof(Vertex))
+		);
+
+		m_pImpl->screenVA.Bind();
+		m_pImpl->screenVA.SetIndexBuffer(&m_pImpl->screenIB);
+		m_pImpl->screenVA.SetLayout({
+			{
+				Objects::VertexArray::Layout::BufferBinding(0),
+				Objects::VertexArray::Layout::ComponentCount(3),
+				Objects::VertexArray::Layout::DataType::Float,
+				Objects::VertexArray::Layout::Normalized(false),
+				Objects::VertexArray::Layout::RelativeOffset(offsetof(ScreenQuadVertex, x))
+			},
+			{
+				Objects::VertexArray::Layout::BufferBinding(0),
+				Objects::VertexArray::Layout::ComponentCount(2),
+				Objects::VertexArray::Layout::DataType::Float,
+				Objects::VertexArray::Layout::Normalized(false),
+				Objects::VertexArray::Layout::RelativeOffset(offsetof(ScreenQuadVertex, u))
+			}
+		});
+		m_pImpl->screenVA.BindVertexBuffer(
+			&m_pImpl->screenVB,
+			Objects::VertexArray::Layout::BufferBinding(0),
+			Objects::VertexArray::Offset(0),
+			Objects::VertexArray::Stride(sizeof(ScreenQuadVertex))
 		);
 
 		{
@@ -328,6 +416,10 @@ namespace Gaze::GFX::Platform::OpenGL {
 
 	auto Renderer::Flush() noexcept -> void
 	{
+		m_pImpl->framebuffer.Bind();
+		// TODO: This call might be out of place here...
+		Clear(Buffer(kColorBuffer | kDepthBuffer | kStencilBuffer));
+
 		m_pImpl->vertexArray.Bind();
 		m_pImpl->program.Use();
 
@@ -376,6 +468,14 @@ namespace Gaze::GFX::Platform::OpenGL {
 			);
 			m_pImpl->statsCurrent.nDrawCalls++;
 		}
+		Objects::Framebuffer::Unbind();
+		glDisable(GL_DEPTH_TEST);
+
+		m_pImpl->screenVA.Bind();
+		m_pImpl->screenProgram.Use();
+		glBindTextureUnit(0, m_pImpl->framebuffer.ColorAttachmentID());
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+		glEnable(GL_DEPTH_TEST);
 
 		m_pImpl->vertexBufSectsCursor = m_pImpl->vertexBufSects.begin();
 		m_pImpl->indexBufSectsCursor = m_pImpl->indexBufSects.begin();

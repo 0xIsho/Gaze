@@ -63,7 +63,7 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 			swap(*this, other);
 		}
 
-		~Object()
+		virtual ~Object()
 		{
 			T::Release(m_ID);
 		}
