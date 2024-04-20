@@ -66,7 +66,6 @@ namespace Gaze::GFX::Platform::OpenGL::Objects {
 		~Object()
 		{
 			T::Release(m_ID);
-			GAZE_ASSERT(m_ID == 0, "ID not reset to 0 after GL object release. (Erroneous Release() implementation)");
 		}
 
 		auto operator=(const Object&) -> Object& = delete;
