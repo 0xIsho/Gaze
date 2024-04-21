@@ -199,3 +199,8 @@ ctest --test-dir <build-path>
 | macOS    | ❌      |
 | Android  | ❌      |
 | iOS      | ❌      |
+
+# License
+
+This project, including all it's libraries under `lib/`, are licensed under the
+MIT license unless otherwise noted. See [LICENSE](LICENSE) for details.
