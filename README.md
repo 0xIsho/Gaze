@@ -19,24 +19,32 @@ This repository hosts the sources of the *Gaze Interactive Experiences Engine*.
 ---
 
 Windows doesn't have a set of standard(-ish) paths for development libraries,
-so we'll have to improvise! We have 2 options when it comes to setting up the
-required dependencies in a way that allows CMake to find them. Both options
-requires you to have the dependencies installed somewhere.
+so we'll have to improvise! We have 3 options when it comes to setting up the
+required dependencies in a way that allows CMake to find them. Options 1 & 2
+requires you to manually install each dependency.
 
 ### Option 1 (Manual)
+
+<details>
+<summary>Click to expand</summary>
 
 If you already have the dependencies installed and want to use those. Use the
 CMake GUI to specify the required paths.
 
 - Point the CMake GUI to the Engine's source directory
-- Specify the build/cache directory path (normally under `out/build` in the root of the repository, but you're free to choose a different path)
+- Specify the build/cache output path (normally under `out/build` in the root of the repository, but you're free to choose a different path)
 - Run the Configure step
 - You'll be presented with "Couldn't find library X" errors; but the cache will be populated with the variables
 - Set the required variables (include directories, library paths, etc.) of each of the dependencies to the appropriate paths
 - Rerun the Configure step
 - Build!
 
+</details>
+
 ### Option 2 (Automated (Kinda))
+
+<details>
+<summary>Click to expand</summary>
 
 Install all of the dependencies under a common prefix and point CMake at said
 prefix. It will automatically figure out the rest.
@@ -94,6 +102,35 @@ The setup is as follows:
 
 ```
 - Head over to the build section!
+
+</details>
+
+### Option 3 (Automated)
+
+<details>
+<summary>Click to expand</summary>
+
+Use [vcpkg](https://vcpkg.io). If you have vcpkg installed (or want to install
+and use it), go ahead, it's fully supported!
+
+vcpkg downloads and makes available to CMake all the dependencies automatically.
+Simply set the environment variable ([How?](https://superuser.com/a/284351))
+`VCPKG_ROOT` to the root of your vcpkg installation. For example if you have
+installed it along with Visual Studio using the Installer, the path might look
+like the following:
+```
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\vcpkg
+```
+> Make sure to restart Visual Studio (if you had it running) after modifying
+environment variables for the changes to take effect.
+
+#### I Don't Know Where I Have It Installed
+
+If you can run the `vcpkg` command in the console but you don't know where the
+.exe is, simply execute the following Powershell command: `where.exe vcpkg`.
+
+
+</details>
 
 ---
 </details>

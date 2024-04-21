@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "assimp",
+    "bullet3",
+    "catch2",
+    "glfw3",
+    "glm",
+    "spdlog"
+  ]
+}
