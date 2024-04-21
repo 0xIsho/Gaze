@@ -150,7 +150,7 @@ git clone --recursive https://gitlab.com/0xIsho/Gaze.git
 
 - Open the Engine's repository in Visual Studio 2022 (Use `Open Folder` *NOT* `Open Project`!)
 - Configure the project by selecting `Project > Configure Gaze` and wait for the Configuration step to finish
-- Click the Configurations drop-down (found in the toolbar right below the top menu-bar) and select `Windows Release (Local Config)`
+- Click the Configurations drop-down (found in the toolbar right below the top menu-bar) and select `Windows x64 Release`
 - Build the project by selecting `Build > Build All` (or simply press `Ctrl+Shift+B`)
 - Run the tests (if you have them enabled; they are by default) by selecting `Test > Run CTests for Gaze` from the menu-bar
 - Build a game :)
