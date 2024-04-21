@@ -95,7 +95,6 @@ namespace Gaze::WM {
 
 	private:
 		GLFWwindow* m_Handle = nullptr;
-		std::string m_Title;
 		int         m_Width = 0;
 		int         m_Height = 0;
 

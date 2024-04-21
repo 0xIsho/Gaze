@@ -45,7 +45,8 @@
 				"rhs": "Windows"
 			},
 			"cacheVariables": {
-				"CMAKE_DEBUG_POSTFIX": "d"
+				"CMAKE_DEBUG_POSTFIX": "d",
+				"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
 			},
 			"architecture": {
 				"value": "x64",

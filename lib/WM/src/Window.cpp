@@ -14,8 +14,7 @@
 
 namespace Gaze::WM {
 	Window::Window(std::string_view title, int width, int height)
-		: m_Title(title.empty() ? "Gaze" : title)
-		, m_Width(width <= 0 ? 800 : width)
+		: m_Width(width <= 0 ? 800 : width)
 		, m_Height(height <= 0 ? 600 : height)
 	{
 		GAZE_ASSERT(!title.empty(), "Title was empty.");
@@ -23,7 +22,7 @@ namespace Gaze::WM {
 		GAZE_ASSERT(height > 0, "Window height must be positive.");
 		GAZE_ASSERT(WM::IsInitialized(), "The Window Manager must be initialized before a window can be created.");
 
-		m_Handle = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
+		m_Handle = glfwCreateWindow(m_Width, m_Height, title.empty() ? "Gaze" : title.data(), nullptr, nullptr);
 		if (m_Handle == nullptr) {
 			throw std::runtime_error("Failed to create a window.");
 		}
@@ -89,7 +88,6 @@ namespace Gaze::WM {
 
 	Window::Window(Window&& other) noexcept
 		: m_Handle(std::exchange(other.m_Handle, nullptr))
-		, m_Title(std::exchange(other.m_Title, std::string()))
 		, m_Width(std::exchange(other.m_Width, 0))
 		, m_Height(std::exchange(other.m_Height, 0))
 	{
@@ -99,7 +97,6 @@ namespace Gaze::WM {
 	{
 		if (this != &other) {
 			std::swap(m_Handle, other.m_Handle);
-			std::swap(m_Title, other.m_Title);
 			std::swap(m_Width, other.m_Width);
 			std::swap(m_Height, other.m_Height);
 		}
