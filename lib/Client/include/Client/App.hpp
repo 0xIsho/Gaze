@@ -14,16 +14,23 @@ namespace Gaze::Client {
 	/**
 	 * @brief The main application
 	 *
-	 * This class is the main entry point for the client application. It
-	 * initializes the engine and runs the client application.
+	 * This class is the main entry point for the client application.
+	 * It handles the main event loop, timers, callback dispatch, etc.
+	 *
+	 * Client applications should *not* inherit from this class directly.
+	 * Use either @ref ClientApp for network clients and @ref ServerApp
+	 * for network servers.
 	 */
 	class App
 	{
 	public:
+		/**
+		 * @brief Possible return values from functions
+		 */
 		enum class Status
 		{
-			Success = 0,
-			Fail
+			Success, /**< Operation was successful */
+			Fail     /**< Operation resulted in an error */
 		};
 
 	public:
@@ -138,15 +145,16 @@ namespace Gaze::Client {
 		bool m_IsRunning = false;
 
 	private:
-		Log::Logger m_Logger;
-		Log::Logger m_ClientLogger;
+		Log::Logger m_Logger;       /**< Engine Logger. Engine-side logging should be done through this */
+		Log::Logger m_ClientLogger; /**< Client Logger. Do not use this on the engine side. Reserved for the client/user */
 	};
 
 	/**
 	 * @brief The client application
 	 *
-	 * This class is the main entry point for the client application. It
-	 * initializes the engine and runs the client application.
+	 * This class is the main entry point for the network client application.
+	 *
+	 * Extend this for network clients.
 	 */
 	class ClientApp : public App
 	{
@@ -180,15 +188,16 @@ namespace Gaze::Client {
 		auto Send(Net::Packet packet, U8 channel = 0) -> bool;
 
 	private:
-		Net::Client m_Client;
-		Log::Logger m_Logger;
+		Net::Client m_Client; /**< Network client. Responsible for remote server connections */
+		Log::Logger m_Logger; /**< Engine Logger. Responsible for network client-specific logging */
 	};
 
 	/**
 	 * @brief The server application
 	 *
-	 * This class is the main entry point for the server application. It
-	 * initializes the engine and runs the server application.
+	 * This class is the main entry point for the server application.
+	 *
+	 * Extend this for network servers
 	 */
 	class ServerApp : public App
 	{
@@ -245,8 +254,8 @@ namespace Gaze::Client {
 		virtual auto OnClientDisconnected(U32 /*clientID*/) -> void { }
 
 	private:
-		Log::Logger m_Logger;
-		Net::Server m_Server;
+		Net::Server m_Server; /**< Network server. Resposible for handling remote peers */
+		Log::Logger m_Logger; /**< Engine Logger. Resposible for server-specific logging */
 	};
 
 	/**
