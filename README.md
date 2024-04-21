@@ -190,6 +190,12 @@ ctest --test-dir <build-path>
 
 > If tests fail in a clean checkout (non-modified copy) of the repository, please file a bug report!
 
+## Chat & Support
+
+Please use the project's issue tracker on GitLab for reporting bugs and
+submitting feature requests. Real-time chat is available on the `#gaze` IRC
+channel available on the [Libera Chat](https://libera.chat/) network.
+
 ## Supported Platforms
 
 | Platform | Support |
