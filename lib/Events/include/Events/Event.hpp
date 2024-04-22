@@ -3,15 +3,20 @@
 #include <string>
 #include <format>
 
-namespace Gaze::Events
-{
+namespace Gaze::Events {
 #define GAZE_REGISTER_EVENT(type) \
 	static constexpr auto kEventType = Type::type; \
 	auto GetType() const noexcept -> Type override { return Type::type; }
 
+	/**
+	 * @brief Base class for all events.
+	 */
 	class Event
 	{
 	public:
+		/**
+		 * @brief Event type.
+		 */
 		enum class Type
 		{
 			Generic,
@@ -27,14 +32,26 @@ namespace Gaze::Events
 			KeyReleased
 		};
 
+		/**
+		 * @brief Default event type.
+		 */
 		static constexpr auto kEventType = Type::Generic;
 
 	public:
 		virtual ~Event() = default;
 
-		[[nodiscard]] auto Handled()              const noexcept -> bool { return m_Handled; }
-		              auto SetHandled(bool value)       noexcept -> void { m_Handled = value; }
-		virtual       auto GetType()              const noexcept -> Type { return Type::Generic; }
+		/**
+		 * @brief Returns true if the event has been handled.
+		 */
+		[[nodiscard]] auto Handled() const noexcept -> bool { return m_Handled; }
+		/**
+		 * @brief Sets the event as handled.
+		 */
+		auto SetHandled(bool value) noexcept -> void { m_Handled = value; }
+		/**
+		 * @brief Returns the event type.
+		 */
+		virtual auto GetType() const noexcept -> Type { return Type::Generic; }
 
 	private:
 		bool m_Handled = false;
@@ -42,6 +59,9 @@ namespace Gaze::Events
 }
 
 namespace Gaze {
+	/**
+	 * @brief Returns the string representation of the event type.
+	 */
 	[[nodiscard]]
 	inline auto ToString(Events::Event::Type type) -> std::string
 	{
@@ -60,6 +80,9 @@ namespace Gaze {
 		return "Unknown";
 	}
 
+	/**
+	 * @brief Returns the string representation of the event.
+	 */
 	[[nodiscard]]
 	inline auto ToString(const Events::Event& event) -> std::string
 	{
