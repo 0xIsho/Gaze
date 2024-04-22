@@ -1,8 +1,8 @@
-<center>
+<div align="center">
 
 [Getting Started][getting-started] | [Wiki][wiki]
 
-</center>
+</div>
 
 # Gaze Engine
 
