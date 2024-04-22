@@ -65,7 +65,7 @@ namespace Gaze {
 	 * @brief POD wrapper
 	 *
 	 * This template is meant to disambiguate function parameters and disable
-	 * implicit conversion for said type.
+	 * implicit conversions for said type.
 	 *
 	 * An example use can be found in the OpenGL's Vertex Array implementation
 	 * in `GFX/Platform/OpenGL/Objects/VertexArray.hpp`.
