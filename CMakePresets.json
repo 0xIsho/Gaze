@@ -2,48 +2,16 @@
 	"version": 3,
 	"configurePresets": [
 		{
-			"name": "linux-base",
-			"hidden": true,
-			"generator": "Ninja",
-			"binaryDir": "${sourceDir}/out/build/default",
-			"installDir": "${sourceDir}/out/install/default",
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Linux"
-			}
-		},
-		{
-			"name": "linux-debug",
-			"displayName": "Linux x64 Debug",
-			"inherits": "linux-base",
-			"binaryDir": "${sourceDir}/out/build/debug",
-			"installDir": "${sourceDir}/out/install/debug",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Debug"
-			}
-		},
-		{
-			"name": "linux-release",
-			"displayName": "Linux x64 Release",
-			"inherits": "linux-base",
-			"binaryDir": "${sourceDir}/out/build/release",
-			"installDir": "${sourceDir}/out/install/release",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Release"
-			}
-		},
-		{
-			"name": "windows-base",
+			"name": "base-generic",
 			"hidden": true,
 			"generator": "Ninja",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
-			"installDir": "${sourceDir}/out/install/${presetName}",
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Windows"
-			},
+			"installDir": "${sourceDir}/out/install/${presetName}"
+		},
+		{
+			"name": "base-windows",
+			"hidden": true,
+			"inherits": "base-generic",
 			"cacheVariables": {
 				"CMAKE_DEBUG_POSTFIX": "d",
 				"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
@@ -54,20 +22,56 @@
 			}
 		},
 		{
-			"name": "windows-debug",
-			"displayName": "Windows x64 Debug",
-			"inherits": "windows-base",
+			"name": "debug",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug"
 			}
 		},
 		{
-			"name": "windows-release",
-			"displayName": "Windows x64 Release",
-			"inherits": "windows-base",
+			"name": "release",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release"
 			}
+		},
+		{
+			"name": "windows-only",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "linux-only",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "windows-debug",
+			"displayName": "Windows x64 Debug",
+			"inherits": [ "base-windows", "debug", "windows-only" ]
+		},
+		{
+			"name": "windows-release",
+			"displayName": "Windows x64 Release",
+			"inherits": [ "base-windows", "release", "windows-only" ]
+		},
+		{
+			"name": "linux-debug",
+			"displayName": "Linux x64 Debug",
+			"inherits": [ "base-generic", "debug", "linux-only" ]
+		},
+		{
+			"name": "linux-release",
+			"displayName": "Linux x64 Release",
+			"inherits": [ "base-generic", "release", "linux-only" ]
 		}
 	]
 }
