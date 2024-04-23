@@ -105,7 +105,7 @@ namespace Gaze::GFX {
 		 * @param aspect The aspect ratio.
 		 * @param zNear The near clipping plane.
 		 * @param zFar The far clipping plane.
-		 *//
+		 */
 		PerspectiveCamera(float fovRadians, float aspect, float zNear, float zFar) noexcept;
 
 		/**
@@ -137,7 +137,7 @@ namespace Gaze::GFX {
 		 * @param top The top clipping plane.
 		 * @param zNear The near clipping plane.
 		 * @param zFar The far clipping plane.
-		 *//
+		 */
 		OrthographicCamera(float left, float right, float bottom, float top, float zNear, float zFar) noexcept;
 
 		/**
