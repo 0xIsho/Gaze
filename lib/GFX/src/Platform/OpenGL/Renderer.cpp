@@ -411,15 +411,16 @@ namespace Gaze::GFX::Platform::OpenGL {
 			bufferBits |= GL_STENCIL_BUFFER_BIT;
 		}
 
+		m_pImpl->framebuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		Objects::Framebuffer::Unbind();
 		glClear(bufferBits);
 	}
 
 	auto Renderer::Flush() noexcept -> void
 	{
 		m_pImpl->framebuffer.Bind();
-		// TODO: This call might be out of place here...
-		Clear(Buffer(kColorBuffer | kDepthBuffer | kStencilBuffer));
-
 		m_pImpl->vertexArray.Bind();
 		m_pImpl->program.Use();
 
@@ -584,6 +585,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 					offset = last->offset + last->size;
 				}
 
+				if (offset > m_pImpl->vertexBufSects.size()) {
+					Flush();
+					offset = 0;
+				}
+
 				auto sect = BufferSection{
 					offset,
 					I32(prim.vertices.size() * mesh.kVertexSize),
@@ -615,6 +621,11 @@ namespace Gaze::GFX::Platform::OpenGL {
 				if (m_pImpl->indexBufSectsCursor != m_pImpl->indexBufSects.begin()) {
 					const auto& last = m_pImpl->indexBufSectsCursor - 1;
 					offset = last->offset + last->size;
+				}
+
+				if (offset > m_pImpl->vertexBufSects.size()) {
+					Flush();
+					offset = 0;
 				}
 
 				auto sect = BufferSection{
