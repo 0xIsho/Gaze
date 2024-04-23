@@ -21,6 +21,7 @@ namespace Gaze::IO::Loader {
 			const auto* mesh = scene->mMeshes[node->mMeshes[i]];
 
 			auto vertices = std::vector<Geometry::Vertex>();
+			vertices.reserve(mesh->mNumVertices);
 			for (auto j = 0U; j < mesh->mNumVertices; ++j) {
 				auto vertex = Geometry::Vertex {
 					.x = mesh->mVertices[j].x,
@@ -40,8 +41,9 @@ namespace Gaze::IO::Loader {
 			}
 
 			auto indices = std::vector<Geometry::Index>();
+			indices.reserve(size_t(mesh->mNumFaces) * 3);
 			for (auto j = 0U; j < mesh->mNumFaces; ++j) {
-				const auto face = mesh->mFaces[j];
+				const auto& face = mesh->mFaces[j];
 				std::copy(face.mIndices, face.mIndices + face.mNumIndices, std::back_inserter(indices));
 			}
 
